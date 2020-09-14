@@ -13,8 +13,6 @@
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Models\Responses\" />
     <Folder Include="Models\Requests\" />
   </ItemGroup>
 </Project>

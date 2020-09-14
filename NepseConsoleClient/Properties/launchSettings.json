@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NepseConsoleClient": {
+      "commandName": "Project",
+      "commandLineArgs": "https://tms49.nepsetms.com.np/ SS482167 Pass!@#$5word"
+    }
+  }
+}

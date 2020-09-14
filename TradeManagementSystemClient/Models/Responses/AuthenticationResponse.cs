@@ -15,7 +15,7 @@ namespace TradeManagementSystemClient.Models.Responses
         public string Message { get; set; }
 
         [JsonProperty("data")]
-        public object Data { get; set; }
+        public AuthenticationDataResponse Data { get; set; }
 
         public AuthenticationResponse()
         {

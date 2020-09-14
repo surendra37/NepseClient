@@ -39,8 +39,10 @@ namespace NepseConsoleClient
                 var businessDate = client.GetBusinessDate();
                 Log.Debug("Business Date: {0}", businessDate);
 
+                client.RestoreSession();
                 var demo = new TmsDemo(client);
                 demo.Run(username, password);
+                client.SaveSession();
             }
             catch (Exception ex)
             {

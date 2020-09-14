@@ -25,6 +25,16 @@ namespace TradeManagementSystemClient
             _client.UseNewtonsoftJson();
         }
 
+        #region UnAuthorized Access
+        public string GetBusinessDate()
+        {
+            var request = new RestRequest("/tmsapi/dashboard/businessDate");
+            var response = _client.Get<string>(request);
+            return response.Data;
+        }
+        #endregion
+
+        #region Session
         public void SaveSession()
         {
             var serialized = JsonConvert.SerializeObject(_session);
@@ -46,6 +56,16 @@ namespace TradeManagementSystemClient
 
         public void Logout()
         {
+            var request = new RestRequest("/tmsapi/authenticate/logout");
+            try
+            {
+                var response = _client.Post(request);
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex, "Failed to logout");
+            }
+
             if (!File.Exists(_sessionFilePath))
                 return;
 
@@ -55,42 +75,87 @@ namespace TradeManagementSystemClient
             _client.Authenticator = null;
         }
 
-        public string GetBusinessDate()
-        {
-            var request = new RestRequest("/tmsapi/dashboard/businessDate");
-            var response = _client.Get<string>(request);
-            return response.Data;
-        }
-
         public void Authenticate(string username, string password)
         {
             Log.Debug("Authenticating...");
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(new AuthenticationRequest(username, password));
+            _client.Authenticator = null;
             var response = _client.Post<AuthenticationResponse>(request);
             if (!response.IsSuccessful)
             {
                 throw new Exception(response.Content);
             }
-            Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
-            // {Set-Cookie=XSRF-TOKEN=9c361ef0-5397-4762-ab97-0def566a627e; Version=1; Path=/; Domain=; Max-Age=4200, accessToken=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3MTYyMCIsImlhdCI6MTYwMDA3NjIxMiwic3ViIjoiQ1MtQTJDQTFVREEzUixPTS1DVVIsU1NJLUEyQ0ExVURBM1IsTUFELVIsTEYtQTJDQTFVREEzUixTVExCSS1DVVIsV1MtUixHTC1SLFRCLUNVUixTUS1SLEROQVMtUixHUkFQSC1SLE1XLVIsUEYtQTJDQTFVREEzUixNV0RDLVIsT0ItQTJDQTFVREEzUixESC1DVVIsT0JILVIsVFItQ1VSLEZNLUEyQ0ExVURBM1IsTUlORk8tUixDRC1SLFNCSS1BMkNBMVVEQTNSLENGVC1BMkNBMVVEQTNSLEZXLUEyQ0ExVURBM1IsV1MtQTJDQTFVREEzUixBUy1SLE1MTldTLVIsTUwtUixNTEVNLVIsU0ktUixDTFRTLVIsTUNPRS1BMkNBMVVEQTNSLEROQUwtUixUQkgtUixCUy1SLENDTS1BMkNBMVVEQTNSIiwiaXNzIjoiU1M0ODIxNjciLCJleHAiOjE2MDAxMDYyMTIsImlzQ2xpZW50IjoiMSIsImlzTWVtYmVyIjoiMCIsImlzRGVhbGVyIjoiMCJ9.Qe42EDhpQk8Vc03xoSV1ZWNvYpaE5a0HlayZSvu5OVY; Version=1; Path=/; Domain=; Secure; HttpOnly; Max-Age=4200, refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3MTYyMCIsImlhdCI6MTYwMDA3NjIxMiwic3ViIjoiQ1MtQTJDQTFVREEzUixPTS1DVVIsU1NJLUEyQ0ExVURBM1IsTUFELVIsTEYtQTJDQTFV…
-            var cookies = response.Headers.FirstOrDefault();
+            if (response.Data.Data.IsCookieEnabled)
+            {
+                var cookies = response.Headers.FirstOrDefault(x => x.Name.Equals("Set-Cookie"));
+                if (cookies is null)
+                {
+                    throw new Exception("Cookies Not Found");
+                }
+                var parts = cookies.Value.ToString().Split(',');
+                _session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
+            }
+            else
+            {
+                _session = GetSessionInfo(null, response.Data.Data);
+            }
 
-            ////_session = new SessionInfo
-            //{
-            //    AccessToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3MTYyMCIsImlhdCI6MTYwMDA3MzI2Miwic3ViIjoiQ1MtVUEyUkExQ0RBMyxPTS1VUkMsU1NJLVVBMlJBMUNEQTMsTUFELVIsTEYtVUEyUkExQ0RBMyxTVExCSS1VUkMsV1MtUixHTC1SLFRCLVVSQyxTUS1SLEROQVMtUixHUkFQSC1SLE1XLVIsUEYtVUEyUkExQ0RBMyxNV0RDLVIsT0ItVUEyUkExQ0RBMyxESC1VUkMsT0JILVIsVFItVVJDLEZNLVVBMlJBMUNEQTMsTUlORk8tUixDRC1SLFNCSS1VQTJSQTFDREEzLENGVC1VQTJSQTFDREEzLEZXLVVBMlJBMUNEQTMsV1MtVUEyUkExQ0RBMyxBUy1SLE1MTldTLVIsTUwtUixNTEVNLVIsU0ktUixDTFRTLVIsTUNPRS1VQTJSQTFDREEzLEROQUwtUixUQkgtUixCUy1SLENDTS1VQTJSQTFDREEzIiwiaXNzIjoiU1M0ODIxNjciLCJleHAiOjE2MDAxMDMyNjIsImlzQ2xpZW50IjoiMSIsImlzTWVtYmVyIjoiMCIsImlzRGVhbGVyIjoiMCJ9._fb3OtlXmdcMcduerBwXwhbRfHA9stRV9fY_WUZatDg",
-            //    RefreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3MTYyMCIsImlhdCI6MTYwMDA3MzI2Miwic3ViIjoiQ1MtVUEyUkExQ0RBMyxPTS1VUkMsU1NJLVVBMlJBMUNEQTMsTUFELVIsTEYtVUEyUkExQ0RBMyxTVExCSS1VUkMsV1MtUixHTC1SLFRCLVVSQyxTUS1SLEROQVMtUixHUkFQSC1SLE1XLVIsUEYtVUEyUkExQ0RBMyxNV0RDLVIsT0ItVUEyUkExQ0RBMyxESC1VUkMsT0JILVIsVFItVVJDLEZNLVVBMlJBMUNEQTMsTUlORk8tUixDRC1SLFNCSS1VQTJSQTFDREEzLENGVC1VQTJSQTFDREEzLEZXLVVBMlJBMUNEQTMsV1MtVUEyUkExQ0RBMyxBUy1SLE1MTldTLVIsTUwtUixNTEVNLVIsU0ktUixDTFRTLVIsTUNPRS1VQTJSQTFDREEzLEROQUwtUixUQkgtUixCUy1SLENDTS1VQTJSQTFDREEzIiwiaXNzIjoiU1M0ODIxNjciLCJleHAiOjE2MDAwNzY4NjIsImlzQ2xpZW50IjoiMSIsImlzTWVtYmVyIjoiMCIsImlzRGVhbGVyIjoiMCJ9.cYxJY4tRM3mgX_aZcGIIvyfnQePCTrtIcWBcW2LyBhA",
-            //   XsrfToken = "47177bf0-970b-4c4e-a095-bc54ee5827bc",
-            //   ClientId = "1979933",
-            //    LastUpdated = DateTime.Now,
-            // };
+            _client.Authenticator = new TmsAuthenticator(_session);
+            Log.Debug("Authentication Complete");
+            Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
         }
+        #endregion
 
         public IEnumerable<IScripResponse> GetMyPortfolio()
         {
             var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{_session.ClientId}/CLI");
+            _client.Authenticator = new TmsAuthenticator(_session);
             var response = _client.Get<List<ScripResponse>>(request);
             return response.Data;
         }
+
+        #region Helpers
+        private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
+        {
+            var session = new SessionInfo
+            {
+                XsrfToken = string.Empty,
+                RefreshToken = string.Empty,
+                AccessToken = string.Empty,
+                LastUpdated = DateTime.Now,
+                ClientId = authData.ClientDealerMember.Client.Id,
+                CookieEnabled = authData.IsCookieEnabled,
+                JsonWebToken = authData.JsonWebToken,
+            };
+
+            if (string.IsNullOrEmpty(cookie))
+                return session;
+
+            var parts = cookie.Split(',');
+            foreach (var part in parts)
+            {
+                var innerParts = part.Split(';');
+                var firstParts = innerParts[0].Split('=');
+                var key = firstParts[0].Trim();
+                var value = firstParts[1];
+                switch (key)
+                {
+                    case "XSRF-TOKEN":
+                        session.XsrfToken = value;
+                        break;
+                    case "accessToken":
+                        session.AccessToken = value;
+                        break;
+                    case "refreshToken":
+                        session.RefreshToken = value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return session;
+        }
+        #endregion
     }
 }

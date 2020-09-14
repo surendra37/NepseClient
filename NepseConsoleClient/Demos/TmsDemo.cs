@@ -28,6 +28,7 @@ namespace NepseConsoleClient.Demos
                 table.AddRow(demo.Key, demo.Value.Description);
             }
             table.AddRow("Q/q", "Exit");
+            
             while (true)
             {
                 table.Write(Format.Minimal);
@@ -35,14 +36,15 @@ namespace NepseConsoleClient.Demos
                 {
                     Console.Write("Your Selection: ");
                     var selection = Console.ReadLine();
+                    // Handle exit condition
                     if (selection.Equals("q", StringComparison.OrdinalIgnoreCase))
                     {
                         return;
                     }
-
                     if (!demos.ContainsKey(selection))
                     {
                         Log.Warning("Invalid Selection.");
+                        continue;
                     }
                     try
                     {
@@ -64,21 +66,14 @@ namespace NepseConsoleClient.Demos
             {
                 new DemoBase
                 {
-                    Id = "0",
-                    Description = "Restore Session",
-                    Command = _client.RestoreSession,
-                },
-                new DemoBase
-                {
-                    Id = "1",
-                    Description = "Save Session",
-                    Command = _client.SaveSession,
-                },
-                new DemoBase
-                {
-                    Id = "2",
+                    Id = "a",
                     Description = "Authenticate",
                     Command = () => _client.Authenticate(username, password)
+                },new DemoBase
+                {
+                    Id = "l",
+                    Description = "Log out",
+                    Command = _client.Logout
                 },
                 new DemoBase
                 {
@@ -87,7 +82,7 @@ namespace NepseConsoleClient.Demos
                     Command  = () =>
                     {
                         var portfolio = _client.GetMyPortfolio();
-                        ConsoleTables.ConsoleTable.From(portfolio)
+                        ConsoleTable.From(portfolio)
                         .Write();
                     }
                 },

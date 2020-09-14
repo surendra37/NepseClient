@@ -8,5 +8,6 @@ namespace NepseClient.Commons
 
         void SaveSession();
         void RestoreSession();
+        void Logout();
     }
 }

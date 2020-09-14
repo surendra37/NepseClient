@@ -15,10 +15,18 @@ namespace TradeManagementSystemClient
 
         public void Authenticate(IRestClient client, IRestRequest request)
         {
-            request.AddHeader("X-XSRF-TOKEN", _session.XsrfToken);
-            request.AddCookie("accessToken", _session.AccessToken);
-            request.AddCookie("refreshToken", _session.RefreshToken);
-            request.AddCookie("XSRF-TOKEN", _session.XsrfToken);
+            if (_session.CookieEnabled)
+            {
+                request.AddHeader("X-XSRF-TOKEN", _session.XsrfToken);
+                request.AddCookie("accessToken", _session.AccessToken);
+                request.AddCookie("refreshToken", _session.RefreshToken);
+                request.AddCookie("XSRF-TOKEN", _session.XsrfToken);
+            }
+            else
+            {
+                request.AddHeader("Authorization", $"Bearer {_session.JsonWebToken}");
+            }
+
         }
     }
 }
