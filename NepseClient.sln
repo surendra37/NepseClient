@@ -1,0 +1,35 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseConsoleClient", "NepseConsoleClient\NepseConsoleClient.csproj", "{1553D2C4-FE47-44F8-A225-9148F6343730}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeManagementSystemClient", "TradeManagementSystemClient\TradeManagementSystemClient.csproj", "{C24F418B-DB14-45F0-8176-E825CF5064EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseClient.Commons", "NepseClient.Commons\NepseClient.Commons.csproj", "{456F3585-A2DF-48C3-965D-69D33353D222}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_lib", "_lib", "{177EC4C8-1907-43FE-8DED-8A9A39E32B80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1553D2C4-FE47-44F8-A225-9148F6343730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1553D2C4-FE47-44F8-A225-9148F6343730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1553D2C4-FE47-44F8-A225-9148F6343730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1553D2C4-FE47-44F8-A225-9148F6343730}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{456F3585-A2DF-48C3-965D-69D33353D222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{456F3585-A2DF-48C3-965D-69D33353D222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{456F3585-A2DF-48C3-965D-69D33353D222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{456F3585-A2DF-48C3-965D-69D33353D222}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{456F3585-A2DF-48C3-965D-69D33353D222} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+		{C24F418B-DB14-45F0-8176-E825CF5064EC} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+	EndGlobalSection
+EndGlobal
