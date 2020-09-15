@@ -1,0 +1,28 @@
+﻿<Window x:Class="NepseApp.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding Title}" Height="480" Width="640" 
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="10"
+        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="160"/>
+            <ColumnDefinition Width="2" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <mde:SideNavigation Grid.Column="0" Items="{Binding Path=NavigationItems, Mode=OneTime}"
+                    NavigationItemSelected="NavigationItemSelectedHandler"/>
+
+        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>
+
+        <ContentControl Grid.Column="2" prism:RegionManager.RegionName="ContentRegion" />
+    </Grid>
+</Window>

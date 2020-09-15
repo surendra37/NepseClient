@@ -10,6 +10,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 
 namespace TradeManagementSystemClient
 {
@@ -22,6 +23,7 @@ namespace TradeManagementSystemClient
         public TmsClient(string baseUrl)
         {
             _client = new RestClient(baseUrl);
+            _client.ThrowOnAnyError = true;
             _client.UseNewtonsoftJson();
         }
 
@@ -84,7 +86,7 @@ namespace TradeManagementSystemClient
             var response = _client.Post<AuthenticationResponse>(request);
             if (!response.IsSuccessful)
             {
-                throw new Exception(response.Content);
+                throw new AuthenticationException(response.Content);
             }
             if (response.Data.Data.IsCookieEnabled)
             {

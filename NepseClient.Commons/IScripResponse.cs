@@ -1,5 +1,4 @@
-﻿using System;
-namespace NepseClient.Commons
+﻿namespace NepseClient.Commons
 {
     public interface IScripResponse
     {

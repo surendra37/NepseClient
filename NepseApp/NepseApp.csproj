@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>NepseApp</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors" Version="1.2.6" />
+    <PackageReference Include="MaterialDesignExtensions" Version="3.2.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.1.3" />
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+    <ProjectReference Include="..\TradeManagementSystemClient\TradeManagementSystemClient.csproj" />
+  </ItemGroup>
+</Project>
