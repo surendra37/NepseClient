@@ -4,6 +4,7 @@ using Prism.Mvvm;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace NepseApp.ViewModels
 {
@@ -41,6 +42,23 @@ namespace NepseApp.ViewModels
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to refresh portfolio");
+            }
+        }
+
+        private DelegateCommand _logoutCommand;
+        public DelegateCommand LogoutCommand =>
+            _logoutCommand ?? (_logoutCommand = new DelegateCommand(ExecuteLogoutCommand));
+
+        void ExecuteLogoutCommand()
+        {
+            try
+            {
+                _client.Logout();
+                MessageBox.Show("You have been logged out", "Logged out");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to logout");
             }
         }
     }
