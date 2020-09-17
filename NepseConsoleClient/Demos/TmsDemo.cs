@@ -68,7 +68,7 @@ namespace NepseConsoleClient.Demos
                 {
                     Id = "a",
                     Description = "Authenticate",
-                    Command = () => _client.Authenticate(username, password)
+                    Command = () => _client.Authenticate("https://tms49.nepsetms.com.np/", username, password)
                 },new DemoBase
                 {
                     Id = "l",

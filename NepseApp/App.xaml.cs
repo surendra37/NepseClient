@@ -5,6 +5,8 @@ using NepseClient.Commons;
 using TradeManagementSystemClient;
 using NepseApp.ViewModels;
 using Serilog;
+using Prism.Services.Dialogs;
+using System.Security.Authentication;
 
 namespace NepseApp
 {
@@ -30,11 +32,25 @@ namespace NepseApp
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            var nepseClient = new TmsClient("https://tms49.nepsetms.com.np/");
+            var nepseClient = new ProxyNepseClient(new TmsClient(), ShowAuthDialog);
             nepseClient.RestoreSession();
             containerRegistry.RegisterInstance<INepseClient>(nepseClient);
 
+            containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
+
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
+        }
+
+        private void ShowAuthDialog(INepseClient client)
+        {
+            var dialog = Container.Resolve<IDialogService>();
+            var success = false;
+            dialog.ShowDialog(nameof(AuthenticationDialog), new DialogParameters { { "Client", client } }, result =>
+            {
+                success = result?.Result == ButtonResult.OK;
+            });
+            if (!success)
+                throw new AuthenticationException("Not Authenticated.");
         }
 
         protected override void OnExit(ExitEventArgs e)

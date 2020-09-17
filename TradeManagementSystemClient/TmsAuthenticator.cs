@@ -1,7 +1,7 @@
-﻿using System;
-using TradeManagementSystemClient.Models;
-using RestSharp.Authenticators;
+﻿using RestSharp.Authenticators;
 using RestSharp;
+using NepseClient.Commons;
+
 namespace TradeManagementSystemClient
 {
     public class TmsAuthenticator : IAuthenticator
@@ -15,6 +15,8 @@ namespace TradeManagementSystemClient
 
         public void Authenticate(IRestClient client, IRestRequest request)
         {
+            if (_session == null) return;
+
             if (_session.CookieEnabled)
             {
                 request.AddHeader("X-XSRF-TOKEN", _session.XsrfToken);

@@ -7,7 +7,6 @@ namespace NepseConsoleClient
 {
     class Program
     {
-        private const string BaseUrl = "https://tms49.nepsetms.com.np/";
         static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -34,7 +33,7 @@ namespace NepseConsoleClient
             try
             {
                 Log.Verbose("Creating rest client");
-                var client = new TmsClient(BaseUrl);
+                var client = new TmsClient();
 
                 var businessDate = client.GetBusinessDate();
                 Log.Debug("Business Date: {0}", businessDate);

@@ -3,11 +3,14 @@ namespace NepseClient.Commons
 {
     public interface INepseClient
     {
-        void Authenticate(string username, string password);
-        IEnumerable<IScripResponse> GetMyPortfolio();
-
+        #region Session
+        SessionInfo Session { get; }
+        void Authenticate(string url, string username, string password);
         void SaveSession();
         void RestoreSession();
-        void Logout();
+        void Logout(); 
+        #endregion
+
+        IEnumerable<IScripResponse> GetMyPortfolio();
     }
 }

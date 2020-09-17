@@ -18,13 +18,27 @@ namespace TradeManagementSystemClient
     {
         private const string _sessionFilePath = "tms.session";
         private RestClient _client;
+
         private SessionInfo _session;
-        public bool IsAuthenticated { get; private set; }
-        public TmsClient(string baseUrl)
+        public SessionInfo Session
         {
-            _client = new RestClient(baseUrl);
-            _client.ThrowOnAnyError = true;
-            _client.UseNewtonsoftJson();
+            get
+            {
+                if (_session is null)
+                    throw new AuthenticationException("Not Authorized.");
+                return _session;
+            }
+            private set { _session = value; }
+        }
+        public bool IsAuthenticated { get; private set; }
+
+        private RestClient CreateClient(string baseUrl)
+        {
+            var client = new RestClient(baseUrl);
+            client.ThrowOnAnyError = true;
+            client.UseNewtonsoftJson();
+
+            return client;
         }
 
         #region UnAuthorized Access
@@ -39,7 +53,9 @@ namespace TradeManagementSystemClient
         #region Session
         public void SaveSession()
         {
-            var serialized = JsonConvert.SerializeObject(_session);
+            if (Session is null) return;
+
+            var serialized = JsonConvert.SerializeObject(Session);
             File.WriteAllText(_sessionFilePath, serialized);
         }
 
@@ -49,11 +65,12 @@ namespace TradeManagementSystemClient
                 return;
 
             var session = File.ReadAllText(_sessionFilePath);
-            _session = JsonConvert.DeserializeObject<SessionInfo>(session);
-            _client.Authenticator = new TmsAuthenticator(_session);
+            Session = JsonConvert.DeserializeObject<SessionInfo>(session);
+            _client = CreateClient(Session.Host);
+            _client.Authenticator = new TmsAuthenticator(Session);
 
             IsAuthenticated = true;
-            Log.Debug("Session restored [{0}]", _session.LastUpdated);
+            Log.Debug("Session restored [{0}]", Session.LastUpdated);
         }
 
         public void Logout()
@@ -68,18 +85,21 @@ namespace TradeManagementSystemClient
                 Log.Debug(ex, "Failed to logout");
             }
 
+            Session = null;
+            IsAuthenticated = false;
+            _client.Authenticator = null;
+
             if (!File.Exists(_sessionFilePath))
                 return;
 
             File.Delete(_sessionFilePath);
-            _session = default;
-            IsAuthenticated = false;
-            _client.Authenticator = null;
         }
 
-        public void Authenticate(string username, string password)
+        public void Authenticate(string url, string username, string password)
         {
             Log.Debug("Authenticating...");
+            _client = CreateClient(url);
+
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(new AuthenticationRequest(username, password));
             _client.Authenticator = null;
@@ -96,14 +116,15 @@ namespace TradeManagementSystemClient
                     throw new Exception("Cookies Not Found");
                 }
                 var parts = cookies.Value.ToString().Split(',');
-                _session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
+                Session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
             }
             else
             {
-                _session = GetSessionInfo(null, response.Data.Data);
+                Session = GetSessionInfo(null, response.Data.Data);
             }
-
-            _client.Authenticator = new TmsAuthenticator(_session);
+            Session.Host = url;
+            Session.Username = username;
+            _client.Authenticator = new TmsAuthenticator(Session);
             Log.Debug("Authentication Complete");
             Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
         }
@@ -111,9 +132,10 @@ namespace TradeManagementSystemClient
 
         public IEnumerable<IScripResponse> GetMyPortfolio()
         {
-            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{_session.ClientId}/CLI");
-            _client.Authenticator = new TmsAuthenticator(_session);
+            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
+            _client.Authenticator = new TmsAuthenticator(Session);
             var response = _client.Get<List<ScripResponse>>(request);
+            CheckAuthenticated(response);
             return response.Data;
         }
 
@@ -157,6 +179,12 @@ namespace TradeManagementSystemClient
                 }
             }
             return session;
+        }
+
+        private void CheckAuthenticated(IRestResponse response)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                throw new AuthenticationException(response.Content);
         }
         #endregion
     }

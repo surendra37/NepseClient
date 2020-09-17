@@ -1,8 +1,14 @@
 ﻿using System;
-namespace TradeManagementSystemClient.Models
+
+namespace NepseClient.Commons
 {
-    public struct SessionInfo
+
+    public class SessionInfo
     {
+        public string Host { get; set; }
+        public string Username { get; set; }
+        //public string Password { get; set; }
+
         public bool CookieEnabled { get; set; }
         public string JsonWebToken { get; set; }
         public string XsrfToken { get; set; }
