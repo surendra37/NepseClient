@@ -17,6 +17,7 @@ namespace NepseApp.ViewModels
     {
         private const string _headerRequest = "top25securities";
         private readonly SocketHelper _socket;
+        private readonly INepseClient _client;
         private IEnumerable<ISecurityItem> _items;
         public IEnumerable<ISecurityItem> Items
         {
@@ -24,23 +25,10 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        private bool _isBusy;
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set
-            {
-                if (SetProperty(ref _isBusy, value))
-                {
-                    RefreshCommand.RaiseCanExecuteChanged();
-                }
-            }
-        }
-
-        public LiveMarketPageViewModel(SocketHelper socket)
+        public LiveMarketPageViewModel(SocketHelper socket, INepseClient client)
         {
             _socket = socket;
-
+            _client = client;
             socket.MessageReceived += Socket_MessageReceived;
         }
 
@@ -55,32 +43,16 @@ namespace NepseApp.ViewModels
                 if (topSecurities == default) return;
 
                 var items = topSecurities.Payload.ToObject<PayloadResponse<SecurityItem>>();
-                Items = items.Data.OrderByDescending(x => x.LastTradedDateTime);
-                IsBusy = false;
+                Items = items.Data.OrderByDescending(x => x.LastTradedDateTime).ToArray();
+                if (!_client.IsLive())
+                {
+                    // to stop fetching multiple data during not live
+                    _socket.Send(_headerRequest, false);
+                }
             }
             catch (Exception ex)
             {
                 Log.Verbose(ex, "Failed to receive");
-            }
-        }
-
-        private DelegateCommand _refreshCommand;
-
-        public DelegateCommand RefreshCommand =>
-            _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand, () => !IsBusy));
-
-        void ExecuteRefreshCommand()
-        {
-            try
-            {
-                IsBusy = true;
-                _socket.Send(_headerRequest, true);
-                //Items = _client.GetLiveMarket();
-            }
-            catch (Exception ex)
-            {
-                IsBusy = false;
-                Log.Error(ex, "Failed to get Live market data");
             }
         }
 
@@ -103,8 +75,11 @@ namespace NepseApp.ViewModels
             // UpdateCommand.IsActive = IsActive; //set the command as active
             IsActiveChanged?.Invoke(this, new EventArgs()); //invoke the event for all listeners
 
-            _socket.Send(_headerRequest, IsActive);
-        } 
+            var alreadyLoaded = Items?.Any() ?? false;
+
+            if (_client.IsLive() || !alreadyLoaded)
+                _socket.Send(_headerRequest, IsActive);
+        }
         #endregion
     }
 }

@@ -227,6 +227,19 @@ namespace TradeManagementSystemClient
 
             return output.Count > 0 ? output : null;
         }
+
+        public bool IsLive()
+        {
+            var today = DateTime.Now;
+            var offDay = today.DayOfWeek == DayOfWeek.Friday || today.DayOfWeek == DayOfWeek.Saturday;
+            if (offDay) return false;
+
+            if (today.Hour < 11) return false;
+
+            if (today.Hour > 6) return false;
+
+            return true;
+        }
         #endregion
     }
 }

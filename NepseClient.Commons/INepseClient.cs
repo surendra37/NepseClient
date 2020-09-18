@@ -15,5 +15,6 @@ namespace NepseClient.Commons
         IEnumerable<ISecurityItem> GetLiveMarket();
         string GetSocketUrl();
         List<KeyValuePair<string, string>> GetCookies();
+        bool IsLive();
     }
 }

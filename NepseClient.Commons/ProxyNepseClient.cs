@@ -55,5 +55,7 @@ namespace NepseClient.Commons
         public string GetSocketUrl() => Retry(_client.GetSocketUrl);
 
         public List<KeyValuePair<string, string>> GetCookies() => _client.GetCookies();
+
+        public bool IsLive() => _client.IsLive();
     }
 }
