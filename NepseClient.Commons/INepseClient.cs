@@ -12,5 +12,8 @@ namespace NepseClient.Commons
         #endregion
 
         IEnumerable<IScripResponse> GetMyPortfolio();
+        IEnumerable<ISecurityItem> GetLiveMarket();
+        string GetSocketUrl();
+        List<KeyValuePair<string, string>> GetCookies();
     }
 }

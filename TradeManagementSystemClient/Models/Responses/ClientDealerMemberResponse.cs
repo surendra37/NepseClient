@@ -7,5 +7,11 @@ namespace TradeManagementSystemClient.Models.Responses
     {
         [JsonProperty("client")]
         public ClientResponse Client { get; set; }
+
+        [JsonProperty("dealer")]
+        public ClientResponse Dealer { get; set; }
+
+        [JsonProperty("member")]
+        public ClientResponse Member { get; set; }
     }
 }

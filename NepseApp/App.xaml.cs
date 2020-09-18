@@ -7,6 +7,7 @@ using NepseApp.ViewModels;
 using Serilog;
 using Prism.Services.Dialogs;
 using System.Security.Authentication;
+using TradeManagementSystem.Nepse;
 
 namespace NepseApp
 {
@@ -38,9 +39,13 @@ namespace NepseApp
             nepseClient.RestoreSession();
             containerRegistry.RegisterInstance<INepseClient>(nepseClient);
 
+            var socketHelper = new SocketHelper(nepseClient);
+            containerRegistry.RegisterInstance(socketHelper);
+
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
+            containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
         }
 
         private void ShowAuthDialog(INepseClient client)
@@ -58,6 +63,7 @@ namespace NepseApp
         protected override void OnExit(ExitEventArgs e)
         {
             Container.Resolve<INepseClient>().SaveSession();
+            Container.Resolve<SocketHelper>().Stop();
             base.OnExit(e);
         }
     }

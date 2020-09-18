@@ -45,7 +45,7 @@ namespace NepseApp.ViewModels
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = true,
+                IsSelected = false,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
             yield return new DividerNavigationItem();
@@ -55,7 +55,8 @@ namespace NepseApp.ViewModels
             {
                 Label = "Live",
                 Icon = PackIconKind.RecordCircle,
-                IsSelectable = false,
+                IsSelected = true,
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(LiveMarketPage)),
             };
             yield return new FirstLevelNavigationItem()
             {

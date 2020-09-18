@@ -15,6 +15,10 @@ namespace NepseClient.Commons
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
         public string ClientId { get; set; }
+        public string DealerId { get; set; }
+        public string MemberId { get; set; }
+        public string UserId { get; set; }
+
         public DateTime LastUpdated { get; set; }
     }
 }

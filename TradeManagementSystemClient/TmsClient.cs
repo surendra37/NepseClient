@@ -5,7 +5,6 @@ using TradeManagementSystemClient.Models.Responses;
 using RestSharp.Serializers.NewtonsoftJson;
 using Serilog;
 using TradeManagementSystemClient.Models.Requests;
-using TradeManagementSystemClient.Models;
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -139,6 +138,16 @@ namespace TradeManagementSystemClient
             return response.Data;
         }
 
+        public IEnumerable<ISecurityItem> GetLiveMarket()
+        {
+            var request = new RestRequest("/tmsapi/ws/top25securities");
+
+            var response = _client.Get<SocketResponse<SecurityItem2>>(request);
+            CheckAuthenticated(response);
+
+            return response.Data.Payload.Data.OrderByDescending(x => x.LastTradedDateTime);
+        }
+
         #region Helpers
         private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
         {
@@ -149,6 +158,9 @@ namespace TradeManagementSystemClient
                 AccessToken = string.Empty,
                 LastUpdated = DateTime.Now,
                 ClientId = authData.ClientDealerMember.Client.Id,
+                DealerId = authData.ClientDealerMember.Dealer.Id,
+                MemberId = authData.ClientDealerMember.Member.Id,
+                UserId = authData.User.Id,
                 CookieEnabled = authData.IsCookieEnabled,
                 JsonWebToken = authData.JsonWebToken,
             };
@@ -185,6 +197,35 @@ namespace TradeManagementSystemClient
         {
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 throw new AuthenticationException(response.Content);
+        }
+
+        public string GetSocketUrl()
+        {
+            // wss://tms49.nepsetms.com.np//tmsapi/socketEnd?memberId=149&clientId=1979933&dealerId=1&userId=71620&access_token=eyJhbGciO...
+            var accessToken = string.IsNullOrEmpty(Session.AccessToken) ? Session.JsonWebToken : Session.AccessToken;
+            var wssUrl = $"wss://{_client.BaseUrl.Host}//tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={accessToken}";
+            return wssUrl;
+        }
+
+        public List<KeyValuePair<string, string>> GetCookies()
+        {
+            var output = new List<KeyValuePair<string, string>>();
+            if (!string.IsNullOrEmpty(Session.XsrfToken))
+            {
+                output.Add(new KeyValuePair<string, string>("XSRF-TOKEN", Session.XsrfToken));
+            }
+
+            if (!string.IsNullOrEmpty(Session.AccessToken))
+            {
+                output.Add(new KeyValuePair<string, string>("accessToken", Session.AccessToken));
+            }
+
+            if (!string.IsNullOrEmpty(Session.RefreshToken))
+            {
+                output.Add(new KeyValuePair<string, string>("refreshToken", Session.RefreshToken));
+            }
+
+            return output.Count > 0 ? output : null;
         }
         #endregion
     }

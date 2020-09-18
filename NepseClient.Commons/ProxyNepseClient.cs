@@ -29,6 +29,11 @@ namespace NepseClient.Commons
             return Retry(_client.GetMyPortfolio);
         }
 
+        public IEnumerable<ISecurityItem> GetLiveMarket()
+        {
+            return Retry(_client.GetLiveMarket);
+        }
+
         private T Retry<T>(Func<T> body, bool retry = true)
         {
             try
@@ -46,5 +51,9 @@ namespace NepseClient.Commons
                 throw;
             }
         }
+
+        public string GetSocketUrl() => Retry(_client.GetSocketUrl);
+
+        public List<KeyValuePair<string, string>> GetCookies() => _client.GetCookies();
     }
 }

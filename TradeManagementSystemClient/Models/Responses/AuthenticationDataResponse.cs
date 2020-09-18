@@ -15,5 +15,8 @@ namespace TradeManagementSystemClient.Models.Responses
         public string CookieEnabled { get; set; }
 
         public bool IsCookieEnabled => !CookieEnabled.Equals("0");
+
+        [JsonProperty("user")]
+        public ClientResponse User { get; set; }
     }
 }
