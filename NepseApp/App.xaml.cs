@@ -21,6 +21,8 @@ namespace NepseApp
                 .WriteTo.Console()
                 .CreateLogger();
 
+            ConfigUtils.LoadSettings();
+
             Log.Debug("Starting application");
             base.OnStartup(e);
         }

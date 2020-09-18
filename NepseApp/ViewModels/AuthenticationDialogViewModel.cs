@@ -6,6 +6,7 @@ using Prism.Services.Dialogs;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -41,6 +42,13 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _password, value); }
         }
 
+        private bool _isRememberPassword;
+        public bool IsRememberPassword
+        {
+            get { return _isRememberPassword; }
+            set { SetProperty(ref _isRememberPassword, value); }
+        }
+
         public AuthenticationDialogViewModel()
         {
 
@@ -65,6 +73,13 @@ namespace NepseApp.ViewModels
                 _client.Authenticate(Host, Username, Password.GetString());
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
                 IsBusy = false;
+
+                // Save values
+                ConfigUtils.TmsHost = Host;
+                ConfigUtils.TmsUsername = Username;
+                ConfigUtils.TmsPassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                ConfigUtils.SaveSettings();
+
             }
             catch (Exception ex)
             {
@@ -83,8 +98,9 @@ namespace NepseApp.ViewModels
             _client = parameters.GetValue<INepseClient>("Client");
             try
             {
-                Host = _client.Session.Host;
-                Username = _client.Session.Username;
+                Host = ConfigUtils.TmsHost;
+                Username = ConfigUtils.TmsUsername;
+                Password = ConfigUtils.TmsPassword.ToSecuredString();
             }
             catch (Exception ex)
             {
