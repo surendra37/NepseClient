@@ -1,4 +1,4 @@
-﻿namespace NepseClient.Commons
+﻿namespace NepseClient.Commons.Contracts
 {
     public interface IScripResponse
     {

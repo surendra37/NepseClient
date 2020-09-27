@@ -3,6 +3,7 @@ using MaterialDesignThemes.Wpf;
 using NepseApp.Models;
 using NepseApp.Views;
 using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;

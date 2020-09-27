@@ -2,6 +2,7 @@
 using NepseApp.ViewModels;
 using NepseApp.Views;
 using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Prism.Ioc;
 using Prism.Services.Dialogs;
 using Serilog;

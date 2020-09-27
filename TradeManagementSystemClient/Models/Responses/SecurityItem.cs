@@ -1,4 +1,5 @@
 ﻿using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
 using System;
 

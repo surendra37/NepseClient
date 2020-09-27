@@ -1,5 +1,6 @@
 ﻿using NepseApp.Models;
 using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using System;
 using System.Collections.Generic;
 

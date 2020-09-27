@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NepseClient.Commons
+namespace NepseClient.Commons.Contracts
 {
     public interface ISecurityItem
     {

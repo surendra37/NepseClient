@@ -1,40 +1,38 @@
 ﻿using NepseApp.Models;
+using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Prism;
 using Prism.Commands;
 using Prism.Mvvm;
+using Serilog;
 using System;
 
 namespace NepseApp.ViewModels
 {
-    public class DashboardPageViewModel : BindableBase, IActiveAware
+    public class DashboardPageViewModel : ActiveAwareBindableBase
     {
-        public IApplicationCommand ApplicationCommand { get; }
-        public DashboardPageViewModel(IApplicationCommand applicationCommand)
+        private readonly INepseClient _client;
+        public DashboardPageViewModel(IApplicationCommand applicationCommand, INepseClient client) :
+            base(applicationCommand)
         {
-            ApplicationCommand = applicationCommand;
-
-            applicationCommand.RefreshCommand.RegisterCommand(RefreshCommand);
+            _client = client;
         }
 
-        private bool _isBusy;
-        public bool IsBusy
+        public override void ExecuteRefreshCommand()
         {
-            get { return _isBusy; }
-            set
+            try
             {
-                if (SetProperty(ref _isBusy, value))
-                {
-                    RefreshCommand.RaiseCanExecuteChanged();
-                }
+                //var res = _client.GetMarketWatch();
+                var gainers = _client.GetTopGainers();
+                var losers = _client.GetTopLosers();
+                var trans = _client.GetTopTransactions();
+                var turnovers = _client.GetTopTurnovers();
+                var volumes = _client.GetTopVolumes();
             }
-        }
-
-        private DelegateCommand _refreshCommand;
-        public DelegateCommand RefreshCommand =>
-            _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand, () => !IsBusy));
-
-        void ExecuteRefreshCommand()
-        {
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load dashboard");
+            }
         }
 
         #region IActiveAware

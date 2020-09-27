@@ -1,5 +1,6 @@
 ﻿using NepseApp.Models;
 using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
 using Serilog;
 using System;

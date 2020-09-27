@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NepseClient.Commons.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Security.Authentication;
 
@@ -57,5 +58,35 @@ namespace NepseClient.Commons
         public List<KeyValuePair<string, string>> GetCookies() => _client.GetCookies();
 
         public bool IsLive() => _client.IsLive();
+
+        public IEnumerable<IMarketWatchResponse> GetMarketWatch()
+        {
+            return Retry(_client.GetMarketWatch);
+        }
+
+        public IEnumerable<ITopResponse> GetTopGainers()
+        {
+            return Retry(_client.GetTopGainers);
+        }
+
+        public IEnumerable<ITopResponse> GetTopLosers()
+        {
+            return Retry(_client.GetTopLosers);
+        }
+
+        public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers()
+        {
+            return Retry(_client.GetTopTurnovers);
+        }
+
+        public IEnumerable<ITopSecuritiesResponse> GetTopTransactions()
+        {
+            return Retry(_client.GetTopTransactions);
+        }
+
+        public IEnumerable<ITopSecuritiesResponse> GetTopVolumes()
+        {
+            return Retry(_client.GetTopVolumes);
+        }
     }
 }

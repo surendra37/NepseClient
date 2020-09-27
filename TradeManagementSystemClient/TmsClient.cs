@@ -1,4 +1,5 @@
 ﻿using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -34,7 +35,7 @@ namespace TradeManagementSystemClient
         private RestClient CreateClient(string baseUrl)
         {
             var client = new RestClient(baseUrl);
-            client.ThrowOnAnyError = true;
+            //client.ThrowOnDeserializationError = true;
             client.UseNewtonsoftJson();
 
             return client;
@@ -149,6 +150,55 @@ namespace TradeManagementSystemClient
 
             return response.Data.Payload.Data.OrderByDescending(x => x.LastTradedDateTime);
         }
+
+        public IEnumerable<IMarketWatchResponse> GetMarketWatch()
+        {
+            var request = new RestRequest($"/tmsapi/market-watch/user/{Session.UserId}");
+
+            var response = _client.Get<MarketWatchResponse[]>(request);
+            CheckAuthenticated(response);
+
+            return response.Data;
+        }
+
+        #region Top
+        public IEnumerable<ITopResponse> GetTopGainers()
+        {
+            var request = new RestRequest("/tmsapi/stock/top/gainer/8");
+            var response = _client.Get<TopResponse[]>(request);
+            CheckAuthenticated(response);
+            return response.Data;
+        }
+        public IEnumerable<ITopResponse> GetTopLosers()
+        {
+            var request = new RestRequest("/tmsapi/stock/top/loser/8");
+            var response = _client.Get<TopResponse[]>(request);
+            CheckAuthenticated(response);
+            return response.Data;
+        }
+
+        public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers()
+        {
+            var request = new RestRequest("/tmsapi/stock/top-securities/turnover/9");
+            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            CheckAuthenticated(response);
+            return response.Data;
+        }
+        public IEnumerable<ITopSecuritiesResponse> GetTopTransactions()
+        {
+            var request = new RestRequest("/tmsapi/stock/top-securities/transaction/9");
+            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            CheckAuthenticated(response);
+            return response.Data;
+        }
+        public IEnumerable<ITopSecuritiesResponse> GetTopVolumes()
+        {
+            var request = new RestRequest("/tmsapi/stock/top-securities/volume/9");
+            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            CheckAuthenticated(response);
+            return response.Data;
+        }
+        #endregion
 
         #region Helpers
         private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
