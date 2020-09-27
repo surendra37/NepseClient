@@ -1,13 +1,14 @@
-﻿using Prism.Ioc;
-using NepseApp.Views;
-using System.Windows;
-using NepseClient.Commons;
-using TradeManagementSystemClient;
+﻿using NepseApp.Models;
 using NepseApp.ViewModels;
-using Serilog;
+using NepseApp.Views;
+using NepseClient.Commons;
+using Prism.Ioc;
 using Prism.Services.Dialogs;
+using Serilog;
 using System.Security.Authentication;
+using System.Windows;
 using TradeManagementSystem.Nepse;
+using TradeManagementSystemClient;
 
 namespace NepseApp
 {
@@ -35,6 +36,8 @@ namespace NepseApp
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
+
             var nepseClient = new ProxyNepseClient(new TmsClient(), ShowAuthDialog);
             nepseClient.RestoreSession();
             containerRegistry.RegisterInstance<INepseClient>(nepseClient);
@@ -46,6 +49,7 @@ namespace NepseApp
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
+            containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
         }
 
         private void ShowAuthDialog(INepseClient client)

@@ -1,5 +1,4 @@
-﻿using System;
-using NepseClient.Commons;
+﻿using NepseClient.Commons;
 using Newtonsoft.Json;
 
 namespace TradeManagementSystemClient.Models.Requests

@@ -1,6 +1,6 @@
-﻿using RestSharp.Authenticators;
+﻿using NepseClient.Commons;
 using RestSharp;
-using NepseClient.Commons;
+using RestSharp.Authenticators;
 
 namespace TradeManagementSystemClient
 {

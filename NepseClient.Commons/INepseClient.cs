@@ -5,6 +5,8 @@ namespace NepseClient.Commons
     {
         #region Session
         SessionInfo Session { get; }
+        bool IsAuthenticated { get; }
+
         void Authenticate(string url, string username, string password);
         void SaveSession();
         void RestoreSession();

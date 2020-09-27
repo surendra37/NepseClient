@@ -1,14 +1,11 @@
-﻿using NepseClient.Commons;
-using Prism.Commands;
-using Prism.Mvvm;
-using Serilog;
+﻿using NepseApp.Models;
+using NepseClient.Commons;
 using System;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace NepseApp.ViewModels
 {
-    public class PortfolioPageViewModel : BindableBase
+    public class PortfolioPageViewModel : ActiveAwareBindableBase
     {
         private readonly INepseClient _client;
 
@@ -19,46 +16,26 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public PortfolioPageViewModel(INepseClient client)
+        public PortfolioPageViewModel(INepseClient client, IApplicationCommand applicationCommand) :
+            base(applicationCommand)
         {
             _client = client;
-            RefreshCommand.Execute();
         }
 
-        private DelegateCommand _refreshCommand;
-        public DelegateCommand RefreshCommand =>
-            _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand));
-
-        void ExecuteRefreshCommand()
+        public override void ExecuteRefreshCommand()
         {
             try
             {
-                Log.Debug("Refreshing portfolio");
-                //_client.Authenticate("SS482167", "Pass!@#$5word");
-                //_client.Logout();
-
+                EnqueMessage("Refreshing portfolio");
+                IsBusy = true;
                 Items = _client.GetMyPortfolio();
+                IsBusy = false;                
+                EnqueMessage("Portfolio updated");
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to refresh portfolio");
-            }
-        }
-
-        private DelegateCommand _logoutCommand;
-        public DelegateCommand LogoutCommand =>
-            _logoutCommand ?? (_logoutCommand = new DelegateCommand(ExecuteLogoutCommand));
-
-        void ExecuteLogoutCommand()
-        {
-            try
-            {
-                _client.Logout();
-                MessageBox.Show("You have been logged out", "Logged out");
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to logout");
+                IsBusy = false;
+                LogErrorAndEnqueMessage(ex, "Failed to refresh portfolio");
             }
         }
     }

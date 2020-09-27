@@ -5,10 +5,6 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security;
 using System.Windows;
 

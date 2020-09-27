@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Authentication;
-using System.Text;
 
 namespace NepseClient.Commons
 {
@@ -9,6 +8,7 @@ namespace NepseClient.Commons
     {
         private readonly INepseClient _client;
 
+        public bool IsAuthenticated => _client.IsAuthenticated;
         public SessionInfo Session => _client.Session;
         public Action<INepseClient> ShowAuthenticationDialog { get; }
         public ProxyNepseClient(INepseClient client, Action<INepseClient> showAuthDialog)

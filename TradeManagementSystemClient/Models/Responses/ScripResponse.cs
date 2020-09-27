@@ -1,6 +1,5 @@
-﻿using System;
+﻿using NepseClient.Commons;
 using Newtonsoft.Json;
-using NepseClient.Commons;
 namespace TradeManagementSystemClient.Models.Responses
 {
     public class ScripResponse : IScripResponse

@@ -1,6 +1,4 @@
 ﻿using MaterialDesignExtensions.Controls;
-using Prism.Regions;
-using System.Windows;
 
 namespace NepseApp.Views
 {

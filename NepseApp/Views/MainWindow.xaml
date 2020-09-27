@@ -3,21 +3,57 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="{Binding Title}" Height="480" Width="640" 
+        Height="480" Width="640" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="10"
-        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions" 
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized">
+    <mde:MaterialWindow.TitleTemplate>
+        <DataTemplate>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource WindowTitleTextBlockStyle}" Text="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" Margin="8,0,0,0" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
+                    <Button Style="{StaticResource WindowButtonStyle}" 
+                            Command="{Binding DataContext.ApplicationCommand.RefreshCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
+                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Refresh" />
+                    </Button>
+                    <Button Style="{StaticResource WindowButtonStyle}" 
+                            ToolTip="Log In"
+                            Visibility="{Binding DataContext.IsAuthenticated, Converter={StaticResource InvertBooleanToVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}"
+                            Command="{Binding DataContext.LoginCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
+                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Login" />
+                    </Button>
+                    <Button Style="{StaticResource WindowButtonStyle}" 
+                            ToolTip="Log out"
+                            Visibility="{Binding DataContext.IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}"
+                            Command="{Binding DataContext.LogoutCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
+                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Logout" />
+                    </Button>
+                    <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
+                            Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </mde:MaterialWindow.TitleTemplate>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="160"/>
             <ColumnDefinition Width="2" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         
         <mde:SideNavigation Grid.Column="0" Items="{Binding Path=NavigationItems, Mode=OneTime}"
                     NavigationItemSelected="NavigationItemSelectedHandler"/>
@@ -25,5 +61,7 @@
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>
 
         <ContentControl Grid.Column="2" prism:RegionManager.RegionName="ContentRegion" />
+
+        <md:Snackbar Grid.Row="1" Grid.ColumnSpan="3" MessageQueue="{Binding MessageQueue}" />
     </Grid>
 </mde:MaterialWindow>
