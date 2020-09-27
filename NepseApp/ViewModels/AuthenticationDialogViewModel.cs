@@ -38,7 +38,7 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _password, value); }
         }
 
-        private bool _isRememberPassword;
+        private bool _isRememberPassword = true;
         public bool IsRememberPassword
         {
             get { return _isRememberPassword; }

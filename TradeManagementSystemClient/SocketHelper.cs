@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 using Serilog;
 using SuperSocket.ClientEngine;
 using System;
+using System.Net;
 using System.Threading;
 using TradeManagementSystemClient.Models.Requests;
+using TradeManagementSystemClient.Models.Responses;
 using WebSocket4Net;
 
 namespace TradeManagementSystem.Nepse
@@ -15,11 +17,12 @@ namespace TradeManagementSystem.Nepse
         private WebSocket _websocket;
         private readonly INepseClient _client;
 
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public event EventHandler<SocketResponse[]> DeserializedMessageReceived;
 
         public SocketHelper(INepseClient client)
         {
             _client = client;
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
         private void Start()
@@ -32,11 +35,13 @@ namespace TradeManagementSystem.Nepse
                 var url = _client.GetSocketUrl();
                 Log.Verbose("Opening socket in url: {0}", url);
 
-                _websocket = new WebSocket(url, cookies: _client.GetCookies());
+                _websocket = new WebSocket(url, cookies: _client.GetCookies(), userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36");
+                _websocket.EnableAutoSendPing = true;
+                _websocket.AutoSendPingInterval = 10;
                 _websocket.Opened += Websocket_Opened;
                 _websocket.Error += Websocket_Error;
                 _websocket.Closed += Websocket_Closed;
-                _websocket.MessageReceived += MessageReceived;
+                _websocket.MessageReceived += WebSocketMessageReceived;
                 _websocket.Open();
 
                 while (_websocket.State != WebSocketState.Open)
@@ -49,6 +54,14 @@ namespace TradeManagementSystem.Nepse
                 Log.Error(ex, "Failed to start socket connection");
                 throw;
             }
+        }
+
+        private void WebSocketMessageReceived(object sender, MessageReceivedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.Message)) return;
+
+            var responses = JsonConvert.DeserializeObject<SocketResponse[]>(e.Message);
+            DeserializedMessageReceived?.Invoke(sender, responses);
         }
 
         /// <summary>
@@ -69,7 +82,6 @@ namespace TradeManagementSystem.Nepse
         private void Websocket_Closed(object sender, EventArgs e)
         {
             Log.Verbose("Websocket closed");
-            MessageReceived.Invoke(this, new MessageReceivedEventArgs("[]"));
             _isStarted = false;
         }
 

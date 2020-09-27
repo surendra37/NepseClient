@@ -75,6 +75,11 @@ namespace NepseApp.ViewModels
         {
             RefreshCommand.IsActive = IsActive; //set the command as active
             IsActiveChanged?.Invoke(this, new EventArgs()); //invoke the event for all listeners
+
+            if(IsActive && AppCommand.RefreshOnActive)
+            {
+                RefreshCommand.Execute();
+            }
         }
         #endregion
     }

@@ -7,5 +7,6 @@ namespace NepseApp.Models
     {
         CompositeCommand RefreshCommand { get; }
         ISnackbarMessageQueue MessageQueue { get; }
+        bool RefreshOnActive { get; set; }
     }
 }

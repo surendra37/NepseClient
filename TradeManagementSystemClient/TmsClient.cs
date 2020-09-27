@@ -126,6 +126,8 @@ namespace TradeManagementSystemClient
             _client.Authenticator = new TmsAuthenticator(Session);
             Log.Debug("Authentication Complete");
             Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
+
+            IsAuthenticated = true;
         }
         #endregion
 
@@ -201,14 +203,20 @@ namespace TradeManagementSystemClient
 
         public string GetSocketUrl()
         {
-            // wss://tms49.nepsetms.com.np//tmsapi/socketEnd?memberId=149&clientId=1979933&dealerId=1&userId=71620&access_token=eyJhbGciO...
-            var accessToken = string.IsNullOrEmpty(Session.AccessToken) ? Session.JsonWebToken : Session.AccessToken;
-            var wssUrl = $"wss://{_client.BaseUrl.Host}//tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={accessToken}";
-            return wssUrl;
+            if (Session.CookieEnabled)
+            {
+                return $"wss://{_client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}";
+            }
+            else
+            {
+                return $"wss://{_client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={Session.AccessToken}";
+            }
         }
 
         public List<KeyValuePair<string, string>> GetCookies()
         {
+            if (!Session.CookieEnabled) return null;
+
             var output = new List<KeyValuePair<string, string>>();
             if (!string.IsNullOrEmpty(Session.XsrfToken))
             {

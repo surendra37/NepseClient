@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TradeManagementSystem.Nepse;
+using TradeManagementSystemClient.Models;
 using TradeManagementSystemClient.Models.Responses;
 using WebSocket4Net;
 
@@ -29,19 +30,16 @@ namespace NepseApp.ViewModels
         {
             _socket = socket;
             _client = client;
-            socket.MessageReceived += Socket_MessageReceived;
+            socket.DeserializedMessageReceived += Socket_MessageReceived;
         }
 
-        private void Socket_MessageReceived(object sender, MessageReceivedEventArgs e)
+        private void Socket_MessageReceived(object sender, SocketResponse[] e)
         {
-            if (string.IsNullOrEmpty(e.Message)) return;
+            var topSecurities = e.FirstOrDefault(x => x.Header.Transaction.Equals(TmsTransactions.Securities));
+            if (topSecurities == default) return;
 
             try
             {
-                var response = JsonConvert.DeserializeObject<SocketResponse[]>(e.Message);
-                var topSecurities = response.FirstOrDefault(x => x.Header.Transaction.Equals(_headerRequest));
-                if (topSecurities == default) return;
-
                 var items = topSecurities.Payload.ToObject<PayloadResponse<SecurityItem>>();
                 Items = items.Data.OrderByDescending(x => x.LastTradedDateTime).ToArray();
                 if (!_client.IsLive())
@@ -60,15 +58,36 @@ namespace NepseApp.ViewModels
 
         public override void ExecuteRefreshCommand()
         {
-            var alreadyLoaded = Items?.Any() ?? false;
-
-            if (_client.IsLive() || !alreadyLoaded)
+            try
             {
-                EnqueMessage("Start seeding live market data");
-                IsBusy = true;
-                _socket.Send(_headerRequest, IsActive);
+                EnqueMessage("Getting live market data");
+                Items = _client.GetLiveMarket().ToArray();
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to get live market");
+            }
+        }
 
+        private void Live()
+        {
+            EnqueMessage("Start seeding live market data");
+            IsBusy = true;
+            _socket.Send(_headerRequest, IsActive);
+            //_socket.SendOpCode();
+        }
+
+        private void FirstTime()
+        {
+            try
+            {
+                EnqueMessage("Getting live market data");
+                Items = _client.GetLiveMarket().ToArray();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to get live market");
+            }
         }
     }
 }
