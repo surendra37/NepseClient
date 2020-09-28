@@ -32,6 +32,11 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonProperty("valueAsOfPreviousClosePrice")]
         public float PreviousTotal { get; set; }
 
+        public float WaccValue { get; set; }
+
+        public float DailyGain => (LastTransactionPrice - PreviousClosePrice) * TotalBalance;
+        public float TotalGain => (LastTransactionPrice - WaccValue) * TotalBalance;
+
         public ScripResponse()
         {
         }

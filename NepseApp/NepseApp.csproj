@@ -17,4 +17,7 @@
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
     <ProjectReference Include="..\TradeManagementSystemClient\TradeManagementSystemClient.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Behaviors\" />
+  </ItemGroup>
 </Project>

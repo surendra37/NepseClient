@@ -12,13 +12,45 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />
-                
+
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+            
+            <GridView x:Key="TopItemsGridView" x:Shared="False">
+                <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding Symbol}"/>
+                <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding Ltp}"/>
+                <GridViewColumn Header="Change" DisplayMemberBinding="{Binding PointChange}"/>
+                <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange}"/>
+            </GridView>
+            <GridView x:Key="TopTurnOverGridView">
+                <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+                <GridViewColumn Header="Turnover" DisplayMemberBinding="{Binding TotalTurnover, StringFormat=N0}"/>
+                <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+                <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+                <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+            </GridView>
+            <GridView x:Key="TopVolumeGridView">
+                <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+                <GridViewColumn Header="Volume" DisplayMemberBinding="{Binding Volume, StringFormat=N0}"/>
+                <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+                <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+                <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+            </GridView>
+            <GridView x:Key="TopTransactionGridView">
+                <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+                <GridViewColumn Header="Transactions" DisplayMemberBinding="{Binding TotalTransaction, StringFormat=N0}"/>
+                <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+                <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+                <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+            </GridView>
 
             <converters:InvertBooleanToVisibilityConverter x:Key="InvertBooleanToVisibilityConverter" />
+            <converters:PolarConverter x:Key="PolarConverter" />
+            <converters:DailyGainConverter x:Key="DailyGainConverter" />
+            <converters:TotalGainConverter x:Key="TotalGainConverter" />
+            <converters:PolarBrushConverter x:Key="PolarBrushConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>

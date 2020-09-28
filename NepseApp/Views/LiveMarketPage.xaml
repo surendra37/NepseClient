@@ -7,10 +7,10 @@
         <DataGrid.RowStyle>
             <Style TargetType="DataGridRow">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding PolarChange}" Value="-1">
+                    <DataTrigger Binding="{Binding Change, Converter={StaticResource PolarConverter}}" Value="-1">
                         <Setter Property="Background" Value="#f44336"></Setter>
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding PolarChange}" Value="1">
+                    <DataTrigger Binding="{Binding PolarChange, Converter={StaticResource PolarConverter}}" Value="1">
                         <Setter Property="Background" Value="#4caf50"></Setter>
                     </DataTrigger>
                 </Style.Triggers>

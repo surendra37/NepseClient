@@ -24,5 +24,7 @@ namespace NepseClient.Commons.Contracts
         IEnumerable<ITopSecuritiesResponse> GetTopTurnovers();
         IEnumerable<ITopSecuritiesResponse> GetTopTransactions();
         IEnumerable<ITopSecuritiesResponse> GetTopVolumes();
+        IEnumerable<IIndexResponse> GetIndices();
+        IEnumerable<IStockQuoteResponse> GetStockQuote(string id);
     }
 }

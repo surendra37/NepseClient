@@ -11,5 +11,8 @@
         float PreviousClosePrice { get; set; }
         float LTPTotal { get; set; }
         float PreviousTotal { get; set; }
+        float WaccValue { get; set; }
+        float DailyGain { get; }
+        float TotalGain { get; }
     }
 }

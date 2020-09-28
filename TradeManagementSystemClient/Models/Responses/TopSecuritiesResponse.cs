@@ -111,22 +111,4 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonProperty("prevClosePrice")]
         public double PrevClosePrice { get; set; }
     }
-
-    public class TopResponse : ITopResponse
-    {
-        [JsonProperty("symbol")]
-        public string Symbol { get; set; }
-
-        [JsonProperty("ltp")]
-        public double Ltp { get; set; }
-
-        [JsonProperty("pointChange")]
-        public double PointChange { get; set; }
-
-        [JsonProperty("perChange")]
-        public double PerChange { get; set; }
-
-        [JsonProperty("securityName")]
-        public string SecurityName { get; set; }
-    }
 }

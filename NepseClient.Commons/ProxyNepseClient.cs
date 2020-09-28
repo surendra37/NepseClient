@@ -59,34 +59,20 @@ namespace NepseClient.Commons
 
         public bool IsLive() => _client.IsLive();
 
-        public IEnumerable<IMarketWatchResponse> GetMarketWatch()
-        {
-            return Retry(_client.GetMarketWatch);
-        }
+        public IEnumerable<IMarketWatchResponse> GetMarketWatch() => Retry(_client.GetMarketWatch);
 
-        public IEnumerable<ITopResponse> GetTopGainers()
-        {
-            return Retry(_client.GetTopGainers);
-        }
+        public IEnumerable<ITopResponse> GetTopGainers() => Retry(_client.GetTopGainers);
 
-        public IEnumerable<ITopResponse> GetTopLosers()
-        {
-            return Retry(_client.GetTopLosers);
-        }
+        public IEnumerable<ITopResponse> GetTopLosers() => Retry(_client.GetTopLosers);
 
-        public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers()
-        {
-            return Retry(_client.GetTopTurnovers);
-        }
+        public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers() => Retry(_client.GetTopTurnovers);
 
-        public IEnumerable<ITopSecuritiesResponse> GetTopTransactions()
-        {
-            return Retry(_client.GetTopTransactions);
-        }
+        public IEnumerable<ITopSecuritiesResponse> GetTopTransactions() => Retry(_client.GetTopTransactions);
 
-        public IEnumerable<ITopSecuritiesResponse> GetTopVolumes()
-        {
-            return Retry(_client.GetTopVolumes);
-        }
+        public IEnumerable<ITopSecuritiesResponse> GetTopVolumes() => Retry(_client.GetTopVolumes);
+
+        public IEnumerable<IIndexResponse> GetIndices() => Retry(_client.GetIndices);
+
+        public IEnumerable<IStockQuoteResponse> GetStockQuote(string id) => Retry(() => _client.GetStockQuote(id));
     }
 }

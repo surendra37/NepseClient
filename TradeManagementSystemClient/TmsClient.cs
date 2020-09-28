@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Authentication;
+using System.Text;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
@@ -18,6 +19,7 @@ namespace TradeManagementSystemClient
     {
         private const string _sessionFilePath = "tms.session";
         private RestClient _client;
+        private IDictionary<string, float> _waccDict;
 
         private SessionInfo _session;
         public SessionInfo Session
@@ -31,6 +33,11 @@ namespace TradeManagementSystemClient
             private set { _session = value; }
         }
         public bool IsAuthenticated { get; private set; }
+
+        public TmsClient()
+        {
+            LoadWacc();
+        }
 
         private RestClient CreateClient(string baseUrl)
         {
@@ -53,6 +60,7 @@ namespace TradeManagementSystemClient
         #region Session
         public void SaveSession()
         {
+            SaveWacc();
             if (Session is null) return;
 
             var serialized = JsonConvert.SerializeObject(Session);
@@ -61,6 +69,7 @@ namespace TradeManagementSystemClient
 
         public void RestoreSession()
         {
+            LoadWacc();
             if (!File.Exists(_sessionFilePath))
                 return;
 
@@ -136,8 +145,28 @@ namespace TradeManagementSystemClient
         {
             var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
             _client.Authenticator = new TmsAuthenticator(Session);
-            var response = _client.Get<List<ScripResponse>>(request);
+            var response = _client.Get<ScripResponse[]>(request);
             CheckAuthenticated(response);
+            // Update Wacc Value
+            foreach (var scrip in response.Data)
+            {
+                var key = scrip.Scrip;
+                if (_waccDict.ContainsKey(key))
+                {
+                    scrip.WaccValue = _waccDict[key];
+                    if(scrip.LastTransactionPrice == 0)
+                    {
+                        scrip.LastTransactionPrice = scrip.WaccValue;
+                        scrip.PreviousClosePrice = scrip.LastTransactionPrice;
+                        scrip.LTPTotal = scrip.WaccValue * scrip.TotalBalance;
+                        scrip.PreviousTotal = scrip.LTPTotal;
+                    }
+                }
+                else
+                {
+                    _waccDict.Add(key, scrip.WaccValue);
+                }
+            }
             return response.Data;
         }
 
@@ -199,6 +228,22 @@ namespace TradeManagementSystemClient
             return response.Data;
         }
         #endregion
+
+        public IEnumerable<IStockQuoteResponse> GetStockQuote(string id)
+        {
+            var request = new RestRequest($"/tmsapi/ws/stockQuote/{id}");
+            var response = _client.Execute<SocketResponse<StockQuoteResponse>>(request);
+            CheckAuthenticated(response);
+            return response.Data.Payload.Data;
+        }
+
+        public IEnumerable<IIndexResponse> GetIndices()
+        {
+            var request = new RestRequest("/tmsapi/ws/index");
+            var response = _client.Execute<SocketResponse<IndexResponse>>(request);
+            CheckAuthenticated(response);
+            return response.Data.Payload.Data;
+        }
 
         #region Helpers
         private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
@@ -297,6 +342,45 @@ namespace TradeManagementSystemClient
             if (today.Hour > 6) return false;
 
             return true;
+        }
+
+        private void LoadWacc()
+        {
+            var filepath = "wacc.csv";
+            _waccDict = new Dictionary<string, float>();
+            if (!File.Exists(filepath)) return;
+
+            foreach (var line in File.ReadLines(filepath).Skip(1)) // Skip first headers
+            {
+                var columns = line.Split(",");
+                if(columns.Length < 2) continue;
+                var name = columns[0];
+                var value = float.Parse(columns[1]);
+                _waccDict.Add(name, value);
+            }
+        }
+
+        private void SaveWacc()
+        {
+            var filepath = "wacc.csv";
+            var builder = new StringBuilder();
+            // Add header
+            builder.AppendLine("Name, WACC");
+            foreach (var pair in _waccDict)
+            {
+                builder.Append(pair.Key);
+                builder.Append(',');
+                builder.Append(pair.Value);
+                builder.AppendLine();
+            }
+            try
+            {
+                File.WriteAllText(filepath, builder.ToString());
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to save wacc data");
+            }
         }
         #endregion
     }

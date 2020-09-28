@@ -1,17 +1,58 @@
 ﻿using NepseApp.Models;
-using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
-using Prism;
-using Prism.Commands;
-using Prism.Mvvm;
 using Serilog;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace NepseApp.ViewModels
 {
     public class DashboardPageViewModel : ActiveAwareBindableBase
     {
         private readonly INepseClient _client;
+
+        private IEnumerable<IIndexResponse> _indices;
+        public IEnumerable<IIndexResponse> Indices
+        {
+            get { return _indices; }
+            set { SetProperty(ref _indices, value); }
+        }
+
+        private IEnumerable<ITopSecuritiesResponse> _topTurnovers;
+        public IEnumerable<ITopSecuritiesResponse> TopTurnovers
+        {
+            get { return _topTurnovers; }
+            set { SetProperty(ref _topTurnovers, value); }
+        }
+
+        private IEnumerable<ITopSecuritiesResponse> _topVolume;
+        public IEnumerable<ITopSecuritiesResponse> TopVolume
+        {
+            get { return _topVolume; }
+            set { SetProperty(ref _topVolume, value); }
+        }
+
+        private IEnumerable<ITopSecuritiesResponse> _topTransactions;
+        public IEnumerable<ITopSecuritiesResponse> TopTransactions
+        {
+            get { return _topTransactions; }
+            set { SetProperty(ref _topTransactions, value); }
+        }
+
+        private IEnumerable<ITopResponse> _topGainers;
+        public IEnumerable<ITopResponse> TopGainers
+        {
+            get { return _topGainers; }
+            set { SetProperty(ref _topGainers, value); }
+        }
+
+        private IEnumerable<ITopResponse> _topLosers;
+        public IEnumerable<ITopResponse> TopLosers
+        {
+            get { return _topLosers; }
+            set { SetProperty(ref _topLosers, value); }
+        }
+
         public DashboardPageViewModel(IApplicationCommand applicationCommand, INepseClient client) :
             base(applicationCommand)
         {
@@ -22,12 +63,16 @@ namespace NepseApp.ViewModels
         {
             try
             {
-                //var res = _client.GetMarketWatch();
-                var gainers = _client.GetTopGainers();
-                var losers = _client.GetTopLosers();
-                var trans = _client.GetTopTransactions();
-                var turnovers = _client.GetTopTurnovers();
-                var volumes = _client.GetTopVolumes();
+                IsBusy = true;
+                Indices = _client.GetIndices();
+
+                TopGainers = _client.GetTopGainers();
+                TopLosers = _client.GetTopLosers();
+
+                TopTurnovers = _client.GetTopTurnovers();
+                TopVolume = _client.GetTopVolumes();
+                TopTransactions = _client.GetTopTransactions();
+                IsBusy = false;
             }
             catch (Exception ex)
             {
