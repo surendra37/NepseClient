@@ -17,7 +17,14 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
-            
+            <GridView x:Key="IndexWatchGridView">
+                <GridViewColumn Header="Index Code" DisplayMemberBinding="{Binding IndexCode}" />
+                <GridViewColumn Header="Index Value" DisplayMemberBinding="{Binding IndexValue, StringFormat=N2}" />
+                <GridViewColumn Header="P. Close" DisplayMemberBinding="{Binding PrevCloseIndex, StringFormat=N2}" />
+                <GridViewColumn Header="Change" DisplayMemberBinding="{Binding Change, StringFormat=N2}" />
+                <GridViewColumn Header="% Change" DisplayMemberBinding="{Binding PercentageChange, StringFormat=N2}" />
+            </GridView>
+
             <GridView x:Key="TopItemsGridView" x:Shared="False">
                 <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding Symbol}"/>
                 <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding Ltp}"/>

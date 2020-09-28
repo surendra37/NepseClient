@@ -22,7 +22,7 @@
         </ItemsControl.Template>
         <TabControl Style="{StaticResource MaterialDesignTabControl}">
             <TabItem Header="Index Watch">
-                <ListView ItemsSource="{Binding Indices}">
+                <ListView ItemsSource="{Binding Indices}" View="{StaticResource IndexWatchGridView}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Style.Triggers>
@@ -38,15 +38,6 @@
                     <i:Interaction.Behaviors>
                         <behavior:IgnoreMouseWheelBehavior />
                     </i:Interaction.Behaviors>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Index Code" DisplayMemberBinding="{Binding IndexCode}" />
-                            <GridViewColumn Header="Index Value" DisplayMemberBinding="{Binding IndexValue, StringFormat=N2}" />
-                            <GridViewColumn Header="P. Close" DisplayMemberBinding="{Binding PrevCloseIndex, StringFormat=N2}" />
-                            <GridViewColumn Header="Change" DisplayMemberBinding="{Binding Change, StringFormat=N2}" />
-                            <GridViewColumn Header="% Change" DisplayMemberBinding="{Binding PercentageChange, StringFormat=N2}" />
-                        </GridView>
-                    </ListView.View>
                 </ListView>
             </TabItem>
         </TabControl>        
@@ -59,6 +50,14 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Setter Property="ToolTip" Value="{Binding SecurityName}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PointChange, Converter={StaticResource PolarConverter}}" Value="-1">
+                                    <Setter Property="Foreground" Value="#f44336"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PointChange, Converter={StaticResource PolarConverter}}" Value="1">
+                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -71,6 +70,14 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Setter Property="ToolTip" Value="{Binding SecurityName}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PointChange, Converter={StaticResource PolarConverter}}" Value="-1">
+                                    <Setter Property="Foreground" Value="#f44336"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PointChange, Converter={StaticResource PolarConverter}}" Value="1">
+                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -85,6 +92,14 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Setter Property="ToolTip" Value="{Binding SecurityName}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="-1">
+                                    <Setter Property="Foreground" Value="#f44336"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="1">
+                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -97,6 +112,14 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Setter Property="ToolTip" Value="{Binding SecurityName}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="-1">
+                                    <Setter Property="Foreground" Value="#f44336"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="1">
+                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
@@ -109,6 +132,14 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}" >
                             <Setter Property="ToolTip" Value="{Binding SecurityName}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="-1">
+                                    <Setter Property="Foreground" Value="#f44336"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding PerChange, Converter={StaticResource PolarConverter}}" Value="1">
+                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
                 </ListView>
