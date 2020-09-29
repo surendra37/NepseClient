@@ -10,7 +10,9 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
@@ -47,6 +49,8 @@ namespace TradeManagementSystemClient
             private set { _session = value; }
         }
         public bool IsAuthenticated { get; private set; }
+
+        public Action ShowAuthenticationDialog { get; set; }
 
         public TmsClient()
         {
@@ -160,108 +164,121 @@ namespace TradeManagementSystemClient
         }
         #endregion
 
-        public IEnumerable<IScripResponse> GetMyPortfolio()
+        public Task<IEnumerable<IScripResponse>> GetMyPortfolioAsync(CancellationToken ct = default)
         {
-            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
-            Client.Authenticator = new TmsAuthenticator(Session);
-            var response = Client.Get<ScripResponse[]>(request);
-            CheckAuthenticated(response);
-            // Update Wacc Value
-            foreach (var scrip in response.Data)
+            if (!IsAuthenticated)
             {
-                var key = scrip.Scrip;
-                if (_waccDict.ContainsKey(key))
-                {
-                    scrip.WaccValue = _waccDict[key];
-                    if (scrip.LastTransactionPrice == 0)
-                    {
-                        scrip.LastTransactionPrice = scrip.WaccValue;
-                        scrip.PreviousClosePrice = scrip.LastTransactionPrice;
-                        scrip.LTPTotal = scrip.WaccValue * scrip.TotalBalance;
-                        scrip.PreviousTotal = scrip.LTPTotal;
-                    }
-                }
-                else
-                {
-                    _waccDict.Add(key, scrip.WaccValue);
-                }
+                ShowAuthenticationDialog?.Invoke();
             }
-            return response.Data;
+            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
+
+            return Client.ExecuteGetAsync<ScripResponse[]>(request, ct)
+                .ContinueWith(EnsureAuthenticated, ct)
+                .ContinueWith<IEnumerable<IScripResponse>>(task =>
+                {
+                    var response = task.Result;
+                    // Update Wacc Value
+                    foreach (var scrip in response)
+                    {
+                        var key = scrip.Scrip;
+                        if (_waccDict.ContainsKey(key))
+                        {
+                            scrip.WaccValue = _waccDict[key];
+                            if (scrip.LastTransactionPrice == 0)
+                            {
+                                scrip.LastTransactionPrice = scrip.WaccValue;
+                                scrip.PreviousClosePrice = scrip.LastTransactionPrice;
+                                scrip.LTPTotal = scrip.WaccValue * scrip.TotalBalance;
+                                scrip.PreviousTotal = scrip.LTPTotal;
+                            }
+                        }
+                        else
+                        {
+                            _waccDict.Add(key, scrip.WaccValue);
+                        }
+                    }
+                    return response;
+                }, ct);
         }
 
-        public IEnumerable<ISecurityItem> GetLiveMarket()
+        public Task<IEnumerable<ISecurityItem>> GetLiveMarketAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/ws/top25securities");
 
-            var response = Client.Get<SocketResponse<SecurityItem2>>(request);
-            CheckAuthenticated(response);
-
-            return response.Data.Payload.Data.OrderByDescending(x => x.LastTradedDateTime);
+            return Client.ExecuteGetAsync<SocketResponse<SecurityItem2>>(request, ct)
+                .ContinueWith(EnsureAuthenticated, ct)
+                .ContinueWith<IEnumerable<ISecurityItem>>(task =>
+                {
+                    var response = task.Result;
+                    return response.Payload.Data
+                    .OrderByDescending(x => x.LastTradedDateTime)
+                    .ToArray();
+                }, ct);
         }
 
-        public IEnumerable<IMarketWatchResponse> GetMarketWatch()
+        public Task<IEnumerable<IMarketWatchResponse>> GetMarketWatchAsync(CancellationToken ct = default)
         {
             var request = new RestRequest($"/tmsapi/market-watch/user/{Session.UserId}");
-
-            var response = Client.Get<MarketWatchResponse[]>(request);
-            CheckAuthenticated(response);
-
-            return response.Data;
+            return Client.ExecuteGetAsync<MarketWatchResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<IMarketWatchResponse>>(EnsureAuthenticated, ct);
         }
 
         #region Top
-        public IEnumerable<ITopResponse> GetTopGainers()
+        public Task<IEnumerable<ITopResponse>> GetTopGainersAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/stock/top/gainer/8");
-            var response = Client.Get<TopResponse[]>(request);
-            CheckAuthenticated(response);
-            return response.Data;
+            return Client.ExecuteGetAsync<TopResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<ITopResponse>>(EnsureAuthenticated, ct);
         }
-        public IEnumerable<ITopResponse> GetTopLosers()
+        public Task<IEnumerable<ITopResponse>> GetTopLosersAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/stock/top/loser/8");
-            var response = Client.Get<TopResponse[]>(request);
-            CheckAuthenticated(response);
-            return response.Data;
+            return Client.ExecuteGetAsync<TopResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<ITopResponse>>(EnsureAuthenticated, ct);
         }
 
-        public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers()
+        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopTurnoversAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/turnover/9");
-            var response = Client.Get<TopSecuritiesResponse[]>(request);
-            CheckAuthenticated(response);
-            return response.Data;
+            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
         }
-        public IEnumerable<ITopSecuritiesResponse> GetTopTransactions()
+        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopTransactionsAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/transaction/9");
-            var response = Client.Get<TopSecuritiesResponse[]>(request);
-            CheckAuthenticated(response);
-            return response.Data;
+            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
         }
-        public IEnumerable<ITopSecuritiesResponse> GetTopVolumes()
+        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopVolumesAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/volume/9");
-            var response = Client.Get<TopSecuritiesResponse[]>(request);
-            CheckAuthenticated(response);
-            return response.Data;
+            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
+                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
         }
         #endregion
 
-        public IEnumerable<IStockQuoteResponse> GetStockQuote(string id)
+        public Task<IEnumerable<IStockQuoteResponse>> GetStockQuoteAsync(string id, CancellationToken ct = default)
         {
             var request = new RestRequest($"/tmsapi/ws/stockQuote/{id}");
-            var response = Client.Execute<SocketResponse<StockQuoteResponse>>(request);
-            CheckAuthenticated(response);
-            return response.Data.Payload.Data;
+            return Client.ExecuteGetAsync<SocketResponse<StockQuoteResponse>>(request, ct)
+                .ContinueWith(EnsureAuthenticated, ct)
+                .ContinueWith<IEnumerable<IStockQuoteResponse>>(task =>
+                {
+                    var response = task.Result;
+                    return response.Payload.Data;
+                });
         }
 
-        public IEnumerable<IIndexResponse> GetIndices()
+        public Task<IEnumerable<IIndexResponse>> GetIndicesAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/ws/index");
-            var response = Client.Execute<SocketResponse<IndexResponse>>(request);
-            CheckAuthenticated(response);
-            return response.Data.Payload.Data;
+            return Client.ExecuteGetAsync<SocketResponse<IndexResponse>>(request, ct)
+                .ContinueWith(EnsureAuthenticated, ct)
+                .ContinueWith<IEnumerable<IIndexResponse>>(task =>
+                {
+                    var response = task.Result;
+                    return response.Payload.Data;
+                });
         }
 
         #region Helpers
@@ -307,12 +324,6 @@ namespace TradeManagementSystemClient
                 }
             }
             return session;
-        }
-
-        private void CheckAuthenticated(IRestResponse response)
-        {
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                throw new AuthenticationException(response.Content);
         }
 
         public string GetSocketUrl()
@@ -399,6 +410,34 @@ namespace TradeManagementSystemClient
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to save wacc data");
+            }
+        }
+
+        public T EnsureAuthenticated<T>(Task<IRestResponse<T>> task)
+        {
+            var response = task.Result;
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                IsAuthenticated = false;
+                throw new AuthenticationException(response.Content);
+            }
+
+            return response.Data;
+        }
+
+        public void HandleAuthException(AggregateException ex, ICommand command, object commandParameter = null)
+        {
+            foreach (var innerEx in ex.InnerExceptions)
+            {
+                if (innerEx is AuthenticationException)
+                {
+                    Log.Error(ex, "Not Authorized. Requesting credentials");
+                    ShowAuthenticationDialog?.Invoke();
+                    if (IsAuthenticated)
+                    {
+                        command?.Execute(commandParameter);
+                    }
+                }
             }
         }
         #endregion

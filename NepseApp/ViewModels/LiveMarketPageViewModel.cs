@@ -1,7 +1,5 @@
 ﻿using NepseApp.Models;
-using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
-using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,7 +7,6 @@ using System.Linq;
 using TradeManagementSystem.Nepse;
 using TradeManagementSystemClient.Models;
 using TradeManagementSystemClient.Models.Responses;
-using WebSocket4Net;
 
 namespace NepseApp.ViewModels
 {
@@ -57,12 +54,19 @@ namespace NepseApp.ViewModels
             }
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
+                IsBusy = true;
                 EnqueMessage("Getting live market data");
-                Items = _client.GetLiveMarket().ToArray();
+                Items = await _client.GetLiveMarketAsync();
+                IsBusy = false;
+            }
+            catch(AggregateException ex)
+            {
+                IsBusy = false;
+                _client.HandleAuthException(ex, RefreshCommand);
             }
             catch (Exception ex)
             {
@@ -76,19 +80,6 @@ namespace NepseApp.ViewModels
             IsBusy = true;
             _socket.Send(_headerRequest, IsActive);
             //_socket.SendOpCode();
-        }
-
-        private void FirstTime()
-        {
-            try
-            {
-                EnqueMessage("Getting live market data");
-                Items = _client.GetLiveMarket().ToArray();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to get live market");
-            }
         }
     }
 }

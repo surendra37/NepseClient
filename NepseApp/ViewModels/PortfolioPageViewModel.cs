@@ -3,7 +3,6 @@ using NepseClient.Commons.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace NepseApp.ViewModels
 {
@@ -30,12 +29,14 @@ namespace NepseApp.ViewModels
             _client = client;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
-                Items =_client.GetMyPortfolio();
+                EnqueMessage("Loading portfolio");
+                Items = await _client.GetMyPortfolioAsync();
+                EnqueMessage("Portfolio loaded");
                 IsBusy = false;
                 RaisePropertyChanged(nameof(TotalScrips));
                 RaisePropertyChanged(nameof(TotalPrevious));
@@ -43,6 +44,11 @@ namespace NepseApp.ViewModels
                 RaisePropertyChanged(nameof(DailyGain));
                 RaisePropertyChanged(nameof(TotalWacc));
                 RaisePropertyChanged(nameof(TotalGain));
+            }
+            catch (AggregateException ex)
+            {
+                IsBusy = false;
+                _client.HandleAuthException(ex, RefreshCommand);
             }
             catch (Exception ex)
             {

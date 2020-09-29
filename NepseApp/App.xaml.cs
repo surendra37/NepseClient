@@ -39,9 +39,8 @@ namespace NepseApp
         {
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
 
-            var nepseClient = new ProxyNepseClient(new TmsClient());
+            var nepseClient = new TmsClient();
             nepseClient.RestoreSession();
-            containerRegistry.RegisterInstance<IAuthenticatableNepseClient>(nepseClient);
             containerRegistry.RegisterInstance<INepseClient>(nepseClient);
 
             var socketHelper = new SocketHelper(nepseClient);

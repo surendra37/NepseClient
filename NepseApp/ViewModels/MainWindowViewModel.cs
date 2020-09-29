@@ -18,7 +18,7 @@ namespace NepseApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private IAuthenticatableNepseClient _client;
+        private INepseClient _client;
         private readonly IDialogService _dialog;
         private readonly IRegionManager _regionManager;
 
@@ -56,14 +56,14 @@ namespace NepseApp.ViewModels
         }
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
-            IAuthenticatableNepseClient nepse, IDialogService dialog)
+            INepseClient nepse, IDialogService dialog)
         {
             _regionManager = regionManager;
             _client = nepse;
             _dialog = dialog;
             ApplicationCommand = applicationCommand;
             //_client.ShowAuthenticationDialog = ExecuteLoginCommand;
-            _client.ShowAuthenticationDialog = () => Application.Current.Dispatcher.Invoke(ExecuteLoginCommand);
+            _client.ShowAuthenticationDialog = ExecuteLoginCommand;
         }
 
         private IEnumerable<INavigationItem> GetNavigationItem()
@@ -73,14 +73,14 @@ namespace NepseApp.ViewModels
             {
                 Label = "Dashboard",
                 Icon = PackIconKind.ViewDashboard,
-                IsSelected = true,
+                IsSelected = false,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(DashboardPage)),
             };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = false,
+                IsSelected = true,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
             yield return new DividerNavigationItem();

@@ -65,15 +65,20 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
-                Indices = await Task.Run(() => _client.GetIndices());
+                Indices = await _client.GetIndicesAsync();
 
-                TopGainers = _client.GetTopGainers();
-                TopLosers = _client.GetTopLosers();
+                TopGainers = await _client.GetTopGainersAsync();
+                TopLosers = await _client.GetTopLosersAsync();
 
-                TopTurnovers = _client.GetTopTurnovers();
-                TopVolume = _client.GetTopVolumes();
-                TopTransactions = _client.GetTopTransactions();
+                TopTurnovers = await _client.GetTopTurnoversAsync();
+                TopVolume = await _client.GetTopVolumesAsync();
+                TopTransactions = await _client.GetTopTransactionsAsync();
                 IsBusy = false;
+            }
+            catch(AggregateException ex)
+            {
+                IsBusy = false;
+                _client.HandleAuthException(ex, RefreshCommand);
             }
             catch (Exception ex)
             {
