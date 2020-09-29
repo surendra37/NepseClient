@@ -62,12 +62,12 @@ namespace NepseApp.ViewModels
         public DelegateCommand LoginCommand =>
             _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, () => !IsBusy));
 
-        void ExecuteLoginCommand()
+        async void ExecuteLoginCommand()
         {
             try
             {
                 IsBusy = true;
-                _client.Authenticate(Host, Username, Password.GetString());
+                await _client.AuthenticateAsync(Host, Username, Password.GetString());
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
                 IsBusy = false;
 
@@ -75,6 +75,7 @@ namespace NepseApp.ViewModels
                 ConfigUtils.TmsHost = Host;
                 ConfigUtils.TmsUsername = Username;
                 ConfigUtils.TmsPassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                ConfigUtils.RememberPassword = IsRememberPassword;
                 ConfigUtils.SaveSettings();
 
             }
@@ -98,6 +99,12 @@ namespace NepseApp.ViewModels
                 Host = ConfigUtils.TmsHost;
                 Username = ConfigUtils.TmsUsername;
                 Password = ConfigUtils.TmsPassword.ToSecuredString();
+                IsRememberPassword = ConfigUtils.RememberPassword;
+
+                //if (ConfigUtils.AutoLogin)
+                //{
+                //    LoginCommand.Execute();
+                //}
             }
             catch (Exception ex)
             {

@@ -11,6 +11,9 @@ namespace NepseClient.Commons
         public static string TmsUsername { get; set; }
         public static string TmsPassword { get; set; }
 
+        public static bool RememberPassword { get; set; }
+        public static bool AutoLogin { get; set; }
+
         public static void AddOrUpdateAppSettings(params KeyValuePair<string, string>[] pairs)
         {
             AddOrUpdateAppSettings((IEnumerable<KeyValuePair<string, string>>)pairs);
@@ -49,6 +52,11 @@ namespace NepseClient.Commons
             TmsHost = ConfigurationManager.AppSettings["tms_host"];
             TmsUsername = ConfigurationManager.AppSettings["tms_username"];
             TmsPassword = StringCipher.Decrypt(ConfigurationManager.AppSettings["tms_password"]);
+            bool.TryParse(ConfigurationManager.AppSettings["remember_password"], out bool rememberPassword);
+            bool.TryParse(ConfigurationManager.AppSettings["auto_login"], out bool autoLogin);
+
+            RememberPassword = rememberPassword;
+            AutoLogin = autoLogin && rememberPassword;
         }
 
         public static void SaveSettings()
@@ -57,6 +65,8 @@ namespace NepseClient.Commons
             {
                 new KeyValuePair<string, string>("tms_host", TmsHost),
                 new KeyValuePair<string, string>("tms_username", TmsUsername),
+                new KeyValuePair<string, string>("remember_password", RememberPassword.ToString()),
+                new KeyValuePair<string, string>("auto_login", AutoLogin.ToString()),
                 new KeyValuePair<string, string>("tms_password", StringCipher.Encrypt(TmsPassword)),
             });
         }
@@ -64,6 +74,7 @@ namespace NepseClient.Commons
         public static void ResetSettings()
         {
             TmsHost = TmsUsername = TmsPassword = string.Empty;
+            RememberPassword = AutoLogin = false;
             SaveSettings();
         }
     }

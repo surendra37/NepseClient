@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NepseApp.ViewModels
 {
@@ -59,12 +60,12 @@ namespace NepseApp.ViewModels
             _client = client;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
-                Indices = _client.GetIndices();
+                Indices = await Task.Run(() => _client.GetIndices());
 
                 TopGainers = _client.GetTopGainers();
                 TopLosers = _client.GetTopLosers();

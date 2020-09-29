@@ -2,24 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace NepseClient.Commons
 {
-    public class ProxyNepseClient : INepseClient
+    public class ProxyNepseClient : IAuthenticatableNepseClient
     {
         private readonly INepseClient _client;
 
         public bool IsAuthenticated => _client.IsAuthenticated;
         public SessionInfo Session => _client.Session;
-        public Action<INepseClient> ShowAuthenticationDialog { get; }
-        public ProxyNepseClient(INepseClient client, Action<INepseClient> showAuthDialog)
+        public Action ShowAuthenticationDialog { get; set; }
+
+        public ProxyNepseClient(INepseClient client)
         {
             _client = client;
-            ShowAuthenticationDialog = showAuthDialog;
         }
 
         #region Session
-        public void Authenticate(string url, string username, string password) => _client.Authenticate(url, username, password);
+        public Task AuthenticateAsync(string url, string username, string password) => _client.AuthenticateAsync(url, username, password);
         public void Logout() => _client.Logout();
         public void RestoreSession() => _client.RestoreSession();
         public void SaveSession() => _client.SaveSession();
@@ -46,8 +47,26 @@ namespace NepseClient.Commons
             {
                 if (retry)
                 {
-                    ShowAuthenticationDialog?.Invoke(_client);
+                    ShowAuthenticationDialog?.Invoke();
                     return Retry(body, false);
+                }
+                throw;
+            }
+        }
+
+        private async Task<T> RetryAsync<T>(Func<Task<T>> body, bool retry = true)
+        {
+            try
+            {
+                return await body();
+
+            }
+            catch (AuthenticationException)
+            {
+                if (retry)
+                {
+                    ShowAuthenticationDialog?.Invoke();
+                    return await Retry(body, false);
                 }
                 throw;
             }

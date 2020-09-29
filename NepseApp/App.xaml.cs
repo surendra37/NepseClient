@@ -39,8 +39,9 @@ namespace NepseApp
         {
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
 
-            var nepseClient = new ProxyNepseClient(new TmsClient(), ShowAuthDialog);
+            var nepseClient = new ProxyNepseClient(new TmsClient());
             nepseClient.RestoreSession();
+            containerRegistry.RegisterInstance<IAuthenticatableNepseClient>(nepseClient);
             containerRegistry.RegisterInstance<INepseClient>(nepseClient);
 
             var socketHelper = new SocketHelper(nepseClient);
@@ -51,18 +52,6 @@ namespace NepseApp
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
-        }
-
-        private void ShowAuthDialog(INepseClient client)
-        {
-            var dialog = Container.Resolve<IDialogService>();
-            var success = false;
-            dialog.ShowDialog(nameof(AuthenticationDialog), new DialogParameters { { "Client", client } }, result =>
-            {
-                success = result?.Result == ButtonResult.OK;
-            });
-            if (!success)
-                throw new AuthenticationException("Not Authenticated.");
         }
 
         protected override void OnExit(ExitEventArgs e)

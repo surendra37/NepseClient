@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace NepseClient.Commons.Contracts
 {
     public interface INepseClient
@@ -7,10 +9,10 @@ namespace NepseClient.Commons.Contracts
         SessionInfo Session { get; }
         bool IsAuthenticated { get; }
 
-        void Authenticate(string url, string username, string password);
+        Task AuthenticateAsync(string url, string username, string password);
         void SaveSession();
         void RestoreSession();
-        void Logout(); 
+        void Logout();
         #endregion
 
         IEnumerable<IScripResponse> GetMyPortfolio();

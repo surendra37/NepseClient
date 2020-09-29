@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
+using System.Threading.Tasks;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
@@ -18,8 +19,21 @@ namespace TradeManagementSystemClient
     public class TmsClient : INepseClient
     {
         private const string _sessionFilePath = "tms.session";
-        private RestClient _client;
         private IDictionary<string, float> _waccDict;
+
+        private RestClient _client;
+        public RestClient Client
+        {
+            get
+            {
+                if (_client is null)
+                {
+                    throw new AuthenticationException("Not Authorized");
+                }
+                return _client;
+            }
+            set { _client = value; }
+        }
 
         private SessionInfo _session;
         public SessionInfo Session
@@ -52,7 +66,7 @@ namespace TradeManagementSystemClient
         public string GetBusinessDate()
         {
             var request = new RestRequest("/tmsapi/dashboard/businessDate");
-            var response = _client.Get<string>(request);
+            var response = Client.Get<string>(request);
             return response.Data;
         }
         #endregion
@@ -75,8 +89,8 @@ namespace TradeManagementSystemClient
 
             var session = File.ReadAllText(_sessionFilePath);
             Session = JsonConvert.DeserializeObject<SessionInfo>(session);
-            _client = CreateClient(Session.Host);
-            _client.Authenticator = new TmsAuthenticator(Session);
+            Client = CreateClient(Session.Host);
+            Client.Authenticator = new TmsAuthenticator(Session);
 
             IsAuthenticated = true;
             Log.Debug("Session restored [{0}]", Session.LastUpdated);
@@ -87,7 +101,7 @@ namespace TradeManagementSystemClient
             var request = new RestRequest("/tmsapi/authenticate/logout");
             try
             {
-                var response = _client.Post(request);
+                var response = Client.Post(request);
             }
             catch (Exception ex)
             {
@@ -96,7 +110,7 @@ namespace TradeManagementSystemClient
 
             Session = null;
             IsAuthenticated = false;
-            _client.Authenticator = null;
+            Client.Authenticator = null;
 
             if (!File.Exists(_sessionFilePath))
                 return;
@@ -104,48 +118,53 @@ namespace TradeManagementSystemClient
             File.Delete(_sessionFilePath);
         }
 
-        public void Authenticate(string url, string username, string password)
+        public Task AuthenticateAsync(string url, string username, string password)
         {
             Log.Debug("Authenticating...");
-            _client = CreateClient(url);
+            Client = CreateClient(url);
 
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(new AuthenticationRequest(username, password));
-            _client.Authenticator = null;
-            var response = _client.Post<AuthenticationResponse>(request);
-            if (!response.IsSuccessful)
-            {
-                throw new AuthenticationException(response.Content);
-            }
-            if (response.Data.Data.IsCookieEnabled)
-            {
-                var cookies = response.Headers.FirstOrDefault(x => x.Name.Equals("Set-Cookie"));
-                if (cookies is null)
-                {
-                    throw new Exception("Cookies Not Found");
-                }
-                var parts = cookies.Value.ToString().Split(',');
-                Session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
-            }
-            else
-            {
-                Session = GetSessionInfo(null, response.Data.Data);
-            }
-            Session.Host = url;
-            Session.Username = username;
-            _client.Authenticator = new TmsAuthenticator(Session);
-            Log.Debug("Authentication Complete");
-            Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
+            Client.Authenticator = null;
+            return Client.ExecutePostAsync<AuthenticationResponse>(request)
+                 .ContinueWith(responseTask =>
+                 {
+                     var response = responseTask.Result;
+                     if (!response.IsSuccessful)
+                     {
+                         throw new AuthenticationException(response.Content);
+                     }
+                     if (response.Data.Data.IsCookieEnabled)
+                     {
+                         var cookies = response.Headers.FirstOrDefault(x => x.Name.Equals("Set-Cookie"));
+                         if (cookies is null)
+                         {
+                             throw new Exception("Cookies Not Found");
+                         }
+                         var parts = cookies.Value.ToString().Split(',');
+                         Session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
+                     }
+                     else
+                     {
+                         Session = GetSessionInfo(null, response.Data.Data);
+                     }
+                     Session.Host = url;
+                     Session.Username = username;
+                     Client.Authenticator = new TmsAuthenticator(Session);
+                     Log.Debug("Authentication Complete");
+                     Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
 
-            IsAuthenticated = true;
+                     IsAuthenticated = true;
+                 });
+
         }
         #endregion
 
         public IEnumerable<IScripResponse> GetMyPortfolio()
         {
             var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
-            _client.Authenticator = new TmsAuthenticator(Session);
-            var response = _client.Get<ScripResponse[]>(request);
+            Client.Authenticator = new TmsAuthenticator(Session);
+            var response = Client.Get<ScripResponse[]>(request);
             CheckAuthenticated(response);
             // Update Wacc Value
             foreach (var scrip in response.Data)
@@ -154,7 +173,7 @@ namespace TradeManagementSystemClient
                 if (_waccDict.ContainsKey(key))
                 {
                     scrip.WaccValue = _waccDict[key];
-                    if(scrip.LastTransactionPrice == 0)
+                    if (scrip.LastTransactionPrice == 0)
                     {
                         scrip.LastTransactionPrice = scrip.WaccValue;
                         scrip.PreviousClosePrice = scrip.LastTransactionPrice;
@@ -174,7 +193,7 @@ namespace TradeManagementSystemClient
         {
             var request = new RestRequest("/tmsapi/ws/top25securities");
 
-            var response = _client.Get<SocketResponse<SecurityItem2>>(request);
+            var response = Client.Get<SocketResponse<SecurityItem2>>(request);
             CheckAuthenticated(response);
 
             return response.Data.Payload.Data.OrderByDescending(x => x.LastTradedDateTime);
@@ -184,7 +203,7 @@ namespace TradeManagementSystemClient
         {
             var request = new RestRequest($"/tmsapi/market-watch/user/{Session.UserId}");
 
-            var response = _client.Get<MarketWatchResponse[]>(request);
+            var response = Client.Get<MarketWatchResponse[]>(request);
             CheckAuthenticated(response);
 
             return response.Data;
@@ -194,14 +213,14 @@ namespace TradeManagementSystemClient
         public IEnumerable<ITopResponse> GetTopGainers()
         {
             var request = new RestRequest("/tmsapi/stock/top/gainer/8");
-            var response = _client.Get<TopResponse[]>(request);
+            var response = Client.Get<TopResponse[]>(request);
             CheckAuthenticated(response);
             return response.Data;
         }
         public IEnumerable<ITopResponse> GetTopLosers()
         {
             var request = new RestRequest("/tmsapi/stock/top/loser/8");
-            var response = _client.Get<TopResponse[]>(request);
+            var response = Client.Get<TopResponse[]>(request);
             CheckAuthenticated(response);
             return response.Data;
         }
@@ -209,21 +228,21 @@ namespace TradeManagementSystemClient
         public IEnumerable<ITopSecuritiesResponse> GetTopTurnovers()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/turnover/9");
-            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            var response = Client.Get<TopSecuritiesResponse[]>(request);
             CheckAuthenticated(response);
             return response.Data;
         }
         public IEnumerable<ITopSecuritiesResponse> GetTopTransactions()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/transaction/9");
-            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            var response = Client.Get<TopSecuritiesResponse[]>(request);
             CheckAuthenticated(response);
             return response.Data;
         }
         public IEnumerable<ITopSecuritiesResponse> GetTopVolumes()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/volume/9");
-            var response = _client.Get<TopSecuritiesResponse[]>(request);
+            var response = Client.Get<TopSecuritiesResponse[]>(request);
             CheckAuthenticated(response);
             return response.Data;
         }
@@ -232,7 +251,7 @@ namespace TradeManagementSystemClient
         public IEnumerable<IStockQuoteResponse> GetStockQuote(string id)
         {
             var request = new RestRequest($"/tmsapi/ws/stockQuote/{id}");
-            var response = _client.Execute<SocketResponse<StockQuoteResponse>>(request);
+            var response = Client.Execute<SocketResponse<StockQuoteResponse>>(request);
             CheckAuthenticated(response);
             return response.Data.Payload.Data;
         }
@@ -240,7 +259,7 @@ namespace TradeManagementSystemClient
         public IEnumerable<IIndexResponse> GetIndices()
         {
             var request = new RestRequest("/tmsapi/ws/index");
-            var response = _client.Execute<SocketResponse<IndexResponse>>(request);
+            var response = Client.Execute<SocketResponse<IndexResponse>>(request);
             CheckAuthenticated(response);
             return response.Data.Payload.Data;
         }
@@ -300,11 +319,11 @@ namespace TradeManagementSystemClient
         {
             if (Session.CookieEnabled)
             {
-                return $"wss://{_client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}";
+                return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}";
             }
             else
             {
-                return $"wss://{_client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={Session.AccessToken}";
+                return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={Session.AccessToken}";
             }
         }
 
@@ -353,7 +372,7 @@ namespace TradeManagementSystemClient
             foreach (var line in File.ReadLines(filepath).Skip(1)) // Skip first headers
             {
                 var columns = line.Split(",");
-                if(columns.Length < 2) continue;
+                if (columns.Length < 2) continue;
                 var name = columns[0];
                 var value = float.Parse(columns[1]);
                 _waccDict.Add(name, value);

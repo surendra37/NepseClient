@@ -22,6 +22,6 @@
         <TextBox Text="{Binding Username}" md:HintAssist.Hint="Username" md:HintAssist.IsFloating="True"/>
         <PasswordBox helpers:PasswordBoxHelper.SecurePassword="{Binding Password}" md:HintAssist.Hint="Password" md:HintAssist.IsFloating="True"/>
         <CheckBox Content="Remember Password" IsChecked="{Binding IsRememberPassword}" Margin="0 8"/>
-        <Button Content="Login" Command="{Binding LoginCommand}" Margin="0 8"/>
+        <Button Content="Login" Command="{Binding LoginCommand}" IsDefault="True" Margin="0 8"/>
     </StackPanel>
 </UserControl>
