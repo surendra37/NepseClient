@@ -20,7 +20,8 @@ namespace TradeManagementSystemClient
 {
     public class TmsClient : INepseClient
     {
-        private const string _sessionFilePath = "tms.session";
+        private readonly string _sessionFilePath;
+        private readonly string _waccFilePath;
         private IDictionary<string, float> _waccDict;
 
         private RestClient _client;
@@ -54,6 +55,15 @@ namespace TradeManagementSystemClient
 
         public TmsClient()
         {
+            var commonPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            var folderPath = Path.Combine(commonPath, "Surendra37", "NepseApp");
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            _sessionFilePath = Path.Combine(folderPath, "tms.session");
+            _waccFilePath = Path.Combine(folderPath, "wacc.csv");
+
             LoadWacc();
         }
 
@@ -376,11 +386,10 @@ namespace TradeManagementSystemClient
 
         private void LoadWacc()
         {
-            var filepath = "wacc.csv";
             _waccDict = new Dictionary<string, float>();
-            if (!File.Exists(filepath)) return;
+            if (!File.Exists(_waccFilePath)) return;
 
-            foreach (var line in File.ReadLines(filepath).Skip(1)) // Skip first headers
+            foreach (var line in File.ReadLines(_waccFilePath).Skip(1)) // Skip first headers
             {
                 var columns = line.Split(",");
                 if (columns.Length < 2) continue;
@@ -392,7 +401,6 @@ namespace TradeManagementSystemClient
 
         private void SaveWacc()
         {
-            var filepath = "wacc.csv";
             var builder = new StringBuilder();
             // Add header
             builder.AppendLine("Name, WACC");
@@ -405,7 +413,7 @@ namespace TradeManagementSystemClient
             }
             try
             {
-                File.WriteAllText(filepath, builder.ToString());
+                File.WriteAllText(_waccFilePath, builder.ToString());
             }
             catch (Exception ex)
             {

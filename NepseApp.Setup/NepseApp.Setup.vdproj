@@ -15,7 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_51326F4507FD42C19F7F77ECCFD53645"
+        "MsmKey" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A4BC5CB877F04FB197CBC3A68A313444"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -84,6 +90,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67EA5F7147EA4006A8D6CE9BABF50180"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\..\\Downloads\\fluctuation.ico"
+            "TargetName" = "8:fluctuation.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_0E22893355064494A0E5EFB149FA69DF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -141,7 +167,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:NepseApp"
         "ProductCode" = "8:{1765CD72-2A1F-47FD-BD7D-859553116040}"
-        "PackageCode" = "8:{BDF05D29-5AC4-42C8-B6D1-E954F264AB91}"
+        "PackageCode" = "8:{E6E86979-7E3A-444F-BE7E-2675C42357D0}"
         "UpgradeCode" = "8:{5BB7D42D-B90E-4B18-8919-19C518A3ABEC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -158,7 +184,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Client application for Nepse Trade Management System"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPPRODUCTICON" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -261,6 +287,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_3306FE28EDD44647A752CD33AF25DBF8"
+            {
+            "Name" = "8:Nepse App"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_A4BC5CB877F04FB197CBC3A68A313444"
+            "Folder" = "8:_A31B60E0E51240389D815D6D89AEACD1"
+            "WorkingFolder" = "8:_0E22893355064494A0E5EFB149FA69DF"
+            "Icon" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
@@ -660,9 +700,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_51326F4507FD42C19F7F77ECCFD53645"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A4BC5CB877F04FB197CBC3A68A313444"
             {
-            "SourcePath" = "8:..\\NepseApp\\obj\\Debug\\netcoreapp3.1\\NepseApp.dll"
+            "SourcePath" = "8:..\\NepseApp\\obj\\Debug\\netcoreapp3.1\\NepseApp.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0E22893355064494A0E5EFB149FA69DF"
@@ -681,7 +721,7 @@
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
+            "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{C2ECF70A-4570-4627-B391-A7B1DB5181D5}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
