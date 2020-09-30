@@ -10,7 +10,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Commons", "Neps
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_lib", "_lib", "{177EC4C8-1907-43FE-8DED-8A9A39E32B80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseApp", "NepseApp\NepseApp.csproj", "{C2ECF70A-4570-4627-B391-A7B1DB5181D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseApp", "NepseApp\NepseApp.csproj", "{C2ECF70A-4570-4627-B391-A7B1DB5181D5}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NepseApp.Setup", "NepseApp.Setup\NepseApp.Setup.vdproj", "{6CF440CB-9DEA-4184-BD4C-F3C420E86DC9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_assets", "_assets", "{256DA586-17CA-4060-9470-0D6C3228656D}"
+	ProjectSection(SolutionItems) = preProject
+		assets\nepse_tms.pfx = assets\nepse_tms.pfx
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +41,8 @@ Global
 		{C2ECF70A-4570-4627-B391-A7B1DB5181D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2ECF70A-4570-4627-B391-A7B1DB5181D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2ECF70A-4570-4627-B391-A7B1DB5181D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CF440CB-9DEA-4184-BD4C-F3C420E86DC9}.Debug|Any CPU.ActiveCfg = Debug
+		{6CF440CB-9DEA-4184-BD4C-F3C420E86DC9}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
