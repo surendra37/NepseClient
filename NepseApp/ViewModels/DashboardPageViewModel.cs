@@ -85,26 +85,5 @@ namespace NepseApp.ViewModels
                 Log.Error(ex, "Failed to load dashboard");
             }
         }
-
-        #region IActiveAware
-        private bool _isActive;
-        public bool IsActive
-        {
-            get { return _isActive; }
-            set
-            {
-                _isActive = value;
-                OnIsActiveChanged();
-            }
-        }
-
-        public event EventHandler IsActiveChanged;
-
-        private void OnIsActiveChanged()
-        {
-            RefreshCommand.IsActive = IsActive; //set the command as active            
-            IsActiveChanged?.Invoke(this, new EventArgs()); //invoke the event for all listeners
-        }
-        #endregion
     }
 }
