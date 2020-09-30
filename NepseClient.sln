@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30406.217
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseConsoleClient", "NepseConsoleClient\NepseConsoleClient.csproj", "{1553D2C4-FE47-44F8-A225-9148F6343730}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeManagementSystemClient", "TradeManagementSystemClient\TradeManagementSystemClient.csproj", "{C24F418B-DB14-45F0-8176-E825CF5064EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Commons", "NepseClient.Commons\NepseClient.Commons.csproj", "{456F3585-A2DF-48C3-965D-69D33353D222}"
@@ -25,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1553D2C4-FE47-44F8-A225-9148F6343730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1553D2C4-FE47-44F8-A225-9148F6343730}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1553D2C4-FE47-44F8-A225-9148F6343730}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1553D2C4-FE47-44F8-A225-9148F6343730}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C24F418B-DB14-45F0-8176-E825CF5064EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
