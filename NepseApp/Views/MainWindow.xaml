@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Height="480" Width="640" 
+        Height="640" Width="960" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
@@ -12,7 +12,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         WindowStartupLocation="CenterScreen"
-        WindowState="Maximized">
+        MinWidth="960" MinHeight="640">
     <mde:MaterialWindow.TitleTemplate>
         <DataTemplate>
             <Grid>
@@ -46,8 +46,8 @@
     </mde:MaterialWindow.TitleTemplate>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="160"/>
-            <ColumnDefinition Width="2" />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -55,10 +55,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <mde:SideNavigation Grid.Column="0" Items="{Binding Path=NavigationItems, Mode=OneTime}"
-                    NavigationItemSelected="NavigationItemSelectedHandler"/>
+        <mde:NavigationRail Grid.Column="0" Grid.RowSpan="2" Items="{Binding Path=NavigationItems, Mode=OneTime}"
+                    NavigationItemSelected="NavigationItemSelectedHandler" 
+                            Style="{StaticResource MaterialDesignNavigationRailPrimary}"/>
 
-        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>
+        <!--<GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>-->
 
         <ContentControl Grid.Column="2" prism:RegionManager.RegionName="ContentRegion" />
 

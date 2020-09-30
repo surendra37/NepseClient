@@ -68,7 +68,7 @@ namespace NepseApp.ViewModels
 
         private IEnumerable<INavigationItem> GetNavigationItem()
         {
-            yield return new SubheaderNavigationItem() { Subheader = "General" };
+            //yield return new SubheaderNavigationItem() { Subheader = "General" };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Dashboard",
@@ -83,9 +83,9 @@ namespace NepseApp.ViewModels
                 IsSelected = true,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
-            yield return new DividerNavigationItem();
+            //yield return new DividerNavigationItem();
 
-            yield return new SubheaderNavigationItem() { Subheader = "Market" };
+            //yield return new SubheaderNavigationItem() { Subheader = "Market" };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Live",
