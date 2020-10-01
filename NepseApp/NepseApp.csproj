@@ -6,10 +6,10 @@
     <AssemblyName>NepseApp</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../assets/nepse_tms.pfx</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>fluctuation.ico</ApplicationIcon>
+    <ApplicationIcon>NepseAppLogo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="splash-screen.jpg" />
+    <None Remove="splash.jpg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
@@ -28,6 +28,6 @@
     <Folder Include="Behaviors\" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="splash-screen.jpg" />
+    <SplashScreen Include="splash.jpg" />
   </ItemGroup>
 </Project>

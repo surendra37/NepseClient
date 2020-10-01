@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
+        "MsmKey" = "8:_1AE17B7E3F2741A59EB5A406058DDB85"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -43,6 +43,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +67,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -90,10 +106,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67EA5F7147EA4006A8D6CE9BABF50180"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1AE17B7E3F2741A59EB5A406058DDB85"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\..\\Downloads\\fluctuation.ico"
-            "TargetName" = "8:fluctuation.ico"
+            "SourcePath" = "8:..\\NepseApp\\NepseAppLogo.ico"
+            "TargetName" = "8:NepseAppLogo.ico"
             "Tag" = "8:"
             "Folder" = "8:_0E22893355064494A0E5EFB149FA69DF"
             "Condition" = "8:"
@@ -184,7 +200,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Client application for Nepse Trade Management System"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
+        "ARPPRODUCTICON" = "8:_1AE17B7E3F2741A59EB5A406058DDB85"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -298,7 +314,7 @@
             "Target" = "8:_A4BC5CB877F04FB197CBC3A68A313444"
             "Folder" = "8:_A31B60E0E51240389D815D6D89AEACD1"
             "WorkingFolder" = "8:_0E22893355064494A0E5EFB149FA69DF"
-            "Icon" = "8:_67EA5F7147EA4006A8D6CE9BABF50180"
+            "Icon" = "8:_1AE17B7E3F2741A59EB5A406058DDB85"
             "Feature" = "8:"
             }
         }
