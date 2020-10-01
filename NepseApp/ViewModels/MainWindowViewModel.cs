@@ -4,15 +4,18 @@ using NepseApp.Models;
 using NepseApp.Views;
 using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Serilog;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Windows;
+using TradeManagementSystemClient;
 
 namespace NepseApp.ViewModels
 {
@@ -20,6 +23,7 @@ namespace NepseApp.ViewModels
     {
         private INepseClient _client;
         private readonly IDialogService _dialog;
+        private readonly MeroshareClient _meroshareClient;
         private readonly IRegionManager _regionManager;
 
         public IApplicationCommand ApplicationCommand { get; }
@@ -40,7 +44,7 @@ namespace NepseApp.ViewModels
                 {
                     return _client.IsAuthenticated;
                 }
-                catch 
+                catch
                 {
                     return false;
                 }
@@ -56,13 +60,13 @@ namespace NepseApp.ViewModels
         }
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
-            INepseClient nepse, IDialogService dialog)
+            INepseClient nepse, IDialogService dialog, MeroshareClient meroshareClient)
         {
             _regionManager = regionManager;
             _client = nepse;
             _dialog = dialog;
+            _meroshareClient = meroshareClient;
             ApplicationCommand = applicationCommand;
-            //_client.ShowAuthenticationDialog = ExecuteLoginCommand;
             _client.ShowAuthenticationDialog = ExecuteLoginCommand;
         }
 
@@ -165,6 +169,78 @@ namespace NepseApp.ViewModels
             }
 
             RaisePropertyChanged(nameof(IsAuthenticated));
+        }
+
+        private bool _isImporting;
+        public bool IsImporting
+        {
+            get { return _isImporting; }
+            set
+            {
+                if (SetProperty(ref _isImporting, value))
+                {
+                    ImportPortfolioCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        private DelegateCommand _importPortfolioCommand;
+        public DelegateCommand ImportPortfolioCommand =>
+            _importPortfolioCommand ?? (_importPortfolioCommand = new DelegateCommand(ExecuteImportPortfolioCommand, () => !IsImporting));
+
+        async void ExecuteImportPortfolioCommand()
+        {
+            try
+            {
+                IsImporting = true;
+                MessageQueue.Enqueue("Importing wacc from meroshare");
+                if (!_meroshareClient.IsAuthenticated)
+                {
+                    MessageQueue.Enqueue("Not Authorized");
+                    _dialog.ShowDialog(nameof(MeroshareImportDialog), null, result =>
+                    {
+                        if (result?.Result == ButtonResult.OK)
+                        {
+                            ImportPortfolioCommand.Execute();
+                        }
+                    });
+                    IsImporting = false;
+                    return;
+                }
+
+                var me = await _meroshareClient.GetOwnDetailsAsync();
+                var myShares = await _meroshareClient.GetMySharesAsync();
+
+                using (var viewFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "view.jl.bk")))
+                using (var searchFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "search.jl.bk")))
+                    foreach (var share in myShares)
+                    {
+                        var view = await _meroshareClient.ViewMyPurchaseAsync(me.Demat, share);
+                        await viewFile.WriteLineAsync(JsonConvert.SerializeObject(view));
+
+                        var searches = await _meroshareClient.SearchMyPurchaseAsync(me.Demat, share);
+                        await searchFile.WriteLineAsync(JsonConvert.SerializeObject(searches));
+                    }
+
+                // Replace the old file
+                File.Move(Path.Combine(Constants.AppDataPath.Value, "view.jl.bk"), Path.Combine(Constants.AppDataPath.Value, "view.jl"), true);
+                File.Move(Path.Combine(Constants.AppDataPath.Value, "search.jl.bk"), Path.Combine(Constants.AppDataPath.Value, "search.jl"), true);
+
+                _client.LoadWacc();
+                MessageQueue.Enqueue("Wacc imported.");
+                IsImporting = false;
+            }
+            catch (AuthenticationException)
+            {
+                IsImporting = false;
+                ImportPortfolioCommand.Execute();
+            }
+            catch (System.Exception ex)
+            {
+                IsImporting = false;
+                MessageQueue.Enqueue("Failed to load portfolio. Error: " + ex.Message);
+                Log.Error(ex, "Failed to import portfolio");
+            }
         }
     }
 }

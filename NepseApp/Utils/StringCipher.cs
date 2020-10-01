@@ -9,6 +9,8 @@ namespace NepseApp.Utils
     {
         public static string Encrypt(string clearText)
         {
+            if (string.IsNullOrEmpty(clearText)) return string.Empty;
+
             string EncryptionKey = "Nepse@2020";
             byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
             using (Aes encryptor = Aes.Create())
@@ -30,6 +32,8 @@ namespace NepseApp.Utils
         }
         public static string Decrypt(string cipherText)
         {
+            if (string.IsNullOrEmpty(cipherText)) return string.Empty;
+
             string EncryptionKey = "Nepse@2020";
             cipherText = cipherText.Replace(" ", "+");
             byte[] cipherBytes = Convert.FromBase64String(cipherText);
