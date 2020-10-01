@@ -40,6 +40,15 @@
                     </Button>
                     <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
                             Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
+
+                    <Button Style="{StaticResource WindowButtonStyle}" 
+                            ToolTip="Import WACC from meroshare"
+                            Command="{Binding DataContext.ImportPortfolioCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
+                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Import" />
+                    </Button>
+                    <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
+                            Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
+
                 </StackPanel>
             </Grid>
         </DataTemplate>

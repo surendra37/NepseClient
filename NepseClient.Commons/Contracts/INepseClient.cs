@@ -35,5 +35,6 @@ namespace NepseClient.Commons.Contracts
         Task<IEnumerable<ISecurityItem>> GetLiveMarketAsync(CancellationToken ct = default);
         Task<IEnumerable<IMarketWatchResponse>> GetMarketWatchAsync(CancellationToken ct = default);
         Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default);
+        void LoadWacc();
     }
 }

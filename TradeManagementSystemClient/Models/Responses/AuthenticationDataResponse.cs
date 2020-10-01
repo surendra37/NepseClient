@@ -2,7 +2,6 @@
 
 namespace TradeManagementSystemClient.Models.Responses
 {
-
     public class AuthenticationDataResponse
     {
         [JsonProperty("clientDealerMember")]
@@ -19,6 +18,4 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonProperty("user")]
         public ClientResponse User { get; set; }
     }
-
-
 }

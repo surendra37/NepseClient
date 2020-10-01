@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading;
@@ -21,7 +22,6 @@ namespace TradeManagementSystemClient
     public class TmsClient : INepseClient
     {
         private readonly string _sessionFilePath;
-        private readonly string _waccFilePath;
         private IDictionary<string, float> _waccDict;
 
         private RestClient _client;
@@ -55,14 +55,7 @@ namespace TradeManagementSystemClient
 
         public TmsClient()
         {
-            var commonPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            var folderPath = Path.Combine(commonPath, "Surendra37", "NepseApp");
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            _sessionFilePath = Path.Combine(folderPath, "tms.session");
-            _waccFilePath = Path.Combine(folderPath, "wacc.csv");
+            _sessionFilePath = Path.Combine(Constants.AppDataPath.Value, "tms.session");
 
             LoadWacc();
         }
@@ -88,7 +81,6 @@ namespace TradeManagementSystemClient
         #region Session
         public void SaveSession()
         {
-            SaveWacc();
             if (Session is null) return;
 
             var serialized = JsonConvert.SerializeObject(Session);
@@ -97,7 +89,6 @@ namespace TradeManagementSystemClient
 
         public void RestoreSession()
         {
-            LoadWacc();
             if (!File.Exists(_sessionFilePath))
                 return;
 
@@ -391,41 +382,45 @@ namespace TradeManagementSystemClient
             return true;
         }
 
-        private void LoadWacc()
+        public void LoadWacc()
         {
-            _waccDict = new Dictionary<string, float>();
-            if (!File.Exists(_waccFilePath)) return;
+            var costDict = new Dictionary<string, float>();
+            var quantityDict = new Dictionary<string, int>();
 
-            foreach (var line in File.ReadLines(_waccFilePath).Skip(1)) // Skip first headers
+            if (File.Exists(Path.Combine(Constants.AppDataPath.Value, "view.jl")))
             {
-                var columns = line.Split(",");
-                if (columns.Length < 2) continue;
-                var name = columns[0];
-                var value = float.Parse(columns[1]);
-                _waccDict.Add(name, value);
-            }
-        }
+                foreach (var line in File.ReadAllLines(Path.Combine(Constants.AppDataPath.Value, "view.jl")))
+                {
+                    var view = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse>(line);
+                    if (string.IsNullOrEmpty(view.ScripName)) continue;
 
-        private void SaveWacc()
-        {
-            var builder = new StringBuilder();
-            // Add header
-            builder.AppendLine("Name, WACC");
-            foreach (var pair in _waccDict)
-            {
-                builder.Append(pair.Key);
-                builder.Append(',');
-                builder.Append(pair.Value);
-                builder.AppendLine();
+                    costDict.Add(view.ScripName, view.AverageBuyRate * view.TotalQuantity);
+                    quantityDict.Add(view.ScripName, view.TotalQuantity);
+                }
             }
-            try
+
+            if (File.Exists(Path.Combine(Constants.AppDataPath.Value, "search.jl")))
             {
-                File.WriteAllText(_waccFilePath, builder.ToString());
+                foreach (var line in File.ReadAllLines(Path.Combine(Constants.AppDataPath.Value, "search.jl")))
+                {
+                    var searches = JsonConvert.DeserializeObject<MeroshareSearchMyPurchaseRespose[]>(line);
+                    if (searches.Length == 0) continue;
+                    var scrip = searches[0].Scrip;
+                    if (costDict.ContainsKey(scrip))
+                    {
+                        // average out
+                        costDict[scrip] += searches.Sum(x => x.Rate * x.TransactionQuantity);
+                        quantityDict[scrip] += searches.Sum(x => x.TransactionQuantity);
+                    }
+                    else
+                    {
+                        costDict.Add(scrip, searches.Sum(x => x.Rate * x.TransactionQuantity));
+                        quantityDict.Add(scrip, searches.Sum(x => x.TransactionQuantity));
+                    }
+                }
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to save wacc data");
-            }
+
+            _waccDict = costDict.ToDictionary(x => x.Key, x => x.Value / quantityDict[x.Key]);
         }
 
         public T EnsureAuthenticated<T>(Task<IRestResponse<T>> task)

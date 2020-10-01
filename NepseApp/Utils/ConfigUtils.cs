@@ -11,6 +11,11 @@ namespace NepseClient.Commons
         public static string TmsUsername { get; set; }
         public static string TmsPassword { get; set; }
 
+        public static int MeroshareClientId { get; set; }
+        public static string MeroshareUsername { get; set; }
+        public static string MerosharePassword { get; set; }
+        public static bool MeroshareRememberPassword { get; set; }
+
         public static bool RememberPassword { get; set; }
         public static bool AutoLogin { get; set; }
 
@@ -51,12 +56,22 @@ namespace NepseClient.Commons
         {
             TmsHost = ConfigurationManager.AppSettings["tms_host"];
             TmsUsername = ConfigurationManager.AppSettings["tms_username"];
+            MeroshareUsername = ConfigurationManager.AppSettings["meroshare_username"];
+
             TmsPassword = StringCipher.Decrypt(ConfigurationManager.AppSettings["tms_password"]);
+            MerosharePassword = StringCipher.Decrypt(ConfigurationManager.AppSettings["meroshare_password"]);
+
+            int.TryParse(ConfigurationManager.AppSettings["meroshare_client_id"], out int meroshareClientId);
+
             bool.TryParse(ConfigurationManager.AppSettings["remember_password"], out bool rememberPassword);
             bool.TryParse(ConfigurationManager.AppSettings["auto_login"], out bool autoLogin);
+            bool.TryParse(ConfigurationManager.AppSettings["meroshare_remember_password"], out bool meroshareRememberPassword);
 
             RememberPassword = rememberPassword;
             AutoLogin = autoLogin && rememberPassword;
+
+            MeroshareClientId = meroshareClientId;
+            MeroshareRememberPassword = meroshareRememberPassword;
         }
 
         public static void SaveSettings()
@@ -68,6 +83,11 @@ namespace NepseClient.Commons
                 new KeyValuePair<string, string>("remember_password", RememberPassword.ToString()),
                 new KeyValuePair<string, string>("auto_login", AutoLogin.ToString()),
                 new KeyValuePair<string, string>("tms_password", StringCipher.Encrypt(TmsPassword)),
+                
+                new KeyValuePair<string, string>("meroshare_client_id", MeroshareClientId.ToString()),
+                new KeyValuePair<string, string>("meroshare_username", MeroshareUsername),
+                new KeyValuePair<string, string>("meroshare_password", StringCipher.Encrypt(MerosharePassword)),
+                new KeyValuePair<string, string>("meroshare_remember_password", MerosharePassword.ToString()),
             });
         }
 
@@ -75,6 +95,11 @@ namespace NepseClient.Commons
         {
             TmsHost = TmsUsername = TmsPassword = string.Empty;
             RememberPassword = AutoLogin = false;
+
+            MeroshareClientId = 0;
+            MeroshareUsername = MerosharePassword = string.Empty;
+            MeroshareRememberPassword = false;
+
             SaveSettings();
         }
     }
