@@ -34,5 +34,6 @@ namespace NepseClient.Commons.Contracts
         void HandleAuthException(AggregateException ex, ICommand command, object commandParameter = null);
         Task<IEnumerable<ISecurityItem>> GetLiveMarketAsync(CancellationToken ct = default);
         Task<IEnumerable<IMarketWatchResponse>> GetMarketWatchAsync(CancellationToken ct = default);
+        Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default);
     }
 }

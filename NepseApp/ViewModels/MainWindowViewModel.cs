@@ -80,7 +80,7 @@ namespace NepseApp.ViewModels
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = true,
+                IsSelected = false,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
             //yield return new DividerNavigationItem();
@@ -92,6 +92,13 @@ namespace NepseApp.ViewModels
                 Icon = PackIconKind.RecordCircle,
                 IsSelected = false,
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(LiveMarketPage)),
+            };
+            yield return new FirstLevelNavigationItem()
+            {
+                Label = "Market Depth",
+                Icon = PackIconKind.Eye,
+                IsSelected = true,
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MarketDepthPage)),
             };
             yield return new FirstLevelNavigationItem()
             {

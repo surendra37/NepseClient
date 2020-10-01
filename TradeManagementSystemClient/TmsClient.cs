@@ -291,6 +291,13 @@ namespace TradeManagementSystemClient
                 });
         }
 
+        public Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default)
+        {
+            var request = new RestRequest("/tmsapi/external/cache");
+            return Client.ExecuteGetAsync<CachedDataResponse>(request, ct)
+                .ContinueWith<ICachedDataResponse>(EnsureAuthenticated, ct);
+        }
+
         #region Helpers
         private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
         {

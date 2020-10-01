@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NepseClient.Commons.Contracts
 {
@@ -11,7 +12,7 @@ namespace NepseClient.Commons.Contracts
         double DayHigh { get;  }
         double DayLow { get;  }
         int LastTradedQty { get;  }
-        string LastTradedTime { get;  }
+        DateTime LastTradedTime { get;  }
         double Ltp { get;  }
         double OpenPrice { get;  }
         ISecurityResponse Security { get;  }

@@ -8,5 +8,6 @@
         string CompanyName { get; set; }
         double FiftyTwoWeekhigh { get; set; }
         double FiftyTwoWeekLow { get; set; }
+        string DisplayName { get; }
     }
 }

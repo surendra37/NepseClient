@@ -22,6 +22,9 @@ namespace TradeManagementSystemClient.Models.Responses
 
         [JsonProperty("fiftyTwoWeekLow")]
         public double FiftyTwoWeekLow { get; set; }
+
+        [JsonIgnore]
+        public string DisplayName => $"{Symbol} ({SecurityName})";
     }
 
     //public class SecurityResponse : ISecurityResponse

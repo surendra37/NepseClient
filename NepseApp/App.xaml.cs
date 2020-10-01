@@ -51,6 +51,7 @@ namespace NepseApp
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
+            containerRegistry.RegisterForNavigation<MarketDepthPage, MarketDepthPageViewModel>();
         }
 
         protected override void OnExit(ExitEventArgs e)

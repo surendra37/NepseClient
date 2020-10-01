@@ -1,5 +1,6 @@
 ﻿using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace TradeManagementSystemClient.Models.Responses
@@ -42,7 +43,7 @@ namespace TradeManagementSystemClient.Models.Responses
         public int Volume { get; set; }
 
         [JsonProperty("lastTradedTime")]
-        public string LastTradedTime { get; set; }
+        public DateTime LastTradedTime { get; set; }
 
         [JsonProperty("totalBuyQty")]
         public int TotalBuyQty { get; set; }

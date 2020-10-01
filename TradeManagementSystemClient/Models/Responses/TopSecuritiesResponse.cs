@@ -3,21 +3,6 @@ using Newtonsoft.Json;
 
 namespace TradeManagementSystemClient.Models.Responses
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
-    public class InstrumentType
-    {
-        [JsonProperty("activeStatus")]
-        public string ActiveStatus { get; set; }
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("code")]
-        public string Code { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-    }
 
     public class Country
     {

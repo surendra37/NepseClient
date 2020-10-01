@@ -19,4 +19,6 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonProperty("user")]
         public ClientResponse User { get; set; }
     }
+
+
 }

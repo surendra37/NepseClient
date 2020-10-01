@@ -1,0 +1,148 @@
+﻿<UserControl x:Class="NepseApp.Views.MarketDepthPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"    
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:behavior="clr-namespace:NepseApp.Behaviors"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <Style x:Key="myHeaderStyle" TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+        <Style TargetType="GroupBox" BasedOn="{StaticResource MaterialDesignCardGroupBox}">
+            <Setter Property="Margin" Value="4" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto" />
+            <RowDefinition  Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <ComboBox ItemsSource="{Binding Items}"
+                      DisplayMemberPath="DisplayName" 
+                      Width="400"
+                      IsEditable="True"
+                      md:HintAssist.Hint="Select Security"
+                      md:HintAssist.IsFloating="True"
+                      SelectedItem="{Binding SelectedItem}" Margin="8 0">
+                <ComboBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding RefreshCommand}" />
+                </ComboBox.InputBindings>
+            </ComboBox>
+            <Button Content="Select" Command="{Binding RefreshCommand}" IsDefault="True" VerticalAlignment="Bottom"/>
+        </StackPanel>
+        <ItemsControl Grid.Row="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer>
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+
+            <GroupBox Header="Top Buy">
+                <ListView ItemsSource="{Binding StockQuote.TopBuy}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <i:Interaction.Behaviors>
+                        <behavior:IgnoreMouseWheelBehavior />
+                    </i:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Order">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TotalOrders, StringFormat='N0'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Quantity">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Quantity, StringFormat='N0'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Price">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Price, StringFormat='N2'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <GroupBox Header="Top Sell">
+                <ListView ItemsSource="{Binding StockQuote.TopSell}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <i:Interaction.Behaviors>
+                        <behavior:IgnoreMouseWheelBehavior />
+                    </i:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Price">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Price, StringFormat='N2'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Quantity">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Quantity, StringFormat='N0'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Order">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TotalOrders, StringFormat='N0'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <GroupBox Header="{Binding StockQuote.Security.SecurityName}">
+                <ListView ItemsSource="{Binding StockQuoteDict}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <i:Interaction.Behaviors>
+                        <behavior:IgnoreMouseWheelBehavior />
+                    </i:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView ColumnHeaderContainerStyle="{StaticResource myHeaderStyle}">
+                            <GridViewColumn Header="Key" DisplayMemberBinding="{Binding Key}"/>
+                            <GridViewColumn Header="Value">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Value, StringFormat='N2'}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+        </ItemsControl>
+    </Grid>
+</UserControl>
