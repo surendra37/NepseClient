@@ -72,11 +72,11 @@ namespace NepseApp.ViewModels
                 IsBusy = false;
 
                 // Save values
-                ConfigUtils.TmsHost = Host;
-                ConfigUtils.TmsUsername = Username;
-                ConfigUtils.TmsPassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
-                ConfigUtils.RememberPassword = IsRememberPassword;
-                ConfigUtils.SaveSettings();
+                Settings.Default.TmsHost = Host;
+                Settings.Default.TmsUsername = Username;
+                Settings.Default.TmsPassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                Settings.Default.TmsRememberPassword = IsRememberPassword;
+                Settings.Default.Save();
 
             }
             catch (Exception ex)
@@ -96,10 +96,10 @@ namespace NepseApp.ViewModels
             _client = parameters.GetValue<INepseClient>("Client");
             try
             {
-                Host = ConfigUtils.TmsHost;
-                Username = ConfigUtils.TmsUsername;
-                Password = ConfigUtils.TmsPassword.ToSecuredString();
-                IsRememberPassword = ConfigUtils.RememberPassword;
+                Host = Settings.Default.TmsHost;
+                Username = Settings.Default.TmsUsername;
+                Password = Settings.Default.TmsPassword.ToSecuredString();
+                IsRememberPassword = Settings.Default.TmsRememberPassword;
 
                 //if (ConfigUtils.AutoLogin)
                 //{
