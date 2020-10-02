@@ -88,11 +88,11 @@ namespace NepseApp.ViewModels
                 IsBusy = false;
 
                 // Save values
-                ConfigUtils.MeroshareClientId = SelectedItem.Id;
-                ConfigUtils.MeroshareUsername = Username;
-                ConfigUtils.MerosharePassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
-                ConfigUtils.MeroshareRememberPassword = IsRememberPassword;
-                ConfigUtils.SaveSettings();
+                Settings.Default.MeroshareClientId = SelectedItem.Id;
+                Settings.Default.MeroshareUsername = Username;
+                Settings.Default.MerosharePassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                Settings.Default.MeroshareRememberPassword = IsRememberPassword;
+                Settings.Default.Save();
 
             }
             catch (Exception ex)
@@ -115,10 +115,10 @@ namespace NepseApp.ViewModels
                 {
                     Items = await _client.GetCapitalsAsync();
                 }
-                SelectedItem = Items.FirstOrDefault(x => x.Id == ConfigUtils.MeroshareClientId);
-                Username = ConfigUtils.MeroshareUsername;
-                Password = ConfigUtils.MerosharePassword.ToSecuredString();
-                IsRememberPassword = ConfigUtils.MeroshareRememberPassword;
+                SelectedItem = Items.FirstOrDefault(x => x.Id == Settings.Default.MeroshareClientId);
+                Username = Settings.Default.MeroshareUsername;
+                Password = Settings.Default.MerosharePassword.ToSecuredString();
+                IsRememberPassword = Settings.Default.MeroshareRememberPassword;
             }
             catch (Exception ex)
             {

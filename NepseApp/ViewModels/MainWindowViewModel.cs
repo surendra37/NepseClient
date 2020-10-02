@@ -55,8 +55,9 @@ namespace NepseApp.ViewModels
 
         private object UpdateNavigationSelection(string source)
         {
-            ConfigUtils.SelectedTab = source;
             _regionManager.RequestNavigate("ContentRegion", source);
+            Settings.Default.SelectedTab = source;
+            Settings.Default.Save();
             return null;
         }
 
@@ -79,14 +80,14 @@ namespace NepseApp.ViewModels
             {
                 Label = "Dashboard",
                 Icon = PackIconKind.ViewDashboard,
-                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(DashboardPage)),
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(DashboardPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(DashboardPage)),
             };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(PortfolioPage)),
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(PortfolioPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
             //yield return new DividerNavigationItem();
@@ -96,14 +97,14 @@ namespace NepseApp.ViewModels
             {
                 Label = "Live",
                 Icon = PackIconKind.RecordCircle,
-                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(LiveMarketPage)),
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(LiveMarketPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(LiveMarketPage)),
             };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Market Depth",
                 Icon = PackIconKind.Eye,
-                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(MarketDepthPage)),
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(MarketDepthPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MarketDepthPage)),
             };
             yield return new FirstLevelNavigationItem()

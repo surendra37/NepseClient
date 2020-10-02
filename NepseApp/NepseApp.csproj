@@ -9,6 +9,9 @@
     <ApplicationIcon>NepseAppLogo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Utils\ConfigUtils.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="splash.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -29,5 +32,18 @@
   </ItemGroup>
   <ItemGroup>
     <SplashScreen Include="splash.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>
