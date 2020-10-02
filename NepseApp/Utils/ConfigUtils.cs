@@ -1,4 +1,5 @@
 ﻿using NepseApp.Utils;
+using NepseApp.Views;
 using Serilog;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,6 +8,8 @@ namespace NepseClient.Commons
 {
     public static class ConfigUtils
     {
+        public static string SelectedTab { get; set; }
+
         public static string TmsHost { get; set; }
         public static string TmsUsername { get; set; }
         public static string TmsPassword { get; set; }
@@ -54,6 +57,7 @@ namespace NepseClient.Commons
 
         public static void LoadSettings()
         {
+            SelectedTab = ConfigurationManager.AppSettings["selected_tab"] ?? nameof(DashboardPage);
             TmsHost = ConfigurationManager.AppSettings["tms_host"];
             TmsUsername = ConfigurationManager.AppSettings["tms_username"];
             MeroshareUsername = ConfigurationManager.AppSettings["meroshare_username"];
@@ -78,12 +82,13 @@ namespace NepseClient.Commons
         {
             AddOrUpdateAppSettings(new KeyValuePair<string, string>[]
             {
+                new KeyValuePair<string, string>("selected_tab", SelectedTab),
                 new KeyValuePair<string, string>("tms_host", TmsHost),
                 new KeyValuePair<string, string>("tms_username", TmsUsername),
                 new KeyValuePair<string, string>("remember_password", RememberPassword.ToString()),
                 new KeyValuePair<string, string>("auto_login", AutoLogin.ToString()),
                 new KeyValuePair<string, string>("tms_password", StringCipher.Encrypt(TmsPassword)),
-                
+
                 new KeyValuePair<string, string>("meroshare_client_id", MeroshareClientId.ToString()),
                 new KeyValuePair<string, string>("meroshare_username", MeroshareUsername),
                 new KeyValuePair<string, string>("meroshare_password", StringCipher.Encrypt(MerosharePassword)),
@@ -93,6 +98,7 @@ namespace NepseClient.Commons
 
         public static void ResetSettings()
         {
+            SelectedTab = nameof(DashboardPage);
             TmsHost = TmsUsername = TmsPassword = string.Empty;
             RememberPassword = AutoLogin = false;
 
