@@ -55,6 +55,7 @@ namespace NepseApp.ViewModels
 
         private object UpdateNavigationSelection(string source)
         {
+            ConfigUtils.SelectedTab = source;
             _regionManager.RequestNavigate("ContentRegion", source);
             return null;
         }
@@ -72,19 +73,20 @@ namespace NepseApp.ViewModels
 
         private IEnumerable<INavigationItem> GetNavigationItem()
         {
+
             //yield return new SubheaderNavigationItem() { Subheader = "General" };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Dashboard",
                 Icon = PackIconKind.ViewDashboard,
-                IsSelected = false,
+                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(DashboardPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(DashboardPage)),
             };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = false,
+                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(PortfolioPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
             //yield return new DividerNavigationItem();
@@ -94,14 +96,14 @@ namespace NepseApp.ViewModels
             {
                 Label = "Live",
                 Icon = PackIconKind.RecordCircle,
-                IsSelected = false,
+                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(LiveMarketPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(LiveMarketPage)),
             };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Market Depth",
                 Icon = PackIconKind.Eye,
-                IsSelected = true,
+                IsSelected = ConfigUtils.SelectedTab.Equals(nameof(MarketDepthPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MarketDepthPage)),
             };
             yield return new FirstLevelNavigationItem()

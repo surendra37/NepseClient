@@ -61,6 +61,7 @@ namespace NepseApp
 
         protected override void OnExit(ExitEventArgs e)
         {
+            ConfigUtils.SaveSettings();
             Container.Resolve<INepseClient>().SaveSession();
             Container.Resolve<MeroshareClient>().SaveSession();
             Container.Resolve<SocketHelper>().Stop();
