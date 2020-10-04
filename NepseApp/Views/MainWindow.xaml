@@ -22,6 +22,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Style="{StaticResource WindowTitleTextBlockStyle}" Text="{Binding DataContext.Title, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" Margin="8,0,0,0" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
+                    <TextBlock Style="{StaticResource WindowTitleTextBlockStyle}" Text="{Binding DataContext.Message, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
                     <Button Style="{StaticResource WindowButtonStyle}" 
                             Command="{Binding DataContext.ApplicationCommand.RefreshCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
                         <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Refresh" />
@@ -48,7 +49,6 @@
                     </Button>
                     <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
                             Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
-
                 </StackPanel>
             </Grid>
         </DataTemplate>

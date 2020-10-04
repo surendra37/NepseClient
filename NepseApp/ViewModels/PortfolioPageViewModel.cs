@@ -1,4 +1,5 @@
-﻿using NepseApp.Models;
+﻿using NepseApp.Extensions;
+using NepseApp.Models;
 using NepseClient.Commons.Contracts;
 using System;
 using System.Collections.Generic;
@@ -34,9 +35,9 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
-                EnqueMessage("Loading portfolio");
+                AppCommand.ShowMessage("Loading portfolio...");
                 Items = await _client.GetMyPortfolioAsync();
-                EnqueMessage("Portfolio loaded");
+                AppCommand.HideMessage();
                 IsBusy = false;
                 RaisePropertyChanged(nameof(TotalScrips));
                 RaisePropertyChanged(nameof(TotalPrevious));

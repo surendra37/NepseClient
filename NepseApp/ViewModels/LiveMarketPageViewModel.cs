@@ -1,4 +1,5 @@
-﻿using NepseApp.Models;
+﻿using NepseApp.Extensions;
+using NepseApp.Models;
 using NepseClient.Commons.Contracts;
 using Serilog;
 using System;
@@ -59,8 +60,9 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
-                EnqueMessage("Getting live market data");
+                AppCommand.ShowMessage("Getting live market data...");
                 Items = await _client.GetLiveMarketAsync();
+                AppCommand.HideMessage();
                 IsBusy = false;
             }
             catch(AggregateException ex)

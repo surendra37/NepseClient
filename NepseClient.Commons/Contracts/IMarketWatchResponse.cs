@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace NepseClient.Commons.Contracts
+﻿namespace NepseClient.Commons.Contracts
 {
     public interface IMarketWatchResponse
     {

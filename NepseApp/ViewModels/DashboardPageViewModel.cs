@@ -1,10 +1,9 @@
-﻿using NepseApp.Models;
+﻿using NepseApp.Extensions;
+using NepseApp.Models;
 using NepseClient.Commons.Contracts;
 using Serilog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NepseApp.ViewModels
 {
@@ -65,6 +64,7 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
+                AppCommand.ShowMessage("Loading dashboard...");
                 Indices = await _client.GetIndicesAsync();
 
                 TopGainers = await _client.GetTopGainersAsync();
@@ -73,6 +73,7 @@ namespace NepseApp.ViewModels
                 TopTurnovers = await _client.GetTopTurnoversAsync();
                 TopVolume = await _client.GetTopVolumesAsync();
                 TopTransactions = await _client.GetTopTransactionsAsync();
+                AppCommand.HideMessage();
                 IsBusy = false;
             }
             catch(AggregateException ex)

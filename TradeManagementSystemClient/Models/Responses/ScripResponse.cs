@@ -1,5 +1,4 @@
-﻿using NepseClient.Commons;
-using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
 namespace TradeManagementSystemClient.Models.Responses
 {

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NepseClient.Commons.Extensions;
+using System;
 using System.IO;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -53,6 +55,18 @@ namespace NepseApp.Utils
                 }
             }
             return cipherText;
+        }
+
+        public static string GetEncryptedPassword(SecureString password, bool rememberPassword)
+        {
+            if (!rememberPassword) return string.Empty;
+
+            return Encrypt(password.GetString());
+        }
+
+        public static SecureString GetDecryptedPassword(string encryptedPassword)
+        {
+            return Decrypt(encryptedPassword).ToSecuredString();
         }
     }
 }

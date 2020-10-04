@@ -1,7 +1,6 @@
-﻿using NepseApp.Models;
+﻿using NepseApp.Extensions;
+using NepseApp.Models;
 using NepseClient.Commons.Contracts;
-using Prism.Commands;
-using Prism.Mvvm;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -49,6 +48,7 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
+                AppCommand.ShowMessage("Getting market depth...");
                 if (Cached is null)
                 {
                     Cached = await _client.GetCachedData();
@@ -61,7 +61,7 @@ namespace NepseApp.ViewModels
                     StockQuote = stockQuote.FirstOrDefault();
                     RaisePropertyChanged(nameof(StockQuoteDict));
                 }
-
+                AppCommand.HideMessage();
                 IsBusy = false;
             }
             catch (AggregateException ex)

@@ -1,4 +1,4 @@
-﻿using NepseClient.Commons;
+﻿using NepseApp.Utils;
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
 using Prism.Commands;
@@ -74,7 +74,7 @@ namespace NepseApp.ViewModels
                 // Save values
                 Settings.Default.TmsHost = Host;
                 Settings.Default.TmsUsername = Username;
-                Settings.Default.TmsPassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                Settings.Default.TmsPassword = StringCipher.GetEncryptedPassword(Password, IsRememberPassword);
                 Settings.Default.TmsRememberPassword = IsRememberPassword;
                 Settings.Default.Save();
 
@@ -98,13 +98,8 @@ namespace NepseApp.ViewModels
             {
                 Host = Settings.Default.TmsHost;
                 Username = Settings.Default.TmsUsername;
-                Password = Settings.Default.TmsPassword.ToSecuredString();
+                Password = StringCipher.GetDecryptedPassword(Settings.Default.TmsPassword);
                 IsRememberPassword = Settings.Default.TmsRememberPassword;
-
-                //if (ConfigUtils.AutoLogin)
-                //{
-                //    LoginCommand.Execute();
-                //}
             }
             catch (Exception ex)
             {

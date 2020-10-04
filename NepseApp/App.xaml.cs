@@ -1,12 +1,9 @@
 ﻿using NepseApp.Models;
 using NepseApp.ViewModels;
 using NepseApp.Views;
-using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 using Prism.Ioc;
-using Prism.Services.Dialogs;
 using Serilog;
-using System.Security.Authentication;
 using System.Windows;
 using TradeManagementSystem.Nepse;
 using TradeManagementSystemClient;

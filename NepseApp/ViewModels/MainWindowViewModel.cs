@@ -36,6 +36,13 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
+        private string _message;
+        public string Message
+        {
+            get { return _message; }
+            set { SetProperty(ref _message, value); }
+        }
+
         public bool IsAuthenticated
         {
             get
@@ -70,6 +77,7 @@ namespace NepseApp.ViewModels
             _meroshareClient = meroshareClient;
             ApplicationCommand = applicationCommand;
             _client.ShowAuthenticationDialog = ExecuteLoginCommand;
+            applicationCommand.ShowMessage = ShowMessage;
         }
 
         private IEnumerable<INavigationItem> GetNavigationItem()
@@ -244,6 +252,11 @@ namespace NepseApp.ViewModels
                 MessageQueue.Enqueue("Failed to load portfolio. Error: " + ex.Message);
                 Log.Error(ex, "Failed to import portfolio");
             }
+        }
+
+        private void ShowMessage(string message)
+        {
+            Message = message;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using NepseClient.Commons;
+﻿using NepseApp.Utils;
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
 using Prism.Commands;
@@ -6,7 +6,6 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using Serilog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
@@ -90,7 +89,7 @@ namespace NepseApp.ViewModels
                 // Save values
                 Settings.Default.MeroshareClientId = SelectedItem.Id;
                 Settings.Default.MeroshareUsername = Username;
-                Settings.Default.MerosharePassword = IsRememberPassword ? Password.ToUnsecuredString() : string.Empty;
+                Settings.Default.MerosharePassword = StringCipher.GetEncryptedPassword(Password, IsRememberPassword);
                 Settings.Default.MeroshareRememberPassword = IsRememberPassword;
                 Settings.Default.Save();
 
@@ -117,7 +116,7 @@ namespace NepseApp.ViewModels
                 }
                 SelectedItem = Items.FirstOrDefault(x => x.Id == Settings.Default.MeroshareClientId);
                 Username = Settings.Default.MeroshareUsername;
-                Password = Settings.Default.MerosharePassword.ToSecuredString();
+                Password = StringCipher.GetDecryptedPassword(Settings.Default.MerosharePassword);
                 IsRememberPassword = Settings.Default.MeroshareRememberPassword;
             }
             catch (Exception ex)

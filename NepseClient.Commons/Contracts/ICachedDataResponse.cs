@@ -1,6 +1,4 @@
-﻿using NepseClient.Commons.Contracts;
-
-namespace NepseClient.Commons.Contracts
+﻿namespace NepseClient.Commons.Contracts
 {
     public interface ICachedDataResponse
     {

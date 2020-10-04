@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TradeManagementSystemClient.Models
+﻿namespace TradeManagementSystemClient.Models
 {
     public static class TmsTransactions
     {
