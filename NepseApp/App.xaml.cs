@@ -1,9 +1,11 @@
 ﻿using NepseApp.Models;
 using NepseApp.ViewModels;
 using NepseApp.Views;
+using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 using Prism.Ioc;
 using Serilog;
+using System.IO;
 using System.Windows;
 using TradeManagementSystem.Nepse;
 using TradeManagementSystemClient;
@@ -17,8 +19,13 @@ namespace NepseApp
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            var logPath = Path.Combine(Constants.AppDataPath.Value, "Logs", "log-.txt");
             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+#if DEBUG
                 .WriteTo.Console()
+#endif
+                .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             Log.Debug("Starting application");
