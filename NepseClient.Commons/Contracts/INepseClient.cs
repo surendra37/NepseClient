@@ -31,10 +31,11 @@ namespace NepseClient.Commons.Contracts
         Task<IEnumerable<ITopSecuritiesResponse>> GetTopVolumesAsync(CancellationToken ct = default);
         Task<IEnumerable<IIndexResponse>> GetIndicesAsync(CancellationToken ct = default);
         Task<IEnumerable<IStockQuoteResponse>> GetStockQuoteAsync(string id, CancellationToken ct = default);
-        void HandleAuthException(AggregateException ex, ICommand command, object commandParameter = null);
+        void HandleAuthException(Exception ex, ICommand command, object commandParameter = null);
         Task<IEnumerable<ISecurityItem>> GetLiveMarketAsync(CancellationToken ct = default);
         Task<IEnumerable<IMarketWatchResponse>> GetMarketWatchAsync(CancellationToken ct = default);
         Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default);
         void LoadWacc();
+        Task<IEnumerable<IOHLCDataResponse>> GetOHLCPortfolioAsync(CancellationToken ct = default);
     }
 }

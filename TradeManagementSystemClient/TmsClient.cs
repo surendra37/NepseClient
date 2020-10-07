@@ -256,6 +256,7 @@ namespace TradeManagementSystemClient
         }
         #endregion
 
+        #region WebSocket WS
         public Task<IEnumerable<IStockQuoteResponse>> GetStockQuoteAsync(string id, CancellationToken ct = default)
         {
             var request = new RestRequest($"/tmsapi/ws/stockQuote/{id}");
@@ -279,6 +280,19 @@ namespace TradeManagementSystemClient
                     return response.Payload.Data;
                 });
         }
+
+        public Task<IEnumerable<IOHLCDataResponse>> GetOHLCPortfolioAsync(CancellationToken ct = default)
+        {
+            var request = new RestRequest($"/tmsapi/ws/clientPortfolio/{Session.ClientId}");
+
+            return Client.ExecuteGetAsync<SocketResponse<OHLCDataResponse>>(request, ct)
+                .ContinueWith(EnsureAuthenticated, ct)
+                .ContinueWith<IEnumerable<IOHLCDataResponse>>(task =>
+                {
+                    return task.Result.Payload.Data;
+                });
+        }
+        #endregion
 
         public Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default)
         {
@@ -433,17 +447,31 @@ namespace TradeManagementSystemClient
             return response.Data;
         }
 
-        public void HandleAuthException(AggregateException ex, ICommand command, object commandParameter = null)
+        public void HandleAuthException(Exception ex, ICommand command, object commandParameter = null)
         {
-            foreach (var innerEx in ex.InnerExceptions)
+            if (ex is AuthenticationException)
             {
-                if (innerEx is AuthenticationException)
+                Log.Error(ex, "Not Authorized. Requesting credentials");
+                ShowAuthenticationDialog?.Invoke();
+                if (IsAuthenticated)
                 {
-                    Log.Error(ex, "Not Authorized. Requesting credentials");
-                    ShowAuthenticationDialog?.Invoke();
-                    if (IsAuthenticated)
+                    command?.Execute(commandParameter);
+                }
+                return;
+            }
+
+            if (ex is AggregateException aggEx)
+            {
+                foreach (var innerEx in aggEx.InnerExceptions)
+                {
+                    if (innerEx is AuthenticationException)
                     {
-                        command?.Execute(commandParameter);
+                        Log.Error(ex, "Not Authorized. Requesting credentials");
+                        ShowAuthenticationDialog?.Invoke();
+                        if (IsAuthenticated)
+                        {
+                            command?.Execute(commandParameter);
+                        }
                     }
                 }
             }

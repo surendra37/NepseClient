@@ -36,7 +36,23 @@ namespace NepseApp.ViewModels
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Loading portfolio...");
-                Items = await _client.GetMyPortfolioAsync();
+                var myPortfolio = (await _client.GetMyPortfolioAsync()).ToArray();
+                if (!_client.IsLive())
+                {
+                    var portfolio = await _client.GetOHLCPortfolioAsync();
+                    var closePriceDict = portfolio.ToDictionary(x => x.Symbol, x => x.ClosePrice);
+                    foreach (var p in myPortfolio)
+                    {
+                        if (closePriceDict.ContainsKey(p.Scrip))
+                        {
+                            var pClose = closePriceDict[p.Scrip];
+                            if (pClose == 0) continue; // Skip for not traded scrip
+                            p.PreviousClosePrice = pClose;
+                            p.PreviousTotal = pClose * p.TotalBalance;
+                        }
+                    }
+                }
+                Items = myPortfolio;
                 AppCommand.HideMessage();
                 IsBusy = false;
                 RaisePropertyChanged(nameof(TotalScrips));
@@ -46,15 +62,13 @@ namespace NepseApp.ViewModels
                 RaisePropertyChanged(nameof(TotalWacc));
                 RaisePropertyChanged(nameof(TotalGain));
             }
-            catch (AggregateException ex)
-            {
-                IsBusy = false;
-                _client.HandleAuthException(ex, RefreshCommand);
-            }
             catch (Exception ex)
             {
                 IsBusy = false;
-                LogErrorAndEnqueMessage(ex, "Failed to update portfolio");
+                _client.HandleAuthException(ex, RefreshCommand);
+
+                AppCommand.HideMessage();
+                EnqueMessage("Failed to update portfolio");
             }
         }
     }

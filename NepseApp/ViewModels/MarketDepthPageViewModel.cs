@@ -64,22 +64,13 @@ namespace NepseApp.ViewModels
                 AppCommand.HideMessage();
                 IsBusy = false;
             }
-            catch (AggregateException ex)
-            {
-                _client.HandleAuthException(ex, RefreshCommand);
-            }
-            catch (AuthenticationException ex)
-            {
-                Log.Error(ex, "Not Authorized. Requesting credentials");
-                _client.ShowAuthenticationDialog?.Invoke();
-                if (_client.IsAuthenticated)
-                {
-                    RefreshCommand.Execute();
-                }
-            }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to update market depth");
+                IsBusy = false;
+                _client.HandleAuthException(ex, RefreshCommand);
+                
+                AppCommand.HideMessage();
+                EnqueMessage("Failed to update market depth");
             }
         }
 

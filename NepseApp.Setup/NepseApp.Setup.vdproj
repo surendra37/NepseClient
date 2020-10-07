@@ -50,6 +50,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -74,6 +82,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -182,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:NepseApp"
-        "ProductCode" = "8:{1765CD72-2A1F-47FD-BD7D-859553116040}"
-        "PackageCode" = "8:{E6E86979-7E3A-444F-BE7E-2675C42357D0}"
+        "ProductCode" = "8:{A743702B-05D0-456F-98EF-638414664BD2}"
+        "PackageCode" = "8:{07E10E48-0255-48EF-A861-C010DBBD0C1F}"
         "UpgradeCode" = "8:{5BB7D42D-B90E-4B18-8919-19C518A3ABEC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.1"
         "Manufacturer" = "8:Surendra37"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -718,7 +734,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A4BC5CB877F04FB197CBC3A68A313444"
             {
-            "SourcePath" = "8:..\\NepseApp\\obj\\Debug\\netcoreapp3.1\\NepseApp.exe"
+            "SourcePath" = "8:..\\NepseApp\\obj\\Release\\netcoreapp3.1\\NepseApp.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0E22893355064494A0E5EFB149FA69DF"
