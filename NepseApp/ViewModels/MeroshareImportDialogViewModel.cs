@@ -18,7 +18,7 @@ namespace NepseApp.ViewModels
     {
         public event Action<IDialogResult> RequestClose;
 
-        public string Title { get; } = "Authenticate";
+        public string Title { get; } = "Meroshare Authentication";
 
         private IEnumerable<IMeroshareCapital> _items;
         public IEnumerable<IMeroshareCapital> Items

@@ -16,7 +16,7 @@ namespace NepseApp.ViewModels
         private INepseClient _client;
         public event Action<IDialogResult> RequestClose;
 
-        public string Title { get; } = "Authenticate";
+        public string Title { get; } = "TMS Authentication";
 
         private string _host;
         public string Host
