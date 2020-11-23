@@ -198,15 +198,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:NepseApp"
-        "ProductCode" = "8:{9E775058-82D4-4338-9E8F-271298BC98B4}"
-        "PackageCode" = "8:{9764E86E-CFAD-4677-AC07-A6AF8553EF9D}"
+        "ProductCode" = "8:{0922E2D4-5D8C-4831-87A5-9068BEBBB8B8}"
+        "PackageCode" = "8:{E3C35335-F067-4032-A280-2C658EA26BAA}"
         "UpgradeCode" = "8:{5BB7D42D-B90E-4B18-8919-19C518A3ABEC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:Surendra37"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -734,7 +734,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_A4BC5CB877F04FB197CBC3A68A313444"
             {
-            "SourcePath" = "8:..\\NepseApp\\obj\\Release\\netcoreapp3.1\\NepseApp.exe"
+            "SourcePath" = "8:..\\NepseApp\\obj\\Debug\\net5.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0E22893355064494A0E5EFB149FA69DF"
