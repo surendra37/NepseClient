@@ -207,7 +207,6 @@ namespace NepseApp.ViewModels
                 MessageQueue.Enqueue("Importing wacc from meroshare");
                 if (!_meroshareClient.IsAuthenticated)
                 {
-                    MessageQueue.Enqueue("Not Authorized");
                     _dialog.ShowDialog(nameof(MeroshareImportDialog), null, result =>
                     {
                         if (result?.Result == ButtonResult.OK)

@@ -65,10 +65,8 @@ namespace NepseApp.ViewModels
             catch (Exception ex)
             {
                 IsBusy = false;
-                _client.HandleAuthException(ex, RefreshCommand);
-
                 AppCommand.HideMessage();
-                EnqueMessage("Failed to update portfolio");
+                _client.HandleAuthException(ex, RefreshCommand);
             }
         }
     }

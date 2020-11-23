@@ -79,9 +79,8 @@ namespace NepseApp.ViewModels
             catch (Exception ex)
             {
                 IsBusy = false;
-                _client.HandleAuthException(ex, RefreshCommand);
                 AppCommand.HideMessage();
-                EnqueMessage("Failed to update dashboard");
+                _client.HandleAuthException(ex, RefreshCommand);
             }
         }
     }

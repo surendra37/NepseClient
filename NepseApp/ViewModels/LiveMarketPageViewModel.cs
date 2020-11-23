@@ -68,10 +68,8 @@ namespace NepseApp.ViewModels
             catch(Exception ex)
             {
                 IsBusy = false;
-                _client.HandleAuthException(ex, RefreshCommand);
-                
                 AppCommand.HideMessage();
-                EnqueMessage("Failed to update live market");
+                _client.HandleAuthException(ex, RefreshCommand);                
             }
         }
 

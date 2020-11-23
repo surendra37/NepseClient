@@ -67,10 +67,8 @@ namespace NepseApp.ViewModels
             catch (Exception ex)
             {
                 IsBusy = false;
-                _client.HandleAuthException(ex, RefreshCommand);
-                
                 AppCommand.HideMessage();
-                EnqueMessage("Failed to update market depth");
+                _client.HandleAuthException(ex, RefreshCommand);
             }
         }
 
