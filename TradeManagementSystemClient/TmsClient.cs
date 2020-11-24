@@ -1,9 +1,13 @@
 ﻿using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
+
 using Newtonsoft.Json;
+
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+
 using Serilog;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +16,7 @@ using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
@@ -399,36 +404,33 @@ namespace TradeManagementSystemClient
             var costDict = new Dictionary<string, float>();
             var quantityDict = new Dictionary<string, int>();
 
-            if (File.Exists(Path.Combine(Constants.AppDataPath.Value, "view.jl")))
-            {
-                foreach (var line in File.ReadAllLines(Path.Combine(Constants.AppDataPath.Value, "view.jl")))
-                {
-                    var view = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse>(line);
-                    if (string.IsNullOrEmpty(view.ScripName)) continue;
+            var views = File.ReadLines(Path.Combine(Constants.AppDataPath.Value, "view.jl"));
+            var searches = File.ReadLines(Path.Combine(Constants.AppDataPath.Value, "search.jl"));
 
-                    costDict.Add(view.ScripName, view.AverageBuyRate * view.TotalQuantity);
-                    quantityDict.Add(view.ScripName, view.TotalQuantity);
-                }
+            foreach (var line in views)
+            {
+                var view = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse>(line);
+                if (view is null || string.IsNullOrEmpty(view.ScripName)) continue;
+
+                costDict.Add(view.ScripName, view.AverageBuyRate * view.TotalQuantity);
+                quantityDict.Add(view.ScripName, view.TotalQuantity);
             }
 
-            if (File.Exists(Path.Combine(Constants.AppDataPath.Value, "search.jl")))
+            foreach (var line in searches)
             {
-                foreach (var line in File.ReadAllLines(Path.Combine(Constants.AppDataPath.Value, "search.jl")))
+                var search = JsonConvert.DeserializeObject<MeroshareSearchMyPurchaseRespose[]>(line);
+                if (search is null || search.Length == 0) continue;
+                var scrip = search[0].Scrip;
+                if (costDict.ContainsKey(scrip))
                 {
-                    var searches = JsonConvert.DeserializeObject<MeroshareSearchMyPurchaseRespose[]>(line);
-                    if (searches.Length == 0) continue;
-                    var scrip = searches[0].Scrip;
-                    if (costDict.ContainsKey(scrip))
-                    {
-                        // average out
-                        costDict[scrip] += searches.Sum(x => x.Rate * x.TransactionQuantity);
-                        quantityDict[scrip] += searches.Sum(x => x.TransactionQuantity);
-                    }
-                    else
-                    {
-                        costDict.Add(scrip, searches.Sum(x => x.Rate * x.TransactionQuantity));
-                        quantityDict.Add(scrip, searches.Sum(x => x.TransactionQuantity));
-                    }
+                    // average out
+                    costDict[scrip] += search.Sum(x => x.Rate * x.TransactionQuantity);
+                    quantityDict[scrip] += search.Sum(x => x.TransactionQuantity);
+                }
+                else
+                {
+                    costDict.Add(scrip, search.Sum(x => x.Rate * x.TransactionQuantity));
+                    quantityDict.Add(scrip, search.Sum(x => x.TransactionQuantity));
                 }
             }
 

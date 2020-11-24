@@ -1,20 +1,29 @@
 ﻿using MaterialDesignExtensions.Model;
+
 using MaterialDesignThemes.Wpf;
+
 using NepseApp.Models;
 using NepseApp.Views;
+
 using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
+
 using Newtonsoft.Json;
+
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
+
 using Serilog;
+
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Windows;
+
 using TradeManagementSystemClient;
 
 namespace NepseApp.ViewModels
@@ -205,31 +214,58 @@ namespace NepseApp.ViewModels
             {
                 IsImporting = true;
                 MessageQueue.Enqueue("Importing wacc from meroshare");
-                if (!_meroshareClient.IsAuthenticated)
-                {
-                    _dialog.ShowDialog(nameof(MeroshareImportDialog), null, result =>
-                    {
-                        if (result?.Result == ButtonResult.OK)
-                        {
-                            ImportPortfolioCommand.Execute();
-                        }
-                    });
-                    IsImporting = false;
-                    return;
-                }
 
                 var me = await _meroshareClient.GetOwnDetailsAsync();
                 var myShares = await _meroshareClient.GetMySharesAsync();
+                if (!int.TryParse(ConfigurationManager.AppSettings["max_retry"], out int maxRetry))
+                {
+                    maxRetry = 3;
+                }
 
                 using (var viewFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "view.jl.bk")))
                 using (var searchFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "search.jl.bk")))
                     foreach (var share in myShares)
                     {
-                        var view = await _meroshareClient.ViewMyPurchaseAsync(me.Demat, share);
-                        await viewFile.WriteLineAsync(JsonConvert.SerializeObject(view));
+                        var retry = 0;
+                        while (true)
+                        {
+                            try
+                            {
+                                var view = await _meroshareClient.ViewMyPurchaseAsync(me.Demat, share);
+                                await viewFile.WriteLineAsync(JsonConvert.SerializeObject(view));
+                            }
+                            catch (System.Exception ex)
+                            {
+                                retry++;
+                                Log.Warning(ex, "Failed to load view of {share}. Retrying {retry} times", share, retry);
+                            }
 
-                        var searches = await _meroshareClient.SearchMyPurchaseAsync(me.Demat, share);
-                        await searchFile.WriteLineAsync(JsonConvert.SerializeObject(searches));
+                            if (retry > maxRetry)
+                            {
+                                Log.Error("Exceed max retries({retry}).", retry);
+                                break;
+                            }
+                        }
+
+                        retry = 0;
+                        while (true)
+                        {
+                            try
+                            {
+                                var searches = await _meroshareClient.SearchMyPurchaseAsync(me.Demat, share);
+                                await searchFile.WriteLineAsync(JsonConvert.SerializeObject(searches));
+                            }
+                            catch (System.Exception ex)
+                            {
+                                retry++;
+                                Log.Error(ex, "Failed to load search of {share}. Retrying {retry} times", share, retry);
+                            }
+                            if (retry > maxRetry)
+                            {
+                                Log.Error("Exceed max retries({retry}).", retry);
+                                break;
+                            }
+                        }
                     }
 
                 // Replace the old file
@@ -243,7 +279,13 @@ namespace NepseApp.ViewModels
             catch (AuthenticationException)
             {
                 IsImporting = false;
-                ImportPortfolioCommand.Execute();
+                _dialog.ShowDialog(nameof(MeroshareImportDialog), null, result =>
+                {
+                    if (result?.Result == ButtonResult.OK)
+                    {
+                        ImportPortfolioCommand.Execute();
+                    }
+                });
             }
             catch (System.Exception ex)
             {

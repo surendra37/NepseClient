@@ -5,8 +5,13 @@ using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 using Prism.Ioc;
 using Serilog;
+using Serilog.Formatting.Compact;
+
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Threading;
+
 using TradeManagementSystem.Nepse;
 using TradeManagementSystemClient;
 
@@ -19,17 +24,28 @@ namespace NepseApp
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            var logPath = Path.Combine(Constants.AppDataPath.Value, "Logs", "log-.txt");
+            var logPath = Path.Combine(Constants.AppDataPath.Value, "Logs", "log-.jl");
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
 #if DEBUG
                 .WriteTo.Console()
 #endif
-                .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
+                .WriteTo.File(new CompactJsonFormatter(), logPath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             Log.Debug("Starting application");
+
+            Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
+        }
+
+        private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Log.Fatal(e.Exception, "Unknown error occured");
+            var result = MessageBox.Show("An unknown error has occured. Do you wish to continue? \n" + e.Exception.Message, 
+                "Unknown Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+
+            e.Handled = result == MessageBoxResult.Yes;
         }
 
         protected override Window CreateShell()

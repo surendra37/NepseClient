@@ -1,7 +1,9 @@
 ﻿using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
+
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +11,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
@@ -147,6 +150,11 @@ namespace TradeManagementSystemClient
             {
                 IsAuthenticated = false;
                 throw new AuthenticationException(response.Content);
+            }
+
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.Content);
             }
 
             return response.Data;
