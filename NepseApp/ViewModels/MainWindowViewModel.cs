@@ -233,6 +233,7 @@ namespace NepseApp.ViewModels
                             {
                                 var view = await _meroshareClient.ViewMyPurchaseAsync(me.Demat, share);
                                 await viewFile.WriteLineAsync(JsonConvert.SerializeObject(view));
+                                break;
                             }
                             catch (System.Exception ex)
                             {
@@ -254,6 +255,7 @@ namespace NepseApp.ViewModels
                             {
                                 var searches = await _meroshareClient.SearchMyPurchaseAsync(me.Demat, share);
                                 await searchFile.WriteLineAsync(JsonConvert.SerializeObject(searches));
+                                break;
                             }
                             catch (System.Exception ex)
                             {
