@@ -78,9 +78,8 @@ namespace NepseApp.ViewModels
 
             if(IsActive && AppCommand.RefreshOnActive)
             {
-#if !DEBUG
-                RefreshCommand.Execute(); 
-#endif
+                if (Settings.Default.AutoRefreshOnLoad)
+                    RefreshCommand.Execute();
             }
         }
         #endregion

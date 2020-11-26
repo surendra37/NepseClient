@@ -30,7 +30,7 @@ namespace NepseApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private INepseClient _client;
+        private readonly INepseClient _client;
         private readonly IDialogService _dialog;
         private readonly MeroshareClient _meroshareClient;
         private readonly IRegionManager _regionManager;
@@ -128,7 +128,8 @@ namespace NepseApp.ViewModels
             {
                 Label = "Settings",
                 Icon = PackIconKind.Settings,
-                IsSelectable = false,
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(SettingsPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(SettingsPage)),
             };
         }
 

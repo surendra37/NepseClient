@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:NepseApp"
              xmlns:converters="clr-namespace:NepseApp.Converters"
-             xmlns:prism="http://prismlibrary.com/" >
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+            xmlns:models="clr-namespace:NepseApp.Models">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,7 +18,33 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.DeepPurple.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
 
+
             </ResourceDictionary.MergedDictionaries>
+            
+            <DataTemplate DataType="{x:Type models:ToggleSettingsItem}">
+                <Border x:Name="Border" Padding="8" BorderThickness="0 0 0 1" 
+                        BorderBrush="{DynamicResource MaterialDesignDivider}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Icons" Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition SharedSizeGroup="Checkerz" Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <md:PackIcon Kind="{Binding IconKind}" Height="16" Width="16"/>
+                        
+                        <TextBlock Grid.Column="1"
+                                   FontWeight="Bold" Text="{Binding Name}" 
+                                   Margin="8 0 0 0" VerticalAlignment="Center"
+                                   Style="{DynamicResource MaterialDesignTitleTextBlock}"/>
+                        
+                        <ToggleButton Grid.Column="2" 
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding IsChecked}"/>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
             <GridView x:Key="IndexWatchGridView">
                 <GridViewColumn Header="Index Code" DisplayMemberBinding="{Binding IndexCode}" />
                 <GridViewColumn Header="Index Value" DisplayMemberBinding="{Binding IndexValue, StringFormat=N2}" />
