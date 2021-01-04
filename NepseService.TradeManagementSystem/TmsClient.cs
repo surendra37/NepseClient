@@ -8,34 +8,37 @@ using Newtonsoft.Json.Serialization;
 
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
-using System.IO;
 using NepseService.TradeManagementSystem.Models.Responses;
+using System;
 
 namespace NepseService.TradeManagementSystem
 {
-    public class TmsClient
+    public class TmsClient : IDisposable
     {
-        public string CookiePath { get; init; } = "cookies.dat";
-        public bool UseCookies { get; init; } = true;
+        private readonly string _username;
+        private readonly string _password;
         public IRestClient Client { get; }
 
-        public TmsClient(string baseUrl)
+        public TmsClient(string baseUrl, string username, string password)
         {
             Client = new RestClient(baseUrl)
             {
-                CookieContainer = UseCookies ? CookieUtils.ReadCookiesFromDisk(CookiePath) : new CookieContainer(),
+                CookieContainer = new CookieContainer(),
                 Authenticator = new TmsAuthenticator(),
             };
             Client.UseNewtonsoftJson(new Newtonsoft.Json.JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new SnakeCaseNamingStrategy(),
+                    NamingStrategy = new CamelCaseNamingStrategy(),
                 }
             });
+            _username = username;
+            _password = password;
         }
 
-        public void SignIn(string username, string password)
+        #region Authorization
+        private void SignIn(string username, string password)
         {
             Log.Debug("Signing in");
             var request = new RestRequest("/tmsapi/authenticate");
@@ -49,11 +52,7 @@ namespace NepseService.TradeManagementSystem
             }
 
             CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
-
-            if (UseCookies)
-            {
-                CookieUtils.WriteCookiesToDisk(CookiePath, Client.CookieContainer);
-            }
+            Log.Debug("Signed In");
         }
 
         public void SignOut()
@@ -62,12 +61,47 @@ namespace NepseService.TradeManagementSystem
             var request = new RestRequest("/tmsapi/authenticate/logout");
             var response = Client.Post<ResponseBase>(request);
             Log.Information(response.Data.Message);
+        }
+        #endregion
 
-            if (UseCookies && File.Exists(CookiePath))
+        public void Dispose()
+        {
+            SignOut();
+        }
+
+        public string GetBusinessDate()
+        {
+            Log.Debug("Getting business date");
+            var request = new RestRequest("/tmsapi/dashboard/businessDate");
+            var response = Client.Get<string>(request);
+            return response.Data;
+        }
+
+        public ScripReponse[] GetMyPortfolio(string clientId, bool retry = true)
+        {
+            Log.Debug("Getting my portfolio");
+            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{clientId}/CLI");
+
+            var response = Client.Get<ScripReponse[]>(request);
+            if (retry && IsUnAuthorized(response))
             {
-                File.Delete(CookiePath);
+                Authorize();
+                Log.Debug("Retrying after authorization get my portfolio");
+                return GetMyPortfolio(clientId, false);
             }
-            Client.CookieContainer = new CookieContainer();
+            return response.Data;
+        }
+
+        private static bool IsUnAuthorized(IRestResponse response)
+        {
+            return response.StatusCode == HttpStatusCode.Unauthorized;
+        }
+
+        public virtual void Authorize()
+        {
+            Log.Debug("Authorizing...");
+            SignIn(_username, _password);
+            Log.Debug("Authorized");
         }
     }
 }
