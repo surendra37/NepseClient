@@ -4,6 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 
+using Microsoft.Extensions.Configuration;
+
+using NepseService.TradeManagementSystem.Extensions;
 using NepseService.TradeManagementSystem.Models.Requests;
 using NepseService.TradeManagementSystem.Models.Responses;
 
@@ -20,6 +23,12 @@ namespace NepseService.TradeManagementSystem
         private readonly string _username;
         private readonly string _password;
         public IRestClient Client { get; }
+
+        public MeroshareClient(IConfiguration config)
+            : this(config["Meroshare:Host"], config["Meroshare:ClientId"], config["Meroshare:Username"], config["Meroshare:Password"])
+        {
+
+        }
         public MeroshareClient(string baseUrl, string clientId, string username, string password)
         {
             Client = new RestClient(baseUrl)
@@ -161,6 +170,20 @@ namespace NepseService.TradeManagementSystem
             Log.Debug("Authorizing...");
             SignIn(_clientId, _username, _password);
             Log.Debug("Authorized");
+        }
+
+        public MerosharePortfolioResponse GetMyPortfolio(GetMyPortfolioRequest body)
+        {
+            var request = new RestRequest("/api/meroShareView/myPortfolio");
+            request.AddJsonBody(body);
+
+            var response = Client.Post<MerosharePortfolioResponse>(request);
+            if (response.IsUnAuthorized())
+            {
+                Authorize();
+                response = Client.Post<MerosharePortfolioResponse>(request);
+            }
+            return response.Data;
         }
     }
 }

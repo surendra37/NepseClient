@@ -1,9 +1,12 @@
 ﻿using NepseApp.Models;
 using NepseApp.ViewModels;
 using NepseApp.Views;
+
 using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
+
 using Prism.Ioc;
+
 using Serilog;
 using Serilog.Formatting.Compact;
 
@@ -13,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 
 using TradeManagementSystem.Nepse;
+
 using TradeManagementSystemClient;
 
 namespace NepseApp
@@ -42,7 +46,7 @@ namespace NepseApp
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Log.Fatal(e.Exception, "Unknown error occured");
-            var result = MessageBox.Show("An unknown error has occured. Do you wish to continue? \n" + e.Exception.Message, 
+            var result = MessageBox.Show("An unknown error has occured. Do you wish to continue? \n" + e.Exception.Message,
                 "Unknown Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
 
             e.Handled = result == MessageBoxResult.Yes;
@@ -56,10 +60,8 @@ namespace NepseApp
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
-
-            var meroshareClient = new MeroshareClient();
-            meroshareClient.RestoreSession();
-            containerRegistry.RegisterInstance(meroshareClient);
+            containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
+            containerRegistry.RegisterSingleton<MeroshareClient>();
 
             var nepseClient = new TmsClient();
             nepseClient.RestoreSession();
@@ -81,7 +83,7 @@ namespace NepseApp
         protected override void OnExit(ExitEventArgs e)
         {
             Container.Resolve<INepseClient>().SaveSession();
-            Container.Resolve<MeroshareClient>().SaveSession();
+            Container.Resolve<MeroshareClient>().Dispose();
             Container.Resolve<SocketHelper>().Stop();
             base.OnExit(e);
         }

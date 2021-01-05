@@ -14,7 +14,7 @@
     <Setting Name="TmsPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MeroshareClientId" Type="System.Int32" Scope="User">
+    <Setting Name="MeroshareClientId" Type="System.String" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="MeroshareUsername" Type="System.String" Scope="User">
@@ -31,6 +31,12 @@
     </Setting>
     <Setting Name="AutoRefreshOnLoad" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MeroShareBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://backend.cdsc.com.np</Value>
+    </Setting>
+    <Setting Name="MeroshareDemat" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

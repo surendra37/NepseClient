@@ -1,23 +1,11 @@
-﻿using NepseClient.Commons.Contracts;
-using Newtonsoft.Json;
-
-namespace TradeManagementSystemClient.Models.Responses
+﻿namespace TradeManagementSystemClient.Models.Responses
 {
-
-    public class MeroshareCapitalResponse : IMeroshareCapital
+    public class MeroshareCapitalResponse
     {
-        [JsonProperty("code")]
         public string Code { get; set; }
-
-        [JsonProperty("id")]
-        public int Id { get; set; }
-
-        [JsonProperty("name")]
+        public string Id { get; set; }
         public string Name { get; set; }
-
-        [JsonProperty("statusDto")]
         public object StatusDto { get; set; }
-
         public string DisplayName => $"{Name}({Code})";
     }
 }

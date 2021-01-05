@@ -17,9 +17,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_assets", "_assets", "{256D
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WixInstaller", "WixInstaller\WixInstaller.wixproj", "{E77168B9-F82C-477B-913D-FD9E17B6AB49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseService.TradeManagementSystem", "NepseService.TradeManagementSystem\NepseService.TradeManagementSystem.csproj", "{A8A75C88-D57B-4A31-8AD2-14DF2A143218}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseService.TradeManagementSystem", "NepseService.TradeManagementSystem\NepseService.TradeManagementSystem.csproj", "{A8A75C88-D57B-4A31-8AD2-14DF2A143218}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseService", "NepseService\NepseService.csproj", "{2058B6B5-5FEE-4E65-8429-89299B1D7AC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseService", "NepseService\NepseService.csproj", "{2058B6B5-5FEE-4E65-8429-89299B1D7AC9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "executables", "executables", "{B59FCE9B-6A71-4363-A613-C977EA033301}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareMarketApp", "ShareMarketApp\ShareMarketApp.csproj", "{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,14 @@ Global
 		{2058B6B5-5FEE-4E65-8429-89299B1D7AC9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2058B6B5-5FEE-4E65-8429-89299B1D7AC9}.Release|x86.ActiveCfg = Release|Any CPU
 		{2058B6B5-5FEE-4E65-8429-89299B1D7AC9}.Release|x86.Build.0 = Release|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Debug|x86.Build.0 = Debug|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Release|x86.ActiveCfg = Release|Any CPU
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,7 +94,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C24F418B-DB14-45F0-8176-E825CF5064EC} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
 		{456F3585-A2DF-48C3-965D-69D33353D222} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+		{C2ECF70A-4570-4627-B391-A7B1DB5181D5} = {B59FCE9B-6A71-4363-A613-C977EA033301}
 		{A8A75C88-D57B-4A31-8AD2-14DF2A143218} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+		{2058B6B5-5FEE-4E65-8429-89299B1D7AC9} = {B59FCE9B-6A71-4363-A613-C977EA033301}
+		{D73DF3A5-8920-4710-B571-8D7ECCB1CBE8} = {B59FCE9B-6A71-4363-A613-C977EA033301}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFFE650E-64D7-44A4-9E1E-A2C6B6A730E0}

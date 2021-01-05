@@ -74,9 +74,9 @@ namespace NepseApp {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MeroshareClientId {
+        public string MeroshareClientId {
             get {
-                return ((int)(this["MeroshareClientId"]));
+                return ((string)(this["MeroshareClientId"]));
             }
             set {
                 this["MeroshareClientId"] = value;
@@ -140,6 +140,30 @@ namespace NepseApp {
             }
             set {
                 this["AutoRefreshOnLoad"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://backend.cdsc.com.np")]
+        public string MeroShareBaseUrl {
+            get {
+                return ((string)(this["MeroShareBaseUrl"]));
+            }
+            set {
+                this["MeroShareBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MeroshareDemat {
+            get {
+                return ((string)(this["MeroshareDemat"]));
+            }
+            set {
+                this["MeroshareDemat"] = value;
             }
         }
     }

@@ -10,6 +10,7 @@ using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using NepseService.TradeManagementSystem.Models.Responses;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace NepseService.TradeManagementSystem
 {
@@ -18,6 +19,11 @@ namespace NepseService.TradeManagementSystem
         private readonly string _username;
         private readonly string _password;
         public IRestClient Client { get; }
+        public TmsClient(IConfiguration config)
+            : this(config["Tms:Host"], config["Tms:Username"], config["Tms:Password"])
+        {
+
+        }
 
         public TmsClient(string baseUrl, string username, string password)
         {

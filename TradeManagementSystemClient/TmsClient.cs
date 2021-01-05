@@ -2,6 +2,7 @@
 using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -65,9 +66,18 @@ namespace TradeManagementSystemClient
 
         private RestClient CreateClient(string baseUrl)
         {
-            var client = new RestClient(baseUrl);
+            var client = new RestClient(baseUrl)
+            {
+                CookieContainer = new System.Net.CookieContainer(),
+            };
             //client.ThrowOnDeserializationError = true;
-            client.UseNewtonsoftJson();
+            client.UseNewtonsoftJson(new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy(),
+                },
+            });
 
             return client;
         }
@@ -401,40 +411,11 @@ namespace TradeManagementSystemClient
 
         public void LoadWacc()
         {
-            var costDict = new Dictionary<string, float>();
-            var quantityDict = new Dictionary<string, int>();
-
-            var views = File.ReadLines(Path.Combine(Constants.AppDataPath.Value, "view.jl"));
-            var searches = File.ReadLines(Path.Combine(Constants.AppDataPath.Value, "search.jl"));
-
-            foreach (var line in views)
-            {
-                var view = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse>(line);
-                if (view is null || string.IsNullOrEmpty(view.ScripName)) continue;
-
-                costDict.Add(view.ScripName, view.AverageBuyRate * view.TotalQuantity);
-                quantityDict.Add(view.ScripName, view.TotalQuantity);
-            }
-
-            foreach (var line in searches)
-            {
-                var search = JsonConvert.DeserializeObject<MeroshareSearchMyPurchaseRespose[]>(line);
-                if (search is null || search.Length == 0) continue;
-                var scrip = search[0].Scrip;
-                if (costDict.ContainsKey(scrip))
-                {
-                    // average out
-                    costDict[scrip] += search.Sum(x => x.Rate * x.TransactionQuantity);
-                    quantityDict[scrip] += search.Sum(x => x.TransactionQuantity);
-                }
-                else
-                {
-                    costDict.Add(scrip, search.Sum(x => x.Rate * x.TransactionQuantity));
-                    quantityDict.Add(scrip, search.Sum(x => x.TransactionQuantity));
-                }
-            }
-
-            _waccDict = costDict.ToDictionary(x => x.Key, x => x.Value / quantityDict[x.Key]);
+            var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
+            if(!File.Exists(path)) return;
+            var json = File.ReadAllText(path);
+            var waccs = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse[]>(json);
+            _waccDict = waccs.ToDictionary(x => x.ScripName, x => (float)x.AverageBuyRate);
         }
 
         public T EnsureAuthenticated<T>(Task<IRestResponse<T>> task)

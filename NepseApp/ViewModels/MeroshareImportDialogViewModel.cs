@@ -1,34 +1,43 @@
-﻿using NepseApp.Utils;
+﻿using NepseApp.Models;
+using NepseApp.Utils;
+
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
+
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+
 using Serilog;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Windows;
+
 using TradeManagementSystemClient;
+using TradeManagementSystemClient.Models.Requests;
+using TradeManagementSystemClient.Models.Responses;
 
 namespace NepseApp.ViewModels
 {
     public class MeroshareImportDialogViewModel : BindableBase, IDialogAware
     {
+        private readonly IMeroShareConfiguration _config;
         public event Action<IDialogResult> RequestClose;
 
         public string Title { get; } = "Meroshare Authentication";
 
-        private IEnumerable<IMeroshareCapital> _items;
-        public IEnumerable<IMeroshareCapital> Items
+        private IEnumerable<MeroshareCapitalResponse> _items;
+        public IEnumerable<MeroshareCapitalResponse> Items
         {
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
 
-        private IMeroshareCapital _selectedItem;
-        public IMeroshareCapital SelectedItem
+        private MeroshareCapitalResponse _selectedItem;
+        public MeroshareCapitalResponse SelectedItem
         {
             get { return _selectedItem; }
             set { SetProperty(ref _selectedItem, value); }
@@ -55,9 +64,10 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _isRememberPassword, value); }
         }
 
-        public MeroshareImportDialogViewModel(MeroshareClient client)
+        public MeroshareImportDialogViewModel(MeroshareClient client, IConfiguration config)
         {
             _client = client;
+            _config = config.Meroshare;
         }
 
         private bool _isBusy;
@@ -73,7 +83,7 @@ namespace NepseApp.ViewModels
         public DelegateCommand LoginCommand =>
             _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, () => !IsBusy));
 
-        async void ExecuteLoginCommand()
+        void ExecuteLoginCommand()
         {
             try
             {
@@ -81,17 +91,19 @@ namespace NepseApp.ViewModels
 
                 IsBusy = true;
                 var client = SelectedItem; //vVy.$3pz7wx#y9S  "150394"
+                var clientId = SelectedItem.Id;
+                var username = Username;
                 var password = Password.GetString();
-                await _client.AuthenticateAsync(client.Id, Username, password);
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+                var request = new MeroshareAuthRequest(clientId, username, password);
+                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, new DialogParameters { { "Credentials", request } }));
                 IsBusy = false;
 
                 // Save values
-                Settings.Default.MeroshareClientId = SelectedItem.Id;
-                Settings.Default.MeroshareUsername = Username;
-                Settings.Default.MerosharePassword = StringCipher.GetEncryptedPassword(Password, IsRememberPassword);
-                Settings.Default.MeroshareRememberPassword = IsRememberPassword;
-                Settings.Default.Save();
+                _config.ClientId = clientId;
+                _config.Username = username;
+                _config.Password = IsRememberPassword ? password : string.Empty;
+                _config.RememberPassword = IsRememberPassword;
+                _config.Save();
 
             }
             catch (Exception ex)
@@ -106,18 +118,18 @@ namespace NepseApp.ViewModels
 
         public void OnDialogClosed() { }
 
-        public async void OnDialogOpened(IDialogParameters parameters)
+        public void OnDialogOpened(IDialogParameters parameters)
         {
             try
             {
                 if (Items == null)
                 {
-                    Items = await _client.GetCapitalsAsync();
+                    Items = _client.GetCapitals();
                 }
-                SelectedItem = Items.FirstOrDefault(x => x.Id == Settings.Default.MeroshareClientId);
-                Username = Settings.Default.MeroshareUsername;
-                Password = StringCipher.GetDecryptedPassword(Settings.Default.MerosharePassword);
-                IsRememberPassword = Settings.Default.MeroshareRememberPassword;
+                SelectedItem = Items.FirstOrDefault(x => x.Id == _config.ClientId);
+                Username = _config.Username;
+                Password = _config.Password.ToSecuredString();
+                IsRememberPassword = _config.RememberPassword;
             }
             catch (Exception ex)
             {

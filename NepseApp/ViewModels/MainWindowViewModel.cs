@@ -25,6 +25,7 @@ using System.Security.Authentication;
 using System.Windows;
 
 using TradeManagementSystemClient;
+using TradeManagementSystemClient.Models.Requests;
 
 namespace NepseApp.ViewModels
 {
@@ -84,6 +85,7 @@ namespace NepseApp.ViewModels
             _client = nepse;
             _dialog = dialog;
             _meroshareClient = meroshareClient;
+            _meroshareClient.PromptCredential = GetMeroShareCredentials;
             ApplicationCommand = applicationCommand;
             _client.ShowAuthenticationDialog = ExecuteLoginCommand;
             applicationCommand.ShowMessage = ShowMessage;
@@ -209,86 +211,21 @@ namespace NepseApp.ViewModels
         public DelegateCommand ImportPortfolioCommand =>
             _importPortfolioCommand ?? (_importPortfolioCommand = new DelegateCommand(ExecuteImportPortfolioCommand, () => !IsImporting));
 
-        async void ExecuteImportPortfolioCommand()
+        void ExecuteImportPortfolioCommand()
         {
             try
             {
                 IsImporting = true;
                 MessageQueue.Enqueue("Importing wacc from meroshare");
 
-                var me = await _meroshareClient.GetOwnDetailsAsync();
-                var myShares = await _meroshareClient.GetMySharesAsync();
-                if (!int.TryParse(ConfigurationManager.AppSettings["max_retry"], out int maxRetry))
-                {
-                    maxRetry = 3;
-                }
+                var myShares = _meroshareClient.GetMyShares();
+                var waccs = _meroshareClient.GetWaccs(myShares).ToArray();
 
-                using (var viewFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "view.jl.bk")))
-                using (var searchFile = new StreamWriter(Path.Combine(Constants.AppDataPath.Value, "search.jl.bk")))
-                    foreach (var share in myShares)
-                    {
-                        var retry = 0;
-                        while (true)
-                        {
-                            try
-                            {
-                                var view = await _meroshareClient.ViewMyPurchaseAsync(me.Demat, share);
-                                await viewFile.WriteLineAsync(JsonConvert.SerializeObject(view));
-                                break;
-                            }
-                            catch (System.Exception ex)
-                            {
-                                retry++;
-                                Log.Warning(ex, "Failed to load view of {share}. Retrying {retry} times", share, retry);
-                            }
-
-                            if (retry > maxRetry)
-                            {
-                                Log.Error("Exceed max retries({retry}).", retry);
-                                break;
-                            }
-                        }
-
-                        retry = 0;
-                        while (true)
-                        {
-                            try
-                            {
-                                var searches = await _meroshareClient.SearchMyPurchaseAsync(me.Demat, share);
-                                await searchFile.WriteLineAsync(JsonConvert.SerializeObject(searches));
-                                break;
-                            }
-                            catch (System.Exception ex)
-                            {
-                                retry++;
-                                Log.Error(ex, "Failed to load search of {share}. Retrying {retry} times", share, retry);
-                            }
-                            if (retry > maxRetry)
-                            {
-                                Log.Error("Exceed max retries({retry}).", retry);
-                                break;
-                            }
-                        }
-                    }
-
-                // Replace the old file
-                File.Move(Path.Combine(Constants.AppDataPath.Value, "view.jl.bk"), Path.Combine(Constants.AppDataPath.Value, "view.jl"), true);
-                File.Move(Path.Combine(Constants.AppDataPath.Value, "search.jl.bk"), Path.Combine(Constants.AppDataPath.Value, "search.jl"), true);
-
+                var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
+                File.WriteAllText(path, JsonConvert.SerializeObject(waccs));
                 _client.LoadWacc();
                 MessageQueue.Enqueue("Wacc imported.");
                 IsImporting = false;
-            }
-            catch (AuthenticationException)
-            {
-                IsImporting = false;
-                _dialog.ShowDialog(nameof(MeroshareImportDialog), null, result =>
-                {
-                    if (result?.Result == ButtonResult.OK)
-                    {
-                        ImportPortfolioCommand.Execute();
-                    }
-                });
             }
             catch (System.Exception ex)
             {
@@ -301,6 +238,20 @@ namespace NepseApp.ViewModels
         private void ShowMessage(string message)
         {
             Message = message;
+        }
+
+        private MeroshareAuthRequest GetMeroShareCredentials()
+        {
+            MeroshareAuthRequest output = null;
+            _dialog.ShowDialog(nameof(MeroshareImportDialog), null,
+                result =>
+                {
+                    if (result.Result == ButtonResult.OK)
+                    {
+                        result.Parameters.TryGetValue("Credentials", out output);
+                    }
+                });
+            return output;
         }
     }
 }

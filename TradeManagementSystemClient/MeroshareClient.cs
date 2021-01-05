@@ -1,163 +1,188 @@
-﻿using NepseClient.Commons;
-using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons.Contracts;
+
+using Newtonsoft.Json.Serialization;
 
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
+using Serilog;
+
+using SuperSocket.ClientEngine;
+
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Authentication;
-using System.Threading;
-using System.Threading.Tasks;
 
+using TradeManagementSystemClient.Extensions;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 
 namespace TradeManagementSystemClient
 {
-    public class MeroshareClient
+    public class MeroshareClient : IDisposable
     {
-        private readonly string _sessionFilePath;
-        private string _authorization;
+        private readonly IConfiguration _configuration;
         public IRestClient Client { get; set; }
-        public bool IsAuthenticated { get; set; }
-
-        public MeroshareClient()
+        public Func<MeroshareAuthRequest> PromptCredential { get; set; }
+        public MeroshareClient(IConfiguration configuration)
         {
-            _sessionFilePath = Path.Combine(Constants.AppDataPath.Value, "meroshare.session");
-            Client = CreateClient();
-        }
-
-        public void SaveSession()
-        {
-            if (!string.IsNullOrEmpty(_authorization))
+            Client = new RestClient(configuration.Meroshare.BaseUrl)
             {
-                File.WriteAllText(_sessionFilePath, _authorization);
-            }
+                CookieContainer = new System.Net.CookieContainer(),
+            };
+            Client.UseNewtonsoftJson(new Newtonsoft.Json.JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy(),
+                },
+            });
+            _configuration = configuration;
         }
 
-        public void RestoreSession()
+        #region Authentication
+        public virtual void Authorize()
         {
-            if (!File.Exists(_sessionFilePath)) return;
-
-            _authorization = File.ReadAllText(_sessionFilePath);
-            if (string.IsNullOrEmpty(_authorization)) return;
-
-
-            Client.Authenticator = new MeroshareAuthenticator(_authorization);
-            IsAuthenticated = true;
+            Log.Debug("Authorizing...");
+            var cred = PromptCredential?.Invoke();
+            if (cred is null) throw new AuthenticationException("Not Authorized");
+            SignIn(cred);
+            Log.Debug("Authorized");
         }
-
-        private RestClient CreateClient()
+        private void SignIn(MeroshareAuthRequest credentials)
         {
-            var client = new RestClient("https://backend.cdsc.com.np");
-            //client.ThrowOnDeserializationError = true;
-            client.UseNewtonsoftJson();
+            Log.Debug("Signing in...");
+            var request = new RestRequest("/api/meroShare/auth/");
+            request.AddJsonBody(credentials);
 
-            return client;
+            var response = Client.Post(request);
+            if (!response.IsSuccessful) throw new AuthenticationException(response.Content);
+
+            var authHeader = response.Headers.FirstOrDefault(x => x.Name.Equals("Authorization"));
+            if (authHeader is null) throw new AuthenticationException("Authorization header not found");
+            var value = authHeader.Value?.ToString();
+            Client.Authenticator = new MeroshareAuthenticator(value);
+
+            // Save values
+            Log.Debug("Signed In");
         }
+        private void SignOut()
+        {
+            var request = new RestRequest("/api/meroShare/auth/logout/");
+            var response = Client.Get(request);
+            Client.Authenticator = null;
+            Log.Debug(response.Content);
+        }
+        #endregion
 
         /// <summary>
         /// Get Depository Participants (Capitals)
         /// </summary>
-        public Task<IEnumerable<IMeroshareCapital>> GetCapitalsAsync(CancellationToken ct = default)
+        public MeroshareCapitalResponse[] GetCapitals()
         {
-            var request = new RestRequest("/api/meroShare/capital/");
-            return Client.ExecuteGetAsync<MeroshareCapitalResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<IMeroshareCapital>>(task => task.Result.Data);
+            Log.Debug("Getting capitals");
+            var request = new RestRequest("/api/meroShare/capital");
+            var response = Client.Get<MeroshareCapitalResponse[]>(request);
+            return response.Data;
         }
 
-        public Task AuthenticateAsync(int clientId, string username, string password, CancellationToken ct = default)
+        public MeroshareOwnDetailResponse GetOwnDetails()
         {
-            var request = new RestRequest("/api/meroShare/auth/");
-            request.AddJsonBody(new MeroshareAuthRequest(clientId, username, password));
-
-            return Client.ExecutePostAsync(request, ct)
-                .ContinueWith(task =>
-                {
-                    var response = task.Result;
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    {
-                        IsAuthenticated = false;
-                        throw new AuthenticationException(response.Content);
-                    }
-                    else
-                    {
-                        var authHeader = response.Headers.FirstOrDefault(x => x.Name.Equals("Authorization"));
-                        if (authHeader == null)
-                        {
-                            IsAuthenticated = false;
-                            throw new AuthenticationException(response.Content);
-                        }
-                        else
-                        {
-                            _authorization = authHeader.Value?.ToString();
-                            var authenticator = new MeroshareAuthenticator(_authorization);
-                            Client.Authenticator = authenticator;
-                            IsAuthenticated = true;
-                        }
-                    }
-                });
-        }
-
-        public Task LogoutAsync(CancellationToken ct = default)
-        {
-            var request = new RestRequest("/api/meroShare/auth/logout/");
-            return Client.ExecuteGetAsync(request, ct)
-                .ContinueWith(task =>
-                {
-                    IsAuthenticated = false;
-                    Client.Authenticator = null;
-                });
-        }
-
-        public Task<IMeroshareOwnDetail> GetOwnDetailsAsync(CancellationToken ct = default)
-        {
+            Log.Debug("Getting own details");
             var request = new RestRequest("/api/meroShare/ownDetail/");
-            return Client.ExecuteGetAsync<MeroshareOwnDetailResponse>(request, ct)
-                .ContinueWith<IMeroshareOwnDetail>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<MeroshareOwnDetailResponse>(request);
+            return response.Data;
         }
 
-        public Task<IEnumerable<string>> GetMySharesAsync(CancellationToken ct = default)
+        public string[] GetMyShares()
         {
+            Log.Debug("Getting my shares");
             var request = new RestRequest("/api/myPurchase/myShare/");
-            return Client.ExecuteGetAsync<string[]>(request, ct)
-                .ContinueWith<IEnumerable<string>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<string[]>(request);
+            return response.Data;
         }
 
-        public Task<IMeroshareViewMyPurchase> ViewMyPurchaseAsync(string demat, string scrip, CancellationToken ct = default)
+        public MeroshareViewMyPurchaseResponse ViewMyPurchase(MeroshareViewMyPurchaseRequest body)
         {
+            Log.Debug("View my purchase");
             var request = new RestRequest("/api/myPurchase/view/");
-            request.AddJsonBody(new MeroshareViewMyPurchaseRequest { Demat = demat, Scrip = scrip });
-            return Client.ExecutePostAsync<MeroshareViewMyPurchaseResponse>(request, ct)
-                .ContinueWith<IMeroshareViewMyPurchase>(EnsureAuthenticated, ct);
+            request.AddJsonBody(body);
+            var response = AuthorizedPost<MeroshareViewMyPurchaseResponse>(request);
+            return response.Data;
         }
 
-        public Task<IEnumerable<IMeroshareSearchMyPurchaseRespose>> SearchMyPurchaseAsync(string demat, string scrip, CancellationToken ct = default)
+        public MeroshareSearchMyPurchaseRespose[] SearchMyPurchase(MeroshareViewMyPurchaseRequest body)
         {
             var request = new RestRequest("/api/myPurchase/search/");
-            request.AddJsonBody(new MeroshareViewMyPurchaseRequest { Demat = demat, Scrip = scrip });
-            return Client.ExecutePostAsync<MeroshareSearchMyPurchaseRespose[]>(request, ct)
-                .ContinueWith<IEnumerable<IMeroshareSearchMyPurchaseRespose>>(EnsureAuthenticated, ct);
+            request.AddJsonBody(body);
+            var response = AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
+            return response.Data;
         }
 
-        public T EnsureAuthenticated<T>(Task<IRestResponse<T>> task)
+        public IEnumerable<MeroshareViewMyPurchaseResponse> GetWaccs(IEnumerable<string> scrips)
         {
-            var response = task.Result;
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            Log.Debug("Getting waccs");
+            var me = GetOwnDetails();
+            var request = new MeroshareViewMyPurchaseRequest
             {
-                IsAuthenticated = false;
-                throw new AuthenticationException(response.Content);
-            }
-
-            if (!response.IsSuccessful)
+                Demat = me.Demat,
+            };
+            foreach (var scrip in scrips)
             {
-                throw new Exception(response.Content);
-            }
+                request.Scrip = scrip;
+                var view = ViewMyPurchase(request);
+                var searches = SearchMyPurchase(request);
+                if (searches.Length == 0)
+                {
+                    yield return view;
+                }
+                else
+                {
+                    var first = searches.First();
+                    var myView = new MeroshareViewMyPurchaseResponse
+                    {
+                        Isin = first.Isin,
+                        ScripName = first.Scrip,
+                        TotalCost = searches.Sum(x => x.UserPrice * x.TransactionQuantity),
+                        TotalQuantity = searches.Sum(x => x.TransactionQuantity),
+                        //AverageBuyRate
+                    };
+                    myView.TotalCost += view.TotalCost;
+                    myView.TotalQuantity += view.TotalQuantity;
+                    myView.AverageBuyRate = view.TotalCost / view.TotalQuantity;
 
-            return response.Data;
+                    yield return myView;
+                }
+
+            }
+        }
+
+        public void Dispose()
+        {
+            SignOut();
+        }
+
+        private IRestResponse<T> AuthorizedGet<T>(IRestRequest request)
+        {
+            var response = Client.Get<T>(request);
+            if (response.IsUnAuthorized())
+            {
+                Authorize();
+                return Client.Get<T>(request);
+            }
+            return response;
+        }
+
+        private IRestResponse<T> AuthorizedPost<T>(IRestRequest request)
+        {
+            var response = Client.Post<T>(request);
+            if (response.IsUnAuthorized())
+            {
+                Authorize();
+                return Client.Post<T>(request);
+            }
+            return response;
         }
     }
 }
