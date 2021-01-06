@@ -14,72 +14,40 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Authentication;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
+using TradeManagementSystemClient.Extensions;
+using TradeManagementSystemClient.Models;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
+using TradeManagementSystemClient.Utils;
 
 namespace TradeManagementSystemClient
 {
-    public class TmsClient : INepseClient
+    public class TmsClient : IDisposable
     {
-        private readonly string _sessionFilePath;
+        private bool _isAuthenticated;
+        private readonly ITmsConfiguration _config;
         private IDictionary<string, float> _waccDict;
+        private AuthenticationDataResponse _authData;
 
-        private RestClient _client;
-        public RestClient Client
+        public RestClient Client { get; }
+        public Func<AuthenticationRequest> PromptCredentials { get; set; }
+
+        public TmsClient(IConfiguration config)
         {
-            get
-            {
-                if (_client is null)
-                {
-                    throw new AuthenticationException("Not Authorized");
-                }
-                return _client;
-            }
-            set { _client = value; }
-        }
-
-        private SessionInfo _session;
-        public SessionInfo Session
-        {
-            get
-            {
-                if (_session is null)
-                    throw new AuthenticationException("Not Authorized.");
-                return _session;
-            }
-            private set { _session = value; }
-        }
-        public bool IsAuthenticated { get; private set; }
-
-        public Action ShowAuthenticationDialog { get; set; }
-
-        public TmsClient()
-        {
-            _sessionFilePath = Path.Combine(Constants.AppDataPath.Value, "tms.session");
-
-            LoadWacc();
-        }
-
-        private RestClient CreateClient(string baseUrl)
-        {
-            var client = new RestClient(baseUrl)
+            _config = config.Tms;
+            Client = new RestClient(_config.BaseUrl)
             {
                 CookieContainer = new System.Net.CookieContainer(),
             };
-            //client.ThrowOnDeserializationError = true;
-            client.UseNewtonsoftJson(new JsonSerializerSettings
+            Client.UseNewtonsoftJson(new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = new CamelCaseNamingStrategy(),
                 },
             });
-
-            return client;
+            LoadWacc();
         }
 
         #region UnAuthorized Access
@@ -91,374 +59,229 @@ namespace TradeManagementSystemClient
         }
         #endregion
 
-        #region Session
-        public void SaveSession()
+        #region Authentication
+        public virtual void Authorize()
         {
-            if (Session is null) return;
-
-            var serialized = JsonConvert.SerializeObject(Session);
-            File.WriteAllText(_sessionFilePath, serialized);
+            Log.Debug("Authorizing");
+            var cred = PromptCredentials?.Invoke();
+            SignIn(cred);
+            Log.Debug("Authorized");
         }
-
-        public void RestoreSession()
+        private void SignIn(AuthenticationRequest body)
         {
-            if (!File.Exists(_sessionFilePath))
-                return;
-
-            var session = File.ReadAllText(_sessionFilePath);
-            Session = JsonConvert.DeserializeObject<SessionInfo>(session);
-            Client = CreateClient(Session.Host);
-            Client.Authenticator = new TmsAuthenticator(Session);
-
-            IsAuthenticated = true;
-            Log.Debug("Session restored [{0}]", Session.LastUpdated);
-        }
-
-        public void Logout()
-        {
-            var request = new RestRequest("/tmsapi/authenticate/logout");
-            try
-            {
-                var response = Client.Post(request);
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex, "Failed to logout");
-            }
-
-            Session = null;
-            IsAuthenticated = false;
-            Client.Authenticator = null;
-
-            if (!File.Exists(_sessionFilePath))
-                return;
-
-            File.Delete(_sessionFilePath);
-        }
-
-        public Task AuthenticateAsync(string url, string username, string password)
-        {
-            Log.Debug("Authenticating...");
-            Client = CreateClient(url);
-
+            Log.Debug("Signing in");
+            Client.BaseUrl = body.BaseUrl;
             var request = new RestRequest("/tmsapi/authenticate");
-            request.AddJsonBody(new AuthenticationRequest(username, password));
-            Client.Authenticator = null;
-            return Client.ExecutePostAsync<AuthenticationResponse>(request)
-                 .ContinueWith(responseTask =>
-                 {
-                     var response = responseTask.Result;
-                     if (!response.IsSuccessful)
-                     {
-                         throw new AuthenticationException(response.Content);
-                     }
-                     if (response.Data.Data.IsCookieEnabled)
-                     {
-                         var cookies = response.Headers.FirstOrDefault(x => x.Name.Equals("Set-Cookie"));
-                         if (cookies is null)
-                         {
-                             throw new Exception("Cookies Not Found");
-                         }
-                         var parts = cookies.Value.ToString().Split(',');
-                         Session = GetSessionInfo(cookies.Value.ToString(), response.Data.Data);
-                     }
-                     else
-                     {
-                         Session = GetSessionInfo(null, response.Data.Data);
-                     }
-                     Session.Host = url;
-                     Session.Username = username;
-                     Client.Authenticator = new TmsAuthenticator(Session);
-                     Log.Debug("Authentication Complete");
-                     Log.Debug("Authentication Response Message: {0}", response.Data?.Message);
+            request.AddJsonBody(body);
 
-                     IsAuthenticated = true;
-                 });
+            var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
+            if (!response.IsSuccessful)
+            {
+                _isAuthenticated = false;
+                throw new AuthenticationException(response.Content);
+            }
 
+            _authData = response.Data.Data;
+            CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
+            Client.Authenticator = new TmsAuthenticator();
+            Log.Debug("Signed In");
+            _isAuthenticated = true;
+        }
+        public void SignOut()
+        {
+            Log.Debug("Signing out from Tms");
+            if (!_isAuthenticated)
+            {
+                Log.Debug("Not authenticated. No sign out required.");
+                return;
+            }
+            Log.Debug("Signing out");
+            var request = new RestRequest("/tmsapi/authenticate/logout");
+            var response = Client.Post<ResponseBase>(request);
+            Log.Information(response.Data.Message);
+            _isAuthenticated = false;
+            Log.Debug("Signed out from Tms");
         }
         #endregion
-
-        public Task<IEnumerable<IScripResponse>> GetMyPortfolioAsync(CancellationToken ct = default)
+        public void Dispose()
         {
-            if (!IsAuthenticated)
-            {
-                ShowAuthenticationDialog?.Invoke();
-            }
-            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{Session.ClientId}/CLI");
-
-            return Client.ExecuteGetAsync<ScripResponse[]>(request, ct)
-                .ContinueWith(EnsureAuthenticated, ct)
-                .ContinueWith<IEnumerable<IScripResponse>>(task =>
-                {
-                    var response = task.Result;
-                    // Update Wacc Value
-                    foreach (var scrip in response)
-                    {
-                        var key = scrip.Scrip;
-                        if (_waccDict.ContainsKey(key))
-                        {
-                            scrip.WaccValue = _waccDict[key];
-                            if (scrip.LastTransactionPrice == 0)
-                            {
-                                scrip.LastTransactionPrice = scrip.WaccValue;
-                                scrip.PreviousClosePrice = scrip.LastTransactionPrice;
-                                scrip.LTPTotal = scrip.WaccValue * scrip.TotalBalance;
-                                scrip.PreviousTotal = scrip.LTPTotal;
-                            }
-                        }
-                        else
-                        {
-                            _waccDict.Add(key, scrip.WaccValue);
-                        }
-                    }
-                    return response;
-                }, ct);
+            SignOut();
         }
 
-        public Task<IEnumerable<ISecurityItem>> GetLiveMarketAsync(CancellationToken ct = default)
+        public ScripResponse[] GetMyPortfolios()
+        {
+            if (!_isAuthenticated) Authorize();
+
+            var clientId = _authData.ClientDealerMember.Client.Id;
+            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{clientId}/CLI");
+            var response = AuthorizedGet<ScripResponse[]>(request);
+            // Update Wacc Value
+            foreach (var scrip in response.Data)
+            {
+                var key = scrip.Scrip;
+                if (_waccDict.ContainsKey(key))
+                {
+                    scrip.WaccValue = _waccDict[key];
+                    if (scrip.LastTransactionPrice == 0)
+                    {
+                        scrip.LastTransactionPrice = scrip.WaccValue;
+                        scrip.PreviousClosePrice = scrip.LastTransactionPrice;
+                        scrip.LTPTotal = scrip.WaccValue * scrip.TotalBalance;
+                        scrip.PreviousTotal = scrip.LTPTotal;
+                    }
+                }
+                else
+                {
+                    _waccDict.Add(key, scrip.WaccValue);
+                }
+            }
+            return response.Data;
+        }
+
+        public ISecurityItem[] GetLiveMarket()
         {
             var request = new RestRequest("/tmsapi/ws/top25securities");
 
-            return Client.ExecuteGetAsync<SocketResponse<SecurityItem2>>(request, ct)
-                .ContinueWith(EnsureAuthenticated, ct)
-                .ContinueWith<IEnumerable<ISecurityItem>>(task =>
-                {
-                    var response = task.Result;
-                    return response.Payload.Data
-                    .OrderByDescending(x => x.LastTradedDateTime)
-                    .ToArray();
-                }, ct);
+            var response = AuthorizedGet<SocketResponse<SecurityItem2>>(request);
+            return response.Data.Payload.Data
+                .OrderByDescending(x => x.LastTradedDateTime)
+                .ToArray();
         }
 
-        public Task<IEnumerable<IMarketWatchResponse>> GetMarketWatchAsync(CancellationToken ct = default)
+        public MarketWatchResponse[] GetMarketWatch()
         {
-            var request = new RestRequest($"/tmsapi/market-watch/user/{Session.UserId}");
-            return Client.ExecuteGetAsync<MarketWatchResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<IMarketWatchResponse>>(EnsureAuthenticated, ct);
+            if(!_isAuthenticated) Authorize();
+
+            var request = new RestRequest($"/tmsapi/market-watch/user/{_authData.User.Id}");
+            var response = AuthorizedGet<MarketWatchResponse[]>(request);
+            return response.Data;
         }
 
         #region Top
-        public Task<IEnumerable<ITopResponse>> GetTopGainersAsync(CancellationToken ct = default)
+        public ITopResponse[] GetTopGainers()
         {
             var request = new RestRequest("/tmsapi/stock/top/gainer/8");
-            return Client.ExecuteGetAsync<TopResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<ITopResponse>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<TopResponse[]>(request);
+            return response.Data;
         }
-        public Task<IEnumerable<ITopResponse>> GetTopLosersAsync(CancellationToken ct = default)
+        public ITopResponse[] GetTopLosers()
         {
             var request = new RestRequest("/tmsapi/stock/top/loser/8");
-            return Client.ExecuteGetAsync<TopResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<ITopResponse>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<TopResponse[]>(request);
+            return response.Data;
         }
-
-        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopTurnoversAsync(CancellationToken ct = default)
+        public ITopSecuritiesResponse[] GetTopTurnovers()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/turnover/9");
-            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<TopSecuritiesResponse[]>(request);
+            return response.Data;
         }
-        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopTransactionsAsync(CancellationToken ct = default)
+        public ITopSecuritiesResponse[] GetTopTransactions()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/transaction/9");
-            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<TopSecuritiesResponse[]>(request);
+            return response.Data;
         }
-        public Task<IEnumerable<ITopSecuritiesResponse>> GetTopVolumesAsync(CancellationToken ct = default)
+        public ITopSecuritiesResponse[] GetTopVolumes()
         {
             var request = new RestRequest("/tmsapi/stock/top-securities/volume/9");
-            return Client.ExecuteGetAsync<TopSecuritiesResponse[]>(request, ct)
-                .ContinueWith<IEnumerable<ITopSecuritiesResponse>>(EnsureAuthenticated, ct);
+            var response = AuthorizedGet<TopSecuritiesResponse[]>(request);
+            return response.Data;
         }
         #endregion
 
         #region WebSocket WS
-        public Task<IEnumerable<IStockQuoteResponse>> GetStockQuoteAsync(string id, CancellationToken ct = default)
+        public IStockQuoteResponse[] GetStockQuote(string id)
         {
             var request = new RestRequest($"/tmsapi/ws/stockQuote/{id}");
-            return Client.ExecuteGetAsync<SocketResponse<StockQuoteResponse>>(request, ct)
-                .ContinueWith(EnsureAuthenticated, ct)
-                .ContinueWith<IEnumerable<IStockQuoteResponse>>(task =>
-                {
-                    var response = task.Result;
-                    return response.Payload.Data;
-                });
+            var response = AuthorizedGet<SocketResponse<StockQuoteResponse>>(request);
+            return response.Data.Payload.Data;
         }
-
-        public Task<IEnumerable<IIndexResponse>> GetIndicesAsync(CancellationToken ct = default)
+        public IIndexResponse[] GetIndices()
         {
             var request = new RestRequest("/tmsapi/ws/index");
-            return Client.ExecuteGetAsync<SocketResponse<IndexResponse>>(request, ct)
-                .ContinueWith(EnsureAuthenticated, ct)
-                .ContinueWith<IEnumerable<IIndexResponse>>(task =>
-                {
-                    var response = task.Result;
-                    return response.Payload.Data;
-                });
+            var response = AuthorizedGet<SocketResponse<IndexResponse>>(request);
+            return response.Data.Payload.Data;
         }
-
-        public Task<IEnumerable<IOHLCDataResponse>> GetOHLCPortfolioAsync(CancellationToken ct = default)
+        public IOHLCDataResponse[] GetOHLCPortfolio()
         {
-            var request = new RestRequest($"/tmsapi/ws/clientPortfolio/{Session.ClientId}");
-
-            return Client.ExecuteGetAsync<SocketResponse<OHLCDataResponse>>(request, ct)
-                .ContinueWith(EnsureAuthenticated, ct)
-                .ContinueWith<IEnumerable<IOHLCDataResponse>>(task =>
-                {
-                    return task.Result.Payload.Data;
-                });
+            if(_isAuthenticated) Authorize();
+            var request = new RestRequest($"/tmsapi/ws/clientPortfolio/{_authData.ClientDealerMember.Client.Id}");
+            var response = AuthorizedGet<SocketResponse<OHLCDataResponse>>(request);
+            return response.Data.Payload.Data;
         }
         #endregion
-
-        public Task<ICachedDataResponse> GetCachedData(CancellationToken ct = default)
-        {
-            var request = new RestRequest("/tmsapi/external/cache");
-            return Client.ExecuteGetAsync<CachedDataResponse>(request, ct)
-                .ContinueWith<ICachedDataResponse>(EnsureAuthenticated, ct);
-        }
-
-        #region Helpers
-        private SessionInfo GetSessionInfo(string cookie, AuthenticationDataResponse authData)
-        {
-            var session = new SessionInfo
-            {
-                XsrfToken = string.Empty,
-                RefreshToken = string.Empty,
-                AccessToken = string.Empty,
-                LastUpdated = DateTime.Now,
-                ClientId = authData.ClientDealerMember.Client.Id,
-                DealerId = authData.ClientDealerMember.Dealer.Id,
-                MemberId = authData.ClientDealerMember.Member.Id,
-                UserId = authData.User.Id,
-                CookieEnabled = authData.IsCookieEnabled,
-                JsonWebToken = authData.JsonWebToken,
-            };
-
-            if (string.IsNullOrEmpty(cookie))
-                return session;
-
-            var parts = cookie.Split(',');
-            foreach (var part in parts)
-            {
-                var innerParts = part.Split(';');
-                var firstParts = innerParts[0].Split('=');
-                var key = firstParts[0].Trim();
-                var value = firstParts[1];
-                switch (key)
-                {
-                    case "XSRF-TOKEN":
-                        session.XsrfToken = value;
-                        break;
-                    case "accessToken":
-                        session.AccessToken = value;
-                        break;
-                    case "refreshToken":
-                        session.RefreshToken = value;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return session;
-        }
-
-        public string GetSocketUrl()
-        {
-            if (Session.CookieEnabled)
-            {
-                return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}";
-            }
-            else
-            {
-                return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={Session.AccessToken}";
-            }
-        }
-
-        public List<KeyValuePair<string, string>> GetCookies()
-        {
-            if (!Session.CookieEnabled) return null;
-
-            var output = new List<KeyValuePair<string, string>>();
-            if (!string.IsNullOrEmpty(Session.XsrfToken))
-            {
-                output.Add(new KeyValuePair<string, string>("XSRF-TOKEN", Session.XsrfToken));
-            }
-
-            if (!string.IsNullOrEmpty(Session.AccessToken))
-            {
-                output.Add(new KeyValuePair<string, string>("accessToken", Session.AccessToken));
-            }
-
-            if (!string.IsNullOrEmpty(Session.RefreshToken))
-            {
-                output.Add(new KeyValuePair<string, string>("refreshToken", Session.RefreshToken));
-            }
-
-            return output.Count > 0 ? output : null;
-        }
-
-        public bool IsLive()
-        {
-            var today = DateTime.Now;
-            var offDay = today.DayOfWeek == DayOfWeek.Friday || today.DayOfWeek == DayOfWeek.Saturday;
-            if (offDay) return false;
-
-            if (today.Hour < 11) return false;
-
-            if (today.Hour > 6) return false;
-
-            return true;
-        }
 
         public void LoadWacc()
         {
             var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
-            if(!File.Exists(path)) return;
+            if (!File.Exists(path)) return;
             var json = File.ReadAllText(path);
             var waccs = JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse[]>(json);
             _waccDict = waccs.ToDictionary(x => x.ScripName, x => (float)x.AverageBuyRate);
         }
 
-        public T EnsureAuthenticated<T>(Task<IRestResponse<T>> task)
+        private IRestResponse<T> AuthorizedGet<T>(IRestRequest request)
         {
-            var response = task.Result;
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            if (!_isAuthenticated)
             {
-                IsAuthenticated = false;
-                throw new AuthenticationException(response.Content);
+                Authorize();
             }
-
-            return response.Data;
+            var response = Client.Get<T>(request);
+            if (response.IsUnAuthorized())
+            {
+                Authorize();
+                return Client.Get<T>(request);
+            }
+            return response;
         }
 
-        public void HandleAuthException(Exception ex, ICommand command, object commandParameter = null)
+        private IRestResponse<T> AuthorizedPost<T>(IRestRequest request)
         {
-            if (ex is AuthenticationException)
+            var response = Client.Post<T>(request);
+            if (response.IsUnAuthorized())
             {
-                Log.Error(ex, "Not Authorized. Requesting credentials");
-                ShowAuthenticationDialog?.Invoke();
-                if (IsAuthenticated)
-                {
-                    command?.Execute(commandParameter);
-                }
-                return;
+                Authorize();
+                return Client.Post<T>(request);
             }
-
-            if (ex is AggregateException aggEx)
-            {
-                foreach (var innerEx in aggEx.InnerExceptions)
-                {
-                    if (innerEx is AuthenticationException)
-                    {
-                        Log.Error(ex, "Not Authorized. Requesting credentials");
-                        ShowAuthenticationDialog?.Invoke();
-                        if (IsAuthenticated)
-                        {
-                            command?.Execute(commandParameter);
-                        }
-                    }
-                }
-            }
+            return response;
         }
-        #endregion
+
+        public string GetSocketUrl()
+        {
+            return null;
+            //if (Session.CookieEnabled)
+            //{
+            //    return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}";
+            //}
+            //else
+            //{
+            //    return $"wss://{Client.BaseUrl.Host}/tmsapi/socketEnd?memberId={Session.MemberId}&clientId={Session.ClientId}&dealerId={Session.DealerId}&userId={Session.UserId}&access_token={Session.AccessToken}";
+            //}
+        }
+
+        public List<KeyValuePair<string, string>> GetCookies()
+        {
+            return null;
+            //if (!Session.CookieEnabled) return null;
+
+            //var output = new List<KeyValuePair<string, string>>();
+            //if (!string.IsNullOrEmpty(Session.XsrfToken))
+            //{
+            //    output.Add(new KeyValuePair<string, string>("XSRF-TOKEN", Session.XsrfToken));
+            //}
+
+            //if (!string.IsNullOrEmpty(Session.AccessToken))
+            //{
+            //    output.Add(new KeyValuePair<string, string>("accessToken", Session.AccessToken));
+            //}
+
+            //if (!string.IsNullOrEmpty(Session.RefreshToken))
+            //{
+            //    output.Add(new KeyValuePair<string, string>("refreshToken", Session.RefreshToken));
+            //}
+
+            //return output.Count > 0 ? output : null;
+        }
     }
 }

@@ -5,11 +5,13 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 
+using TradeManagementSystemClient;
+
 namespace NepseApp.ViewModels
 {
     public class DashboardPageViewModel : ActiveAwareBindableBase
     {
-        private readonly INepseClient _client;
+        private readonly TmsClient _client;
 
         private IEnumerable<IIndexResponse> _indices;
         public IEnumerable<IIndexResponse> Indices
@@ -53,26 +55,26 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _topLosers, value); }
         }
 
-        public DashboardPageViewModel(IApplicationCommand applicationCommand, INepseClient client) :
+        public DashboardPageViewModel(IApplicationCommand applicationCommand, TmsClient client) :
             base(applicationCommand)
         {
             _client = client;
         }
 
-        public override async void ExecuteRefreshCommand()
+        public override void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Loading dashboard...");
-                Indices = await _client.GetIndicesAsync();
+                Indices =  _client.GetIndices();
 
-                TopGainers = await _client.GetTopGainersAsync();
-                TopLosers = await _client.GetTopLosersAsync();
+                TopGainers =  _client.GetTopGainers();
+                TopLosers =  _client.GetTopLosers();
 
-                TopTurnovers = await _client.GetTopTurnoversAsync();
-                TopVolume = await _client.GetTopVolumesAsync();
-                TopTransactions = await _client.GetTopTransactionsAsync();
+                TopTurnovers =  _client.GetTopTurnovers();
+                TopVolume =  _client.GetTopVolumes();
+                TopTransactions =  _client.GetTopTransactions();
                 AppCommand.HideMessage();
                 IsBusy = false;
             }
@@ -80,7 +82,6 @@ namespace NepseApp.ViewModels
             {
                 IsBusy = false;
                 AppCommand.HideMessage();
-                _client.HandleAuthException(ex, RefreshCommand);
             }
         }
     }

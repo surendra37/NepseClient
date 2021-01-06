@@ -5,6 +5,8 @@ using SuperSocket.ClientEngine;
 using System;
 using System.Net;
 using System.Threading;
+
+using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
 using WebSocket4Net;
@@ -15,11 +17,11 @@ namespace TradeManagementSystem.Nepse
     {
         private bool _isStarted;
         private WebSocket _websocket;
-        private readonly INepseClient _client;
+        private readonly TmsClient _client;
 
         public event EventHandler<SocketResponse[]> DeserializedMessageReceived;
 
-        public SocketHelper(INepseClient client)
+        public SocketHelper(TmsClient client)
         {
             _client = client;
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;

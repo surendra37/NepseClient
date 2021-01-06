@@ -1,25 +1,23 @@
-﻿using NepseClient.Commons;
+﻿using System;
+
+using NepseClient.Commons;
+
 using Newtonsoft.Json;
 
 namespace TradeManagementSystemClient.Models.Requests
 {
     public class AuthenticationRequest
     {
-        [JsonProperty("userName")]
-        public string Username { get; set; }
-
-        [JsonProperty("password")]
+        [JsonIgnore]
+        public Uri BaseUrl { get; set; }
+        public string UserName { get; set; }
         public string Password { get; set; }
-
-        [JsonProperty("otp")]
-        public string OTP { get; set; }
-
-        [JsonProperty("jwt")]
-        public string JWT { get; set; }
+        public string Otp { get; set; }
+        public string Jwt { get; set; }
 
         public AuthenticationRequest(string username, string password)
         {
-            Username = username;
+            UserName = username;
             Password = EncodingUtils.Base64Encode(password);
         }
     }

@@ -1,19 +1,27 @@
 ﻿using NepseApp.Utils;
+
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
+
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+
 using Serilog;
+
 using System;
 using System.Security;
 using System.Windows;
+
+using TradeManagementSystemClient;
+using TradeManagementSystemClient.Models.Requests;
 
 namespace NepseApp.ViewModels
 {
     public class AuthenticationDialogViewModel : BindableBase, IDialogAware
     {
-        private INepseClient _client;
+        private readonly ITmsConfiguration _config;
+        private readonly TmsClient _client;
         public event Action<IDialogResult> RequestClose;
 
         public string Title { get; } = "TMS Authentication";
@@ -46,9 +54,9 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _isRememberPassword, value); }
         }
 
-        public AuthenticationDialogViewModel()
+        public AuthenticationDialogViewModel(IConfiguration config)
         {
-
+            _config = config.Tms;
         }
 
         private bool _isBusy;
@@ -62,22 +70,24 @@ namespace NepseApp.ViewModels
         public DelegateCommand LoginCommand =>
             _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, () => !IsBusy));
 
-        async void ExecuteLoginCommand()
+        void ExecuteLoginCommand()
         {
             try
             {
                 IsBusy = true;
-                await _client.AuthenticateAsync(Host, Username, Password.GetString());
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+                var url = Host;
+                var username = Username;
+                var password = Password.GetString();
+                var request = new AuthenticationRequest(username, password) { BaseUrl = new Uri(url) };
+                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, new DialogParameters { { "Credentials", request } }));
                 IsBusy = false;
 
                 // Save values
-                Settings.Default.TmsHost = Host;
-                Settings.Default.TmsUsername = Username;
-                Settings.Default.TmsPassword = StringCipher.GetEncryptedPassword(Password, IsRememberPassword);
-                Settings.Default.TmsRememberPassword = IsRememberPassword;
-                Settings.Default.Save();
-
+                _config.BaseUrl = url;
+                _config.Username = username;
+                _config.Password = IsRememberPassword ? password : string.Empty;
+                _config.RememberPassword = IsRememberPassword;
+                _config.Save();
             }
             catch (Exception ex)
             {
@@ -89,17 +99,16 @@ namespace NepseApp.ViewModels
 
         public bool CanCloseDialog() => true;
 
-        public void OnDialogClosed() { _client = null; }
+        public void OnDialogClosed() { }
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            _client = parameters.GetValue<INepseClient>("Client");
             try
             {
-                Host = Settings.Default.TmsHost;
-                Username = Settings.Default.TmsUsername;
-                Password = StringCipher.GetDecryptedPassword(Settings.Default.TmsPassword);
-                IsRememberPassword = Settings.Default.TmsRememberPassword;
+                Host = _config.BaseUrl;
+                Username = _config.Username;
+                Password = _config.Password.ToSecuredString();
+                IsRememberPassword = _config.RememberPassword;
             }
             catch (Exception ex)
             {

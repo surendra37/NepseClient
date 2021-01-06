@@ -62,13 +62,8 @@ namespace NepseApp
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
             containerRegistry.RegisterSingleton<MeroshareClient>();
-
-            var nepseClient = new TmsClient();
-            nepseClient.RestoreSession();
-            containerRegistry.RegisterInstance<INepseClient>(nepseClient);
-
-            var socketHelper = new SocketHelper(nepseClient);
-            containerRegistry.RegisterInstance(socketHelper);
+            containerRegistry.RegisterSingleton<TmsClient>();
+            //containerRegistry.RegisterSingleton<SocketHelper>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
             containerRegistry.RegisterDialog<MeroshareImportDialog, MeroshareImportDialogViewModel>();
@@ -82,9 +77,10 @@ namespace NepseApp
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Container.Resolve<INepseClient>().SaveSession();
+            Container.Resolve<TmsClient>().Dispose();
             Container.Resolve<MeroshareClient>().Dispose();
-            Container.Resolve<SocketHelper>().Stop();
+            //Container.Resolve<SocketHelper>().Stop();
+            Log.CloseAndFlush();
             base.OnExit(e);
         }
     }

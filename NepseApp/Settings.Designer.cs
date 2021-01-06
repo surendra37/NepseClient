@@ -166,5 +166,29 @@ namespace NepseApp {
                 this["MeroshareDemat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TmsClientId {
+            get {
+                return ((string)(this["TmsClientId"]));
+            }
+            set {
+                this["TmsClientId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TmsUserId {
+            get {
+                return ((string)(this["TmsUserId"]));
+            }
+            set {
+                this["TmsUserId"] = value;
+            }
+        }
     }
 }

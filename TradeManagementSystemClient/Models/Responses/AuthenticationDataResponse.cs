@@ -4,18 +4,12 @@ namespace TradeManagementSystemClient.Models.Responses
 {
     public class AuthenticationDataResponse
     {
-        [JsonProperty("clientDealerMember")]
         public ClientDealerMemberResponse ClientDealerMember { get; set; }
-
         [JsonProperty("jwt")]
         public string JsonWebToken { get; set; }
-
-        [JsonProperty("cookieEnabled")]
         public string CookieEnabled { get; set; }
-
+        [JsonIgnore]
         public bool IsCookieEnabled => !CookieEnabled.Equals("0");
-
-        [JsonProperty("user")]
         public ClientResponse User { get; set; }
     }
 }

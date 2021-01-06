@@ -27,18 +27,6 @@
                             Command="{Binding DataContext.ApplicationCommand.RefreshCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
                         <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Refresh" />
                     </Button>
-                    <Button Style="{StaticResource WindowButtonStyle}" 
-                            ToolTip="Log In"
-                            Visibility="{Binding DataContext.IsAuthenticated, Converter={StaticResource InvertBooleanToVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}"
-                            Command="{Binding DataContext.LoginCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
-                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Login" />
-                    </Button>
-                    <Button Style="{StaticResource WindowButtonStyle}" 
-                            ToolTip="Log out"
-                            Visibility="{Binding DataContext.IsAuthenticated, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}"
-                            Command="{Binding DataContext.LogoutCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
-                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Logout" />
-                    </Button>
                     <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
                             Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
 
@@ -64,9 +52,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <mde:NavigationRail Grid.Column="0" Grid.RowSpan="2" Items="{Binding Path=NavigationItems, Mode=OneTime}"
-                    NavigationItemSelected="NavigationItemSelectedHandler" 
-                            Style="{StaticResource MaterialDesignNavigationRailPrimary}"/>
+        <mde:NavigationRail 
+            Grid.Column="0" Grid.RowSpan="2" 
+            Items="{Binding Path=NavigationItems, Mode=OneTime}"
+            NavigationItemSelected="NavigationItemSelectedHandler" 
+            Style="{StaticResource MaterialDesignNavigationRailPrimary}"/>
 
         <!--<GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>-->
 

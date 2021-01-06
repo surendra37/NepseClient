@@ -1,4 +1,4 @@
-﻿namespace NepseService.TradeManagementSystem.Models.Requests
+﻿namespace TradeManagementSystemClient.Models.Requests
 {
     public class GetMyPortfolioRequest
     {

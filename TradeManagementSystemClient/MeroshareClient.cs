@@ -1,5 +1,7 @@
-﻿using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 using RestSharp;
@@ -7,10 +9,9 @@ using RestSharp.Serializers.NewtonsoftJson;
 
 using Serilog;
 
-using SuperSocket.ClientEngine;
-
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 
@@ -22,7 +23,21 @@ namespace TradeManagementSystemClient
 {
     public class MeroshareClient : IDisposable
     {
-        private readonly IConfiguration _configuration;
+        private bool _isAuthenticated;
+        private MeroshareOwnDetailResponse _me;
+        private readonly object _authLock = new object();
+        private MeroshareOwnDetailResponse Me
+        {
+            get
+            {
+                lock (_authLock)
+                {
+                    if (!_isAuthenticated)
+                        Authorize(); 
+                }
+                return _me;
+            }
+        }
         public IRestClient Client { get; set; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
         public MeroshareClient(IConfiguration configuration)
@@ -38,7 +53,6 @@ namespace TradeManagementSystemClient
                     NamingStrategy = new CamelCaseNamingStrategy(),
                 },
             });
-            _configuration = configuration;
         }
 
         #region Authentication
@@ -57,22 +71,35 @@ namespace TradeManagementSystemClient
             request.AddJsonBody(credentials);
 
             var response = Client.Post(request);
-            if (!response.IsSuccessful) throw new AuthenticationException(response.Content);
+            if (!response.IsSuccessful)
+            {
+                _isAuthenticated = false;
+                throw new AuthenticationException(response.Content);
+            }
 
             var authHeader = response.Headers.FirstOrDefault(x => x.Name.Equals("Authorization"));
             if (authHeader is null) throw new AuthenticationException("Authorization header not found");
             var value = authHeader.Value?.ToString();
             Client.Authenticator = new MeroshareAuthenticator(value);
+            _isAuthenticated = true;
 
-            // Save values
+            _me = GetOwnDetails();
             Log.Debug("Signed In");
         }
         private void SignOut()
         {
+            Log.Debug("Signing out from MeroShare");
+            if (!_isAuthenticated)
+            {
+                Log.Debug("Not authorized. No sign out required");
+                return;
+            }
             var request = new RestRequest("/api/meroShare/auth/logout/");
             var response = Client.Get(request);
             Client.Authenticator = null;
             Log.Debug(response.Content);
+            _isAuthenticated = false;
+            Log.Debug("Signed out from MeroShare");
         }
         #endregion
 
@@ -150,11 +177,44 @@ namespace TradeManagementSystemClient
                     };
                     myView.TotalCost += view.TotalCost;
                     myView.TotalQuantity += view.TotalQuantity;
-                    myView.AverageBuyRate = view.TotalCost / view.TotalQuantity;
+                    myView.AverageBuyRate = myView.TotalCost / myView.TotalQuantity;
 
                     yield return myView;
                 }
 
+            }
+        }
+        public MerosharePortfolioResponse GetMyPortfolios(int page = 1)
+        {
+            var body = new GetMyPortfolioRequest
+            {
+                ClientCode = Me.ClientCode,
+                Demat = new string[] { Me.Demat },
+                Page = page,
+                Size = 200,
+                SortAsc = true,
+                SortBy = "scrip"
+            };
+            var request = new RestRequest("/api/meroShareView/myPortfolio");
+            request.AddJsonBody(body);
+
+            var response = AuthorizedPost<MerosharePortfolioResponse>(request);
+            return response.Data;
+        }
+
+        public MeroshareViewMyPurchaseResponse[] ReadWaccFromFile()
+        {
+            var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
+            if (!File.Exists(path))
+            {
+                var output = GetWaccs(GetMyShares()).ToArray();
+                File.WriteAllText(path, JsonConvert.SerializeObject(output));
+                return output;
+            }
+            else
+            {
+                var json = File.ReadAllText(path);
+                return JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse[]>(json);
             }
         }
 

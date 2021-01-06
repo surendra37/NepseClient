@@ -1,15 +1,20 @@
 ﻿using NepseApp.Extensions;
 using NepseApp.Models;
+
 using NepseClient.Commons.Contracts;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using TradeManagementSystemClient;
+using TradeManagementSystemClient.Adapters;
 
 namespace NepseApp.ViewModels
 {
     public class PortfolioPageViewModel : ActiveAwareBindableBase
     {
-        private readonly INepseClient _client;
+        private readonly MeroshareClient _client;
 
         private IEnumerable<IScripResponse> _items;
         public IEnumerable<IScripResponse> Items
@@ -20,39 +25,29 @@ namespace NepseApp.ViewModels
         public int TotalScrips => Items.Count();
         public float TotalPrevious => Items.Sum(x => x.PreviousTotal);
         public float TotalLTP => Items.Sum(x => x.LTPTotal);
-        public float TotalWacc => Items.Sum(x => x.WaccValue * x.CurrentBalance);
-        public float DailyGain => TotalLTP - TotalPrevious;
-        public float TotalGain => TotalLTP - TotalWacc;
+        public float TotalWacc => Items.Sum(x => x.TotalCost);
+        public float DailyGain => Items.Sum(x => x.DailyGain);
+        public float TotalGain => Items.Sum(x => x.TotalGain);
 
-        public PortfolioPageViewModel(INepseClient client, IApplicationCommand applicationCommand) :
+        public PortfolioPageViewModel(MeroshareClient client, IApplicationCommand applicationCommand) :
             base(applicationCommand)
         {
             _client = client;
         }
 
-        public override async void ExecuteRefreshCommand()
+        public override void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Loading portfolio...");
-                var myPortfolio = (await _client.GetMyPortfolioAsync()).ToArray();
-                if (!_client.IsLive())
-                {
-                    var portfolio = await _client.GetOHLCPortfolioAsync();
-                    var closePriceDict = portfolio.ToDictionary(x => x.Symbol, x => x.ClosePrice);
-                    foreach (var p in myPortfolio)
-                    {
-                        if (closePriceDict.ContainsKey(p.Scrip))
-                        {
-                            var pClose = closePriceDict[p.Scrip];
-                            if (pClose == 0) continue; // Skip for not traded scrip
-                            p.PreviousClosePrice = pClose;
-                            p.PreviousTotal = pClose * p.TotalBalance;
-                        }
-                    }
-                }
-                Items = myPortfolio;
+                var portfolios = _client.GetMyPortfolios();
+                var waccDict = _client.ReadWaccFromFile().ToDictionary(x => x.ScripName);
+                var newItems = portfolios.MeroShareMyPortfolio
+                    .Select(x => new MeroSharePortfolioAdapter(x, waccDict))
+                    .ToArray();
+                
+                Items = newItems;
                 AppCommand.HideMessage();
                 IsBusy = false;
                 RaisePropertyChanged(nameof(TotalScrips));
@@ -66,7 +61,7 @@ namespace NepseApp.ViewModels
             {
                 IsBusy = false;
                 AppCommand.HideMessage();
-                _client.HandleAuthException(ex, RefreshCommand);
+                LogDebugAndEnqueMessage(ex.Message);
             }
         }
     }

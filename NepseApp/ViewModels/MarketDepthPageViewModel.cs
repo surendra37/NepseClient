@@ -1,17 +1,19 @@
 ﻿using NepseApp.Extensions;
 using NepseApp.Models;
+
 using NepseClient.Commons.Contracts;
-using Serilog;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Authentication;
+
+using TradeManagementSystemClient;
 
 namespace NepseApp.ViewModels
 {
     public class MarketDepthPageViewModel : ActiveAwareBindableBase
     {
-        private readonly INepseClient _client;
+        private readonly TmsClient _client;
 
         private ICachedDataResponse _cached;
         public ICachedDataResponse Cached
@@ -38,12 +40,12 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _stockQuote, value); }
         }
 
-        public MarketDepthPageViewModel(IApplicationCommand appCommand, INepseClient client) : base(appCommand)
+        public MarketDepthPageViewModel(IApplicationCommand appCommand, TmsClient client) : base(appCommand)
         {
             _client = client;
         }
 
-        public override async void ExecuteRefreshCommand()
+        public override void ExecuteRefreshCommand()
         {
             try
             {
@@ -51,13 +53,13 @@ namespace NepseApp.ViewModels
                 AppCommand.ShowMessage("Getting market depth...");
                 if (Cached is null)
                 {
-                    Cached = await _client.GetCachedData();
+                    //Cached = _client.GetCachedData();
                     SelectedItem = Items.FirstOrDefault();
                     RaisePropertyChanged(nameof(Items));
                 }
                 if (SelectedItem != null)
                 {
-                    var stockQuote = await _client.GetStockQuoteAsync(SelectedItem?.Id.ToString());
+                    var stockQuote = _client.GetStockQuote(SelectedItem?.Id.ToString());
                     StockQuote = stockQuote.FirstOrDefault();
                     RaisePropertyChanged(nameof(StockQuoteDict));
                 }
@@ -68,7 +70,6 @@ namespace NepseApp.ViewModels
             {
                 IsBusy = false;
                 AppCommand.HideMessage();
-                _client.HandleAuthException(ex, RefreshCommand);
             }
         }
 

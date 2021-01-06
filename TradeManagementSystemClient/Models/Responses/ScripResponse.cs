@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 namespace TradeManagementSystemClient.Models.Responses
 {
-    public class ScripResponse : IScripResponse
+    public class ScripResponse 
     {
         [JsonProperty("cdsFreeBalance")]
         public float FreeBalance { get; set; }
@@ -16,10 +16,8 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonProperty("ltp")]
         public float LastTransactionPrice { get; set; }
 
-        [JsonProperty("previousCloseprice")]
         public float PreviousClosePrice { get; set; }
 
-        [JsonProperty("scrip")]
         public string Scrip { get; set; }
 
         [JsonProperty("symbolName")]
