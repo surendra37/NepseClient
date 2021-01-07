@@ -1,6 +1,5 @@
-﻿using NepseApp.Utils;
-
-using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons.Contracts;
+using NepseClient.Commons.Utils;
 
 namespace NepseApp.Models
 {
@@ -37,6 +36,12 @@ namespace NepseApp.Models
         {
             get => Settings.Default.MeroshareRememberPassword;
             set => Settings.Default.MeroshareRememberPassword = value;
+        }
+
+        public string AuthHeader
+        {
+            get => StringCipher.Decrypt(Settings.Default.MeroShareAuthorization);
+            set => Settings.Default.MeroShareAuthorization = StringCipher.Encrypt(value);
         }
 
         public void Save()

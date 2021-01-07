@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="NepseApp.Views.MeroShareAsbaOldApplicationReportPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"     
+             xmlns:behaviors="clr-namespace:NepseApp.Behaviors"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <DataGrid ItemsSource="{Binding Items}"
+              AutoGenerateColumns="False" IsReadOnly="True"
+              behaviors:DataGridBehavior.DisplayRowNumber="True" 
+              HeadersVisibility="All">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Scrip" Binding="{Binding Scrip}" />
+            <DataGridTextColumn Header="Company" Binding="{Binding CompanyName}" />
+            <DataGridTextColumn Header="Type" Binding="{Binding ShareTypeName}" />
+            <DataGridTextColumn Header="Group" Binding="{Binding ShareGroupName}" />
+            <DataGridTextColumn Header="Sub Group" Binding="{Binding SubGroup}" />
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

@@ -7,7 +7,22 @@ namespace TradeManagementSystemClient.Extensions
     {
         public static bool IsUnAuthorized(this IRestResponse response)
         {
-            return response.StatusCode == System.Net.HttpStatusCode.Unauthorized;
+            if (response.IsSuccessful) return false;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                return true;
+
+            foreach (var header in response.Headers)
+            {
+                if (header.Name.Equals("Access-Control-Expose-Headers"))
+                {
+                    if (header.Value.Equals("Authorization"))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

@@ -8,6 +8,7 @@
         string ClientId { get; set; }
         string[] Demat { get; set; }
         bool RememberPassword { get; set; }
+        string AuthHeader { get; set; }
 
         void Save();
     }

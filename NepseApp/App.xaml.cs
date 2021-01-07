@@ -12,10 +12,7 @@ using Serilog.Formatting.Compact;
 
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Threading;
-
-using TradeManagementSystem.Nepse;
 
 using TradeManagementSystemClient;
 
@@ -63,23 +60,22 @@ namespace NepseApp
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
             containerRegistry.RegisterSingleton<MeroshareClient>();
             containerRegistry.RegisterSingleton<TmsClient>();
-            //containerRegistry.RegisterSingleton<SocketHelper>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
             containerRegistry.RegisterDialog<MeroshareImportDialog, MeroshareImportDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
-            containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
-            containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
-            containerRegistry.RegisterForNavigation<MarketDepthPage, MarketDepthPageViewModel>();
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
+            // ASBA
+            containerRegistry.RegisterForNavigation<MeroShareAsbaPage, MeroShareAsbaPageViewModel>();
+            containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();
+            containerRegistry.RegisterForNavigation<MeroShareAsbaOldApplicationReportPage, MeroShareAsbaOldApplicationReportPageViewModel>();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             Container.Resolve<TmsClient>().Dispose();
             Container.Resolve<MeroshareClient>().Dispose();
-            //Container.Resolve<SocketHelper>().Stop();
             Log.CloseAndFlush();
             base.OnExit(e);
         }

@@ -190,5 +190,17 @@ namespace NepseApp {
                 this["TmsUserId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MeroShareAuthorization {
+            get {
+                return ((string)(this["MeroShareAuthorization"]));
+            }
+            set {
+                this["MeroShareAuthorization"] = value;
+            }
+        }
     }
 }

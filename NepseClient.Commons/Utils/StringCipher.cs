@@ -5,7 +5,7 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NepseApp.Utils
+namespace NepseClient.Commons.Utils
 {
     public static class StringCipher
     {

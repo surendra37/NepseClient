@@ -75,14 +75,6 @@ namespace NepseApp.ViewModels
 
         private IEnumerable<INavigationItem> GetNavigationItem()
         {
-            //yield return new SubheaderNavigationItem() { Subheader = "General" };
-            yield return new FirstLevelNavigationItem()
-            {
-                Label = "Dashboard",
-                Icon = PackIconKind.ViewDashboard,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(DashboardPage)),
-                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(DashboardPage)),
-            };
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Portfolio",
@@ -90,29 +82,13 @@ namespace NepseApp.ViewModels
                 IsSelected = Settings.Default.SelectedTab.Equals(nameof(PortfolioPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
-            //yield return new DividerNavigationItem();
 
-            //yield return new SubheaderNavigationItem() { Subheader = "Market" };
             yield return new FirstLevelNavigationItem()
             {
-                Label = "Live",
-                Icon = PackIconKind.RecordCircle,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(LiveMarketPage)),
-                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(LiveMarketPage)),
-            };
-            yield return new FirstLevelNavigationItem()
-            {
-                Label = "Market Depth",
-                Icon = PackIconKind.Eye,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(MarketDepthPage)),
-                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MarketDepthPage)),
-            };
-            yield return new FirstLevelNavigationItem()
-            {
-                Label = "Settings",
-                Icon = PackIconKind.Settings,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(SettingsPage)),
-                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(SettingsPage)),
+                Label = "My ASBA",
+                Icon = PackIconKind.Web,
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(MeroShareAsbaPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MeroShareAsbaPage))
             };
         }
 
@@ -154,7 +130,6 @@ namespace NepseApp.ViewModels
 
                 var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
                 File.WriteAllText(path, JsonConvert.SerializeObject(waccs));
-                _client.LoadWacc();
                 MessageQueue.Enqueue("Wacc imported.");
                 IsImporting = false;
             }

@@ -17,12 +17,15 @@ using System.Security.Authentication;
 
 using TradeManagementSystemClient.Extensions;
 using TradeManagementSystemClient.Models.Requests;
+using TradeManagementSystemClient.Models.Requests.MeroShare;
 using TradeManagementSystemClient.Models.Responses;
+using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace TradeManagementSystemClient
 {
     public class MeroshareClient : IDisposable
     {
+        private readonly IMeroShareConfiguration _configuration;
         private bool _isAuthenticated;
         private MeroshareOwnDetailResponse _me;
         private readonly object _authLock = new object();
@@ -32,8 +35,8 @@ namespace TradeManagementSystemClient
             {
                 lock (_authLock)
                 {
-                    if (!_isAuthenticated)
-                        Authorize(); 
+                    if (_me is null)
+                        _me = GetOwnDetails();
                 }
                 return _me;
             }
@@ -53,6 +56,13 @@ namespace TradeManagementSystemClient
                     NamingStrategy = new CamelCaseNamingStrategy(),
                 },
             });
+            _configuration = configuration.Meroshare;
+
+            if (!string.IsNullOrEmpty(_configuration.AuthHeader))
+            {
+                Client.Authenticator = new MeroshareAuthenticator(_configuration.AuthHeader);
+                _isAuthenticated = true;
+            }
         }
 
         #region Authentication
@@ -80,10 +90,11 @@ namespace TradeManagementSystemClient
             var authHeader = response.Headers.FirstOrDefault(x => x.Name.Equals("Authorization"));
             if (authHeader is null) throw new AuthenticationException("Authorization header not found");
             var value = authHeader.Value?.ToString();
+            _configuration.AuthHeader = value;
+            _configuration.Save();
             Client.Authenticator = new MeroshareAuthenticator(value);
             _isAuthenticated = true;
 
-            _me = GetOwnDetails();
             Log.Debug("Signed In");
         }
         private void SignOut()
@@ -99,6 +110,7 @@ namespace TradeManagementSystemClient
             Client.Authenticator = null;
             Log.Debug(response.Content);
             _isAuthenticated = false;
+            _configuration.AuthHeader = string.Empty;
             Log.Debug("Signed out from MeroShare");
         }
         #endregion
@@ -160,7 +172,7 @@ namespace TradeManagementSystemClient
                 request.Scrip = scrip;
                 var view = ViewMyPurchase(request);
                 var searches = SearchMyPurchase(request);
-                if (searches.Length == 0)
+                if (searches is null || searches.Length == 0)
                 {
                     yield return view;
                 }
@@ -220,9 +232,13 @@ namespace TradeManagementSystemClient
 
         public void Dispose()
         {
+#if DEBUG
+#else
             SignOut();
+#endif
         }
 
+        #region Helper Methods
         private IRestResponse<T> AuthorizedGet<T>(IRestRequest request)
         {
             var response = Client.Get<T>(request);
@@ -231,9 +247,12 @@ namespace TradeManagementSystemClient
                 Authorize();
                 return Client.Get<T>(request);
             }
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.Content);
+            }
             return response;
         }
-
         private IRestResponse<T> AuthorizedPost<T>(IRestRequest request)
         {
             var response = Client.Post<T>(request);
@@ -242,7 +261,50 @@ namespace TradeManagementSystemClient
                 Authorize();
                 return Client.Post<T>(request);
             }
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.Content);
+            }
+
             return response;
         }
+        #endregion
+
+        #region ASBA
+        public ApplicationReportResponse GetOldApplicationReport()
+        {
+            var request = new RestRequest("/api/meroShare/migrated/applicantForm/search");
+            var body = new GetApplicationReport("VIEW");
+            request.AddJsonBody(body);
+
+            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            return response.Data;
+        }
+        public ApplicationReportResponse GetApplicationReport()
+        {
+            var request = new RestRequest("/api/meroShare/applicantForm/active/search/");
+            var body = new GetApplicationReport("VIEW_APPLICANT_FORM_COMPLETE");
+            request.AddJsonBody(body);
+
+            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            return response.Data;
+        }
+
+        public OldApplicationReportDetailResponse GetApplicationReportDetails(ApplicationReportItem report)
+        {
+            // For share information
+            var request = new RestRequest($"/api/meroShare/active/{report.CompanyShareId}"); //288  // CompanyShareId
+            var response = AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            return response.Data;
+
+        }
+        public OldApplicationReportDetailResponse GetOldApplicationReportDetails(ApplicationReportItem report)
+        {
+            // For alloted information
+            var request = new RestRequest($"/api/meroShare/migrated/applicantForm/report/{report.ApplicantFormId}"); //8549728 // ApplicantFormId
+            var response = AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            return response.Data;
+        }
+        #endregion
     }
 }

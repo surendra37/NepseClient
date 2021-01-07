@@ -10,8 +10,10 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True"
-                  behaviors:DataGridBehavior.DisplayRowNumber="True" HeadersVisibility="All">
+        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}" 
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  behaviors:DataGridBehavior.DisplayRowNumber="True" 
+                  HeadersVisibility="All">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Symbol" Binding="{Binding Scrip}"/>
                 <DataGridTextColumn Header="Balance" Binding="{Binding CurrentBalance, StringFormat=N0}">

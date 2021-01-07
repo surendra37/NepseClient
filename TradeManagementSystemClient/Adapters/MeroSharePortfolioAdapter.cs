@@ -1,6 +1,4 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using NepseClient.Commons.Contracts;
 
@@ -17,25 +15,23 @@ namespace TradeManagementSystemClient.Adapters
             _portfolio = portfolio;
             if (dict.TryGetValue(_portfolio.Script, out var value))
             {
-                WaccValue = (float)value.AverageBuyRate;
+                WaccValue = value.AverageBuyRate;
                 DailyGain = LTPTotal - PreviousTotal;
-                TotalGain = LTPTotal - (float)value.TotalCost;
-                TotalCost = (float)value.TotalCost;
+                TotalGain = LTPTotal - value.TotalCost;
+                TotalCost = value.TotalCost;
             }
         }
 
         public string Scrip => _portfolio.Script;
         public string Name => _portfolio.ScriptDesc;
-        public float FreeBalance => 0;
-        public float TotalBalance => 0;
-        public float CurrentBalance => (float)_portfolio.CurrentBalance;
-        public float LastTransactionPrice => (float)_portfolio.LastTransactionPrice;
-        public float PreviousClosePrice => (float)_portfolio.PreviousClosingPrice;
-        public float LTPTotal => (float)_portfolio.ValueOfLastTransPrice;
-        public float PreviousTotal => (float)_portfolio.ValueOfPrevClosingPrice;
-        public float WaccValue { get; }
-        public float DailyGain { get; }
-        public float TotalGain { get; }
-        public float TotalCost { get; }
+        public double CurrentBalance => _portfolio.CurrentBalance;
+        public double LastTransactionPrice => _portfolio.LastTransactionPrice;
+        public double PreviousClosePrice => _portfolio.PreviousClosingPrice;
+        public double LTPTotal => _portfolio.ValueOfLastTransPrice;
+        public double PreviousTotal => _portfolio.ValueOfPrevClosingPrice;
+        public double WaccValue { get; }
+        public double DailyGain { get; }
+        public double TotalGain { get; }
+        public double TotalCost { get; }
     }
 }

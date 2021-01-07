@@ -4,16 +4,14 @@
     {
         string Scrip { get; }
         string Name { get; }
-        float FreeBalance { get; }
-        float TotalBalance { get; }
-        float CurrentBalance { get; }
-        float LastTransactionPrice { get; }
-        float PreviousClosePrice { get; }
-        float LTPTotal { get; }
-        float PreviousTotal { get; }
-        float TotalCost { get; }
-        float WaccValue { get; }
-        float DailyGain { get; }
-        float TotalGain { get; }
+        double CurrentBalance { get; }
+        double LastTransactionPrice { get; }
+        double PreviousClosePrice { get; }
+        double LTPTotal { get; }
+        double PreviousTotal { get; }
+        double WaccValue { get; }
+        double TotalCost { get; }
+        double DailyGain { get; }
+        double TotalGain { get; }
     }
 }

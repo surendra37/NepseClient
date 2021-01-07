@@ -11,9 +11,6 @@
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Utils\ConfigUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="splash.jpg" />
   </ItemGroup>
   <ItemGroup>
