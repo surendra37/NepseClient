@@ -1,27 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?define NepseApp_TargetDir=$(var.NepseApp.TargetDir)?>
-  <?define TradeManagementSystemClient_TargetDir=$(var.TradeManagementSystemClient.TargetDir)?>
-  <?define NepseClient.Commons_TargetDir=$(var.NepseClient.Commons.TargetDir)?>
-  <?define ProductName = "NepseApp"?>
-  <?define ProductCode = "*"?>
-  <?define UpgradeCode = "1640ee0f-5edd-4bfc-9e43-00bcfb3248ec"?>
-  <?define ProductVersion = "1.0.1.0"?>
-	<Product Id="$(var.ProductCode)"
-           Name="$(var.ProductName)"
-           Language="1033"
-           Version="$(var.ProductVersion)"
-           Manufacturer="WixProject1"
+
+  <!-- Give product a unique ID per platform -->
+  <?if $(var.Platform)=x64 ?>
+  <?define ProductCode = "{DE3B1CBB-BF7B-46BA-BCBB-4B1542C9B3BB}" ?>
+  <?else?>
+  <?define ProductCode = "{B6C0672A-D365-4D2B-B6A1-42E908D181E0}" ?>
+  <?endif?>
+
+  <!-- Fixed upgrade Id -->
+  <?define UpgradeCode = "{8C197FE6-57DF-41FD-A0CD-84B5D3B97BDC}" ?>
+
+  <!-- Define main product -->
+  <Product Id="$(var.ProductCode)"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="!(loc.Language)"
+           Version="$(var.BuildVersion)"
+           Manufacturer="!(loc.Company)"
            UpgradeCode="$(var.UpgradeCode)">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="$(var.ProductName) Installer"/>
-        
-    <Icon Id="icon.ico" SourceFile="$(var.ProjectDir)Icon.ico" />
-    <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
-    <WixVariable Id="WixUIBannerBmp" Value="Images\installer_top-banner.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="Images\installer_background.bmp" />
-    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\license.rtf" />
+    <!-- Provide package details -->
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Manufacturer="!(loc.Company)"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"
+             Languages="!(loc.Language)"
+             />
 
+    <!-- Downgrade error message -->
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+
+    <!-- Include .cab file into .msi file -->
+    <MediaTemplate
+      EmbedCab="yes"
+      />
+
+    <!-- Define main app icon -->
+    <Icon Id="icon.ico" SourceFile="$(var.NepseApp.ProjectDir)\app.ico" />
+
+    <!-- Use the icon.ico icon for this installer (shows up in Add/Remove programs) -->
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
+    <!-- Help/Support website (shows in the Add/Remove programs) -->
+    <Property Id="ARPURLINFOABOUT">http://www.surendra37.com.np</Property>
+
+    <!-- Create a UI for the installer -->
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
     <UI>
       <UIRef Id="WixUI_InstallDir" />
@@ -31,224 +57,22 @@
           Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
     </UI>
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1"/>
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Nepse App"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch !(loc.ProductName_$(var.Platform))"/>
 
-    <Property Id="WixShellExecTarget" Value="[#NepseApp.exe]" />
+    <Property Id="WixShellExecTarget" Value="[INSTALLFOLDER]NepseApp.exe" />
     <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-    
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
-                  Schedule="afterInstallInitialize"/>
-		<MediaTemplate EmbedCab="yes" />
 
-		<Feature Id="ProductFeature" Title="Nepse Client" Level="1">
-			<ComponentGroupRef Id="ProductComponents" />
-      <ComponentRef Id="ApplicationShortcut" />
-      <ComponentRef Id="ApplicationShortcutDesktop" />
-			<ComponentGroupRef Id="ar_DZ_files" />
-			<ComponentGroupRef Id="cs_files" />
-			<ComponentGroupRef Id="cs_CZ_files" />
-			<ComponentGroupRef Id="de_files" />
-			<ComponentGroupRef Id="fr_files" />
-			<ComponentGroupRef Id="fr_FR_files" />
-			<ComponentGroupRef Id="pt_BR_files" />
-			<ComponentGroupRef Id="pt_files" />
-			<ComponentGroupRef Id="Ru_files" />
-			<ComponentGroupRef Id="ru_ru_files" />
-			<ComponentGroupRef Id="uz_Latn_UZ_files" />
-		</Feature>
-	</Product>
+    <!-- Change the installer UI background images -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\License.rtf" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />
 
-	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFiles64Folder">
-				<Directory Id="INSTALLFOLDER" Name="Surendra37">
-				  <Directory Id="ar_DZ" Name="ar-DZ" />
-				  <Directory Id="cs" Name="cs" />
-				  <Directory Id="cs_CZ" Name="cs-CZ" />
-				  <Directory Id="de" Name="de" />
-				  <Directory Id="fr" Name="fr" />
-				  <Directory Id="fr_FR" Name="fr-FR" />
-				  <Directory Id="pt" Name="pt" />
-				  <Directory Id="pt_BR" Name="pt-BR" />
-				  <Directory Id="Ru" Name="Ru" />
-				  <Directory Id="ru_ru" Name="ru-ru" />
-				  <Directory Id="uz_Latn_UZ" Name="uz-Latn-UZ" />
-				</Directory>
-			</Directory>
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="Surendra37" />
-      </Directory>
-      <Directory Id="DesktopFolder" Name="Desktop" />
-		</Directory>
-	</Fragment>
+    <!-- Define components, shortcuts, files etc... for installer -->
+    <Feature Id="ProductFeature" Title="NepseApp" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishedComponents" />
+    </Feature>
 
-  <Fragment>
-    <DirectoryRef Id="ApplicationProgramsFolder">
-      <Component Id="ApplicationShortcut" Guid="9bd13330-6540-406f-a3a8-d7f7c69ae7f9">
-        <Shortcut Id="ApplicationStartMenuShortcut" Name="Nepse App" Description="Nepse App" Target="[INSTALLFOLDER]NepseApp.exe" WorkingDirectory="INSTALLFOLDER" />
-        <RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
-        <RegistryValue Root="HKCU" Key="Software\NepseApp" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-    <DirectoryRef Id="DesktopFolder">
-      <Component Id="ApplicationShortcutDesktop" Guid="cde1e030-eb64-49a5-b7b8-400b379c2d1a">
-        <Shortcut Id="ApplicationDesktopShortcut" Name="Nepse App" Description="Nepse App" Target="[INSTALLFOLDER]NepseApp.exe" WorkingDirectory="INSTALLFOLDER" />
-        <RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
-        <RegistryValue Root="HKCU" Key="Software\NepseApp" Name="installed" Type="integer" Value="1" KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-  </Fragment>
+  </Product>
 
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-		<Component Id="NepseApp.dll" Guid="bbe2ffc6-2545-44dd-93c7-b7dc80eb429a">
-      <File Id="NepseApp.dll" Name="NepseApp.dll" Source="$(var.NepseApp_TargetDir)NepseApp.dll" />
-      <File Id="NepseApp.exe" Name="NepseApp.exe" Source="$(var.NepseApp_TargetDir)NepseApp.exe" />
-		</Component>
-		<Component Id="Serilog.Sinks.Console.dll" Guid="19534abc-37d8-4857-9146-8c9d7b430a44">
-		  <File Id="Serilog.Sinks.Console.dll" Name="Serilog.Sinks.Console.dll" Source="$(var.NepseApp_TargetDir)Serilog.Sinks.Console.dll" />
-		</Component>
-		<Component Id="Serilog.Sinks.File.dll" Guid="f7ca652d-3972-4d72-b557-da22ef6c4e44">
-		  <File Id="Serilog.Sinks.File.dll" Name="Serilog.Sinks.File.dll" Source="$(var.NepseApp_TargetDir)Serilog.Sinks.File.dll" />
-		</Component>
-		<Component Id="SuperSocket.ClientEngine.dll" Guid="78fc9e64-4dff-4aa5-8662-46a39268245a">
-		  <File Id="SuperSocket.ClientEngine.dll" Name="SuperSocket.ClientEngine.dll" Source="$(var.NepseApp_TargetDir)SuperSocket.ClientEngine.dll" />
-		</Component>
-		<Component Id="System.Windows.Interactivity.dll" Guid="eae52b7d-b0a7-4ece-87ea-402a3c30ce8d">
-		  <File Id="System.Windows.Interactivity.dll" Name="System.Windows.Interactivity.dll" Source="$(var.NepseApp_TargetDir)System.Windows.Interactivity.dll" />
-		</Component>
-		<Component Id="TradeManagementSystemClient.dll" Guid="2a14b784-d819-4830-953e-64f20b0f2ea9">
-		  <File Id="TradeManagementSystemClient.dll" Name="TradeManagementSystemClient.dll" Source="$(var.TradeManagementSystemClient_TargetDir)TradeManagementSystemClient.dll" />
-		</Component>
-		<Component Id="WebSocket4Net.dll" Guid="bf7935fe-8a58-4ce6-8287-47b0882df9a8">
-		  <File Id="WebSocket4Net.dll" Name="WebSocket4Net.dll" Source="$(var.NepseApp_TargetDir)WebSocket4Net.dll" />
-		</Component>
-		<Component Id="CommonServiceLocator.dll" Guid="5f167e5d-ee5e-451f-b159-ff0866235856">
-		  <File Id="CommonServiceLocator.dll" Name="CommonServiceLocator.dll" Source="$(var.NepseApp_TargetDir)CommonServiceLocator.dll" />
-		</Component>
-		<Component Id="DryIoc.dll" Guid="1a9df24d-ee13-4948-b623-9a97db695c24">
-		  <File Id="DryIoc.dll" Name="DryIoc.dll" Source="$(var.NepseApp_TargetDir)DryIoc.dll" />
-		</Component>
-		<Component Id="MaterialDesignColors.dll" Guid="06f9112b-56bf-45f3-80ed-9bfb5685832d">
-		  <File Id="MaterialDesignColors.dll" Name="MaterialDesignColors.dll" Source="$(var.NepseApp_TargetDir)MaterialDesignColors.dll" />
-		</Component>
-		<Component Id="MaterialDesignExtensions.dll" Guid="32c1e5ec-db34-4335-a012-1ebbe9f57c59">
-		  <File Id="MaterialDesignExtensions.dll" Name="MaterialDesignExtensions.dll" Source="$(var.NepseApp_TargetDir)MaterialDesignExtensions.dll" />
-		</Component>
-		<Component Id="MaterialDesignThemes.Wpf.dll" Guid="3957106e-0711-4ae7-9496-6dcd1d78ed38">
-		  <File Id="MaterialDesignThemes.Wpf.dll" Name="MaterialDesignThemes.Wpf.dll" Source="$(var.NepseApp_TargetDir)MaterialDesignThemes.Wpf.dll" />
-		</Component>
-		<Component Id="NepseApp.dll.config" Guid="606b4da1-5ad8-43bc-a322-7f907664421d">
-		  <File Id="NepseApp.dll.config" Name="NepseApp.dll.config" Source="$(var.NepseApp_TargetDir)NepseApp.dll.config" />
-		</Component>
-		<Component Id="NepseApp.runtimeconfig.json" Guid="dfb714e9-aa33-426e-9f36-d37f4e295f71">
-		  <File Id="NepseApp.runtimeconfig.json" Name="NepseApp.runtimeconfig.json" Source="$(var.NepseApp_TargetDir)NepseApp.runtimeconfig.json" />
-		</Component>
-		<Component Id="NepseClient.Commons.dll" Guid="ba282d92-fcab-40c4-80df-4ec11cd20c0e">
-		  <File Id="NepseClient.Commons.dll" Name="NepseClient.Commons.dll" Source="$(var.NepseClient.Commons_TargetDir)NepseClient.Commons.dll" />
-		</Component>
-		<Component Id="Newtonsoft.Json.dll" Guid="d90934d3-a8e4-4a26-85bb-ac95df265858">
-		  <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.NepseApp_TargetDir)Newtonsoft.Json.dll" />
-		</Component>
-		<Component Id="Prism.dll" Guid="3a48f67a-b858-4947-ad38-cd8658963e5d">
-		  <File Id="Prism.dll" Name="Prism.dll" Source="$(var.NepseApp_TargetDir)Prism.dll" />
-		</Component>
-		<Component Id="Prism.DryIoc.Wpf.dll" Guid="28d868c3-ec0c-4a30-b123-4683f33e3d7a">
-		  <File Id="Prism.DryIoc.Wpf.dll" Name="Prism.DryIoc.Wpf.dll" Source="$(var.NepseApp_TargetDir)Prism.DryIoc.Wpf.dll" />
-		</Component>
-		<Component Id="Prism.Wpf.dll" Guid="c761da28-ce30-49ed-a519-f018a73f2170">
-		  <File Id="Prism.Wpf.dll" Name="Prism.Wpf.dll" Source="$(var.NepseApp_TargetDir)Prism.Wpf.dll" />
-		</Component>
-		<Component Id="RestSharp.dll" Guid="5a6a0529-3b68-46b5-93aa-45ebe05b194c">
-		  <File Id="RestSharp.dll" Name="RestSharp.dll" Source="$(var.NepseApp_TargetDir)RestSharp.dll" />
-		</Component>
-		<Component Id="RestSharp.Serializers.NewtonsoftJson.dll" Guid="cbff5f08-f22d-42ea-b081-b56d37de6e2d">
-		  <File Id="RestSharp.Serializers.NewtonsoftJson.dll" Name="RestSharp.Serializers.NewtonsoftJson.dll" Source="$(var.NepseApp_TargetDir)RestSharp.Serializers.NewtonsoftJson.dll" />
-		</Component>
-		<Component Id="Serilog.dll" Guid="8cd33f81-0dc4-4e0d-a770-eb0184216de1">
-		  <File Id="Serilog.dll" Name="Serilog.dll" Source="$(var.NepseApp_TargetDir)Serilog.dll" />
-		</Component>
-		<Component Id="Serilog.Formatting.Compact.dll" Guid="bf43e6d5-869e-4a84-b370-10a5b8ff85a1">
-		  <File Id="Serilog.Formatting.Compact.dll" Name="Serilog.Formatting.Compact.dll" Source="$(var.NepseApp_TargetDir)Serilog.Formatting.Compact.dll" />
-		</Component>
-			
-		</ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="ar_DZ_files" Directory="ar_DZ">
-	    <Component Id="ar_DZ_MaterialDesignExtensions.resources.dll" Guid="046671a2-7497-491e-a409-cb486cb7b1a0">
-	      <File Id="ar_DZ_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)ar-DZ\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="cs_files" Directory="cs">
-	    <Component Id="cs_MaterialDesignExtensions.resources.dll" Guid="c23ac094-98db-4426-836c-f5d3a7d9ff74">
-	      <File Id="cs_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)cs\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="cs_CZ_files" Directory="cs_CZ">
-	    <Component Id="cs_CZ_MaterialDesignExtensions.resources.dll" Guid="e11144ce-7e88-416f-a9a9-1b7f8714cc35">
-	      <File Id="cs_CZ_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)cs-CZ\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="de_files" Directory="de">
-	    <Component Id="de_MaterialDesignExtensions.resources.dll" Guid="138702ab-ad06-48d2-a911-b0c5d79f2f90">
-	      <File Id="de_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)de\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="fr_files" Directory="fr">
-	    <Component Id="fr_MaterialDesignExtensions.resources.dll" Guid="3b75af49-9fe8-4963-9ae7-c4c1c822aa6d">
-	      <File Id="fr_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)fr\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="fr_FR_files" Directory="fr_FR">
-	    <Component Id="fr_FR_MaterialDesignExtensions.resources.dll" Guid="c64fa711-ab66-4b3a-abcc-2c1f241ce3d4">
-	      <File Id="fr_FR_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)fr-FR\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="pt_BR_files" Directory="pt_BR">
-	    <Component Id="pt_BR_MaterialDesignExtensions.resources.dll" Guid="a029c0bf-35b5-4afa-8eaf-0083bc7d06fa">
-	      <File Id="pt_BR_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)pt-BR\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="pt_files" Directory="pt">
-	    <Component Id="pt_MaterialDesignExtensions.resources.dll" Guid="4b5eec01-690a-437c-a786-d595d1da187a">
-	      <File Id="pt_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)pt\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="Ru_files" Directory="Ru">
-	    <Component Id="Ru_MaterialDesignExtensions.resources.dll" Guid="2e3a5402-44fe-4e42-8712-29f33c39b041">
-	      <File Id="Ru_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)Ru\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="ru_ru_files" Directory="ru_ru">
-	    <Component Id="ru_ru_MaterialDesignExtensions.resources.dll" Guid="c516b8d8-6db4-4632-9dc0-b1ae4ca7f6d3">
-	      <File Id="ru_ru_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)ru-ru\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
-	<Fragment>
-	  <ComponentGroup Id="uz_Latn_UZ_files" Directory="uz_Latn_UZ">
-	    <Component Id="uz_Latn_UZ_MaterialDesignExtensions.resources.dll" Guid="cbcec463-8c26-47fa-983a-da341fb40a4d">
-	      <File Id="uz_Latn_UZ_MaterialDesignExtensions.resources.dll" Name="MaterialDesignExtensions.resources.dll" Source="$(var.NepseApp_TargetDir)uz-Latn-UZ\MaterialDesignExtensions.resources.dll" />
-	    </Component>
-	  </ComponentGroup>
-	</Fragment>
 </Wix>
