@@ -6,7 +6,7 @@
   <String Id="ProductNameFolder">NepseApp</String>
 
   <String Id="ProductName_x86">Nepse App (32bit)</String>
-  <String Id="ProductName_x64">Nepse App (64bit)</String>
+  <String Id="ProductName_x64">Nepse App</String>
 
   <String Id="Description">This is nepse app</String>
   <String Id="Comments">NepseApp</String>

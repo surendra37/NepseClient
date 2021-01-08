@@ -56,6 +56,7 @@ namespace NepseApp.ViewModels
                 RaisePropertyChanged(nameof(DailyGain));
                 RaisePropertyChanged(nameof(TotalWacc));
                 RaisePropertyChanged(nameof(TotalGain));
+                EnqueMessage("Portfolio successfully updated");
             }
             catch (Exception ex)
             {

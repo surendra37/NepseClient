@@ -8,8 +8,10 @@
         public T Data { get; set; }
     }
 
-    public class ResponseBase : ResponseBase<object>
+    public class ResponseBase 
     {
-
+        public string Status { get; set; }
+        public string Level { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -35,12 +35,13 @@ namespace NepseApp.ViewModels
                 AppCommand.ShowMessage("Getting application report");
                 Items = _client.GetApplicationReport().Object;
                 IsBusy = false;
+                EnqueMessage("Application report updated successfully");
             }
             catch (Exception ex)
             {
                 IsBusy = false;
-                EnqueMessage("Failed to get application report");
                 Log.Debug(ex, "Failed to get application report");
+                EnqueMessage("Failed to get application report");
             }
             AppCommand.HideMessage();
         }

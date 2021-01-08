@@ -26,12 +26,13 @@ namespace NepseApp.ViewModels
                 view.DataContext is not ActiveAwareBindableBase vm) return;
             try
             {
-                IsBusy = vm.IsBusy;
+                IsBusy = true;
                 vm.ExecuteRefreshCommand();
-                IsBusy = vm.IsBusy;
+                IsBusy = false;
             }
             catch (System.Exception ex)
             {
+                IsBusy = false;
                 Log.Error(ex, "Unknown error");
             }
         }

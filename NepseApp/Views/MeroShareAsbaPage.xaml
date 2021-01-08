@@ -6,6 +6,9 @@
              prism:ViewModelLocator.AutoWireViewModel="True">
     <TabControl Style="{DynamicResource MaterialDesignTabControl}" 
                 SelectedItem="{Binding SelectedItem}">
+        <TabItem Header="Apply for Issue" >
+            <views:MeroShareApplyForIssuePage />
+        </TabItem>
         <TabItem Header="Application Report">
             <views:MeroShareAsbaApplicationReportPage />
         </TabItem>

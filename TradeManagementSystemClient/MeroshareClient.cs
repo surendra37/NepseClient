@@ -48,6 +48,7 @@ namespace TradeManagementSystemClient
             Client = new RestClient(configuration.Meroshare.BaseUrl)
             {
                 CookieContainer = new System.Net.CookieContainer(),
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
             };
             Client.UseNewtonsoftJson(new Newtonsoft.Json.JsonSerializerSettings
             {
@@ -303,6 +304,66 @@ namespace TradeManagementSystemClient
             // For alloted information
             var request = new RestRequest($"/api/meroShare/migrated/applicantForm/report/{report.ApplicantFormId}"); //8549728 // ApplicantFormId
             var response = AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            return response.Data;
+        }
+
+        public ApplicationReportResponse GetApplicableIssues()
+        {
+            var request = new RestRequest("/api/meroShare/companyShare/applicableIssue/");
+            var body = new GetApplicationReport("VIEW_APPLICABLE_SHARE");
+            request.AddJsonBody(body);
+            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            return response.Data;
+        }
+
+        public MeroshareCapitalResponse[] GetMyBanks()
+        {
+            var request = new RestRequest("/api/meroShare/bank/");
+            var response = AuthorizedGet<MeroshareCapitalResponse[]>(request);
+            return response.Data;
+        }
+
+        public BankDetailResponse GetBankDetails(string id)
+        {
+            var request = new RestRequest($"/api/meroShare/bank/{id}"); //44
+
+            var response = AuthorizedGet<BankDetailResponse>(request);
+            return response.Data;
+        }
+
+        public ResponseBase ApplyIssue(string appliedKitta, string crnNumber, string companyShareId, string bankId)
+        {
+            var request = new RestRequest("/api/meroShare/applicantForm/");
+            var bankDetails = GetBankDetails(bankId);
+            var body = new ApplyIssueRequest
+            {
+                Demat = Me.Demat,
+                Boid = Me.Boid,
+                AppliedKitta = appliedKitta,
+                CrnNumber = crnNumber,
+                CompanyShareId = companyShareId,
+                AccountBranchId = bankDetails.AccountBranchId,
+                AccountNumber = bankDetails.AccountNumber,
+                BankId = bankDetails.BankId,
+                CustomerId = bankDetails.Id,
+            };
+            request.AddJsonBody(body);
+
+            var response = AuthorizedPost<ResponseBase>(request);
+            return response.Data;
+        }
+
+        public ResponseBase ValidateIssue(int formId, string companyShareId, string transactionPin)
+        {
+            var request = new RestRequest("/api/meroShare/applicantForm/validate/");
+            var body = new ApplicateValidationRequest
+            {
+                ApplicantFormId = formId,
+                CompanyShareId = companyShareId,
+                TransactionPIN = transactionPin,
+            };
+            request.AddJsonBody(body);
+            var response = AuthorizedPost<ResponseBase>(request);
             return response.Data;
         }
         #endregion

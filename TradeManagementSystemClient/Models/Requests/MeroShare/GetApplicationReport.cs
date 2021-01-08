@@ -65,6 +65,4 @@ namespace TradeManagementSystemClient.Models.Requests.MeroShare
             };
         }
     }
-
-
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace TradeManagementSystemClient.Models.Responses.MeroShare
+﻿namespace TradeManagementSystemClient.Models.Responses.MeroShare
 {
     public class ApplicationReportItem
     {
@@ -12,6 +10,7 @@ namespace TradeManagementSystemClient.Models.Responses.MeroShare
         public string ShareGroupName { get; set; }
         public string StatusName { get; set; }
         public int ApplicantFormId { get; set; }
+        public string Action { get; set; } = "apply";
     }
 
     public class ApplicationReportResponse
