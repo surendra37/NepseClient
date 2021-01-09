@@ -23,7 +23,16 @@ namespace TradeManagementSystem.ConsoleApp
                 {
                     PromptCredentials = GetCredentials
                 };
+                //using (var socketHelper = new SocketHelper(client))
+                //{
+                //    socketHelper.Send("index", true);
 
+                //    while (!socketHelper.Received)
+                //    {
+                //        socketHelper.SendOpCode();
+                //        System.Threading.Thread.Sleep(10000);
+                //    }
+                //}
                 var securities = client.GetSecurities();
                 ConsoleTable
                     .From(securities.Payload.Data)
