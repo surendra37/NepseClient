@@ -4,9 +4,11 @@ using System.Linq;
 
 using NepseApp.Extensions;
 using NepseApp.Models;
+using NepseApp.Views;
 
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 
 using Serilog;
 
@@ -18,7 +20,7 @@ namespace NepseApp.ViewModels
     public class MeroShareApplyForIssuePageViewModel : ActiveAwareBindableBase
     {
         private readonly MeroshareClient _client;
-
+        private readonly IDialogService _dialog;
         private ApplicationReportItem[] _items;
         public ApplicationReportItem[] Items
         {
@@ -27,9 +29,10 @@ namespace NepseApp.ViewModels
         }
 
         public MeroShareApplyForIssuePageViewModel(IApplicationCommand appCommand,
-            MeroshareClient client) : base(appCommand)
+            MeroshareClient client, IDialogService dialog) : base(appCommand)
         {
             _client = client;
+            _dialog = dialog;
         }
 
         public override void ExecuteRefreshCommand()
@@ -60,7 +63,16 @@ namespace NepseApp.ViewModels
             if (item is null) return;
 
             var isApply = item.Action.Equals("apply", StringComparison.OrdinalIgnoreCase);
-
+            _dialog.ShowDialog(nameof(MeroShareApplicationDialogPage), new DialogParameters
+            {
+                { "ShareInfo", item}
+            }, result =>
+            {
+                if (result?.Result == ButtonResult.OK)
+                {
+                    RefreshCommand.Execute();
+                }
+            });
         }
     }
 }

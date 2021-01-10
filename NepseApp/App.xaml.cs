@@ -70,6 +70,8 @@ namespace NepseApp
             containerRegistry.RegisterForNavigation<MeroShareAsbaPage, MeroShareAsbaPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaOldApplicationReportPage, MeroShareAsbaOldApplicationReportPageViewModel>();
+
+            containerRegistry.RegisterDialog<MeroShareApplicationDialogPage, MeroShareApplicationDialogPageViewModel>();
         }
 
         protected override void OnExit(ExitEventArgs e)

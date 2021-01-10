@@ -1,0 +1,89 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseApp.Views.MeroShareApplicationDialogPage"             
+             prism:ViewModelLocator.AutoWireViewModel="True" 
+             av:DesignWidth="400" av:DesignHeight="300"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             Background="{DynamicResource MaterialDesignPaper}"
+             TextElement.FontWeight="Medium"
+             TextElement.FontSize="12"
+             FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="ResizeMode" Value="NoResize"/>
+            <Setter Property="ShowInTaskbar" Value="False"/>
+            <Setter Property="SizeToContent" Value="Height"/>
+            <Setter Property="Width" Value="400" />
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <UserControl.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="8">
+            <StackPanel Orientation="Horizontal" DataContext="{Binding Issue}">
+                <TextBlock Text="{Binding CompanyName}" av:Text="Chandragiri Hill Limited"/>
+                <Separator Margin="4"/>
+                <TextBlock Text="{Binding SubGroup}" av:Text="General Public"/>
+                <TextBlock Text="{Binding Scrip, StringFormat=' ({0})'}" av:Text="(CGHL)"/>
+                <TextBlock Text="{Binding ShareTypeName}" av:Text="IPO" Padding="2" Background="LightBlue" Margin="2 0"/>
+                <Separator Margin="4" />
+                <TextBlock Text="{Binding ShareGroupName}" av:Text="Ordinary Shares" />
+            </StackPanel>
+            <Separator />
+            <Grid Margin="0 4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="128" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                    <RowDefinition Height="24" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="BOID" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Boid}" av:Text="1301180000XXXXXX" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Bank"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Banks}" 
+                          SelectedItem="{Binding SelectedBank}"
+                          DisplayMemberPath="Name"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Branch" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Branch}" av:Text="NICA Bank Ltd. Pulchowk branch"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Account Number" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AccountNumber}" av:Text="4787799326XXXXXX"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="AppliedKitta" />
+                <TextBox Grid.Row="4" Grid.Column="1" 
+                         Text="{Binding AppliedKitta, UpdateSourceTrigger=PropertyChanged}" 
+                         av:Text="10"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Amount" />
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Amount}" av:Text="1000" />
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="CRN" />
+                <TextBox Grid.Row="6" Grid.Column="1" 
+                         Text="{Binding CrnNumber, UpdateSourceTrigger=PropertyChanged}"
+                         av:Text="33-R12312312" />
+            </Grid>
+            <Separator />
+            <CheckBox Content="{Binding Disclaimer}" av:Content="This is a disclaimer"/>
+
+            <StackPanel Orientation="Horizontal" Margin="8">
+                <Button Content="Proceed" Width="96"/>
+                <Button Content="Reset" Margin="8 0" Width="96"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
