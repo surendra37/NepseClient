@@ -1,5 +1,6 @@
 ﻿using System.IO;
 
+using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Utils;
 
@@ -9,7 +10,7 @@ namespace NepseApp.Models
 {
     public class TmsConfigurationFile
     {
-        private const string _filePath = "tms-config.json";
+        private static readonly string _filePath = Path.Combine(Constants.AppDataPath.Value, "tms-config.json");
         public string Password { get; set; }
         public string Username { get; set; }
         public bool RememberPassword { get; set; }
@@ -25,7 +26,7 @@ namespace NepseApp.Models
         {
             if (File.Exists(_filePath))
             {
-                
+
                 var json = File.ReadAllText(_filePath);
                 return JsonConvert.DeserializeObject<TmsConfigurationFile>(json);
             }

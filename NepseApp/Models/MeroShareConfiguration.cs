@@ -1,5 +1,6 @@
 ﻿using System.IO;
 
+using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Utils;
 
@@ -9,7 +10,7 @@ namespace NepseApp.Models
 {
     public class MeroShareConfigurationFile
     {
-        private const string _filePath = "meroshare-config.json";
+        private static readonly string _filePath = Path.Combine(Constants.AppDataPath.Value, "meroshare-config.json");
         public string Username { get; set; }
         public string Password { get; set; }
         public string[] Demat { get; set; }
