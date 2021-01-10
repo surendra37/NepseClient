@@ -25,109 +25,25 @@ namespace NepseApp {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DashboardPage")]
-        public string SelectedTab {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TmsBaseUrl {
             get {
-                return ((string)(this["SelectedTab"]));
+                return ((string)(this["TmsBaseUrl"]));
             }
             set {
-                this["SelectedTab"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://tms49.nepsetms.com.np")]
-        public string TmsHost {
-            get {
-                return ((string)(this["TmsHost"]));
-            }
-            set {
-                this["TmsHost"] = value;
+                this["TmsBaseUrl"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TmsUsername {
+        public string MeroShareClientId {
             get {
-                return ((string)(this["TmsUsername"]));
+                return ((string)(this["MeroShareClientId"]));
             }
             set {
-                this["TmsUsername"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TmsPassword {
-            get {
-                return ((string)(this["TmsPassword"]));
-            }
-            set {
-                this["TmsPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public string MeroshareClientId {
-            get {
-                return ((string)(this["MeroshareClientId"]));
-            }
-            set {
-                this["MeroshareClientId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MeroshareUsername {
-            get {
-                return ((string)(this["MeroshareUsername"]));
-            }
-            set {
-                this["MeroshareUsername"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MerosharePassword {
-            get {
-                return ((string)(this["MerosharePassword"]));
-            }
-            set {
-                this["MerosharePassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool MeroshareRememberPassword {
-            get {
-                return ((bool)(this["MeroshareRememberPassword"]));
-            }
-            set {
-                this["MeroshareRememberPassword"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool TmsRememberPassword {
-            get {
-                return ((bool)(this["TmsRememberPassword"]));
-            }
-            set {
-                this["TmsRememberPassword"] = value;
+                this["MeroShareClientId"] = value;
             }
         }
         
@@ -145,61 +61,13 @@ namespace NepseApp {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://backend.cdsc.com.np")]
-        public string MeroShareBaseUrl {
+        [global::System.Configuration.DefaultSettingValueAttribute("SettingsPage")]
+        public string SelectedTab {
             get {
-                return ((string)(this["MeroShareBaseUrl"]));
+                return ((string)(this["SelectedTab"]));
             }
             set {
-                this["MeroShareBaseUrl"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MeroshareDemat {
-            get {
-                return ((string)(this["MeroshareDemat"]));
-            }
-            set {
-                this["MeroshareDemat"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TmsClientId {
-            get {
-                return ((string)(this["TmsClientId"]));
-            }
-            set {
-                this["TmsClientId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TmsUserId {
-            get {
-                return ((string)(this["TmsUserId"]));
-            }
-            set {
-                this["TmsUserId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string MeroShareAuthorization {
-            get {
-                return ((string)(this["MeroShareAuthorization"]));
-            }
-            set {
-                this["MeroShareAuthorization"] = value;
+                this["SelectedTab"] = value;
             }
         }
     }

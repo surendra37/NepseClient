@@ -1,26 +1,31 @@
 ﻿<UserControl x:Class="NepseApp.Views.SettingsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"             
-             prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="256" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+             xmlns:prism="http://prismlibrary.com/"        
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             FontSize="18">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="8">
+            <md:Card Margin="0 0 0 8" Padding="4">
                 <ItemsControl ItemsSource="{Binding GeneralItems}" />
+            </md:Card>
 
-                <StackPanel
+            <md:Card Margin="0 0 0 8" Padding="4">
+                <ItemsControl ItemsSource="{Binding TmsItems}" />
+            </md:Card>
+
+            <md:Card Margin="0 0 0 8" Padding="4">
+                <ItemsControl ItemsSource="{Binding MeroShareItems}"/>
+            </md:Card>
+
+            <StackPanel
                     Orientation="Horizontal" HorizontalAlignment="Center"
                     Margin="8">
-                    <Button Content="Save" Command="{Binding SaveCommand}" />
-                    <Separator Width="8" Background="Transparent"/>
-                    <Button Content="Reset" Command="{Binding ResetCommand}" />
-                </StackPanel>
+                <Button Content="Save" Command="{Binding SaveCommand}" />
+                <Separator Width="8" Background="Transparent"/>
+                <Button Content="Reset" Command="{Binding ResetCommand}" />
             </StackPanel>
-        </ScrollViewer>
-        
-    </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

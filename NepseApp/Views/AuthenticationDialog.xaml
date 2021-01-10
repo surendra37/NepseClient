@@ -18,7 +18,7 @@
         <md:ColorZone Mode="PrimaryMid" CornerRadius="32" Width="48" Height="48">
             <md:PackIcon Kind="Lock"  HorizontalAlignment="Center" VerticalAlignment="Center" Width="32" Height="32" />
         </md:ColorZone>        
-        <TextBox Text="{Binding Host}" md:HintAssist.Hint="Host" md:HintAssist.IsFloating="True"/>
+        <!--<TextBox Text="{Binding Host}" md:HintAssist.Hint="Host" md:HintAssist.IsFloating="True"/>-->
         <TextBox Text="{Binding Username}" md:HintAssist.Hint="Username" md:HintAssist.IsFloating="True"/>
         <PasswordBox helpers:PasswordBoxHelper.SecurePassword="{Binding Password}" md:HintAssist.Hint="Password" md:HintAssist.IsFloating="True"/>
         <CheckBox Content="Remember Password" IsChecked="{Binding IsRememberPassword}" Margin="0 8"/>

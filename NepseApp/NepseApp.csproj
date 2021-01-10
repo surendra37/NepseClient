@@ -32,6 +32,9 @@
     <SplashScreen Include="splash.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Adapters\" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -43,8 +46,5 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Adapters\" />
   </ItemGroup>
 </Project>

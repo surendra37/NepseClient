@@ -12,6 +12,7 @@ namespace TradeManagementSystem.ConsoleApp.Models
         public IMeroShareConfiguration Meroshare { get; } = new MeroShareConfiguration();
 
         public ITmsConfiguration Tms { get; } = new TmsConfiguration();
+        public string SelectedTab { get; set; }
     }
 
     public class MeroShareConfiguration : IMeroShareConfiguration

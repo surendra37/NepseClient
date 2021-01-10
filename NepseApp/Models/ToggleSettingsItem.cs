@@ -4,6 +4,11 @@ namespace NepseApp.Models
 {
     public class ToggleSettingsItem : SettingsItem
     {
+        public ToggleSettingsItem()
+        {
+            IconKind = MaterialDesignThemes.Wpf.PackIconKind.Web;
+        }
+
         private bool _isChecked;
         public bool IsChecked
         {

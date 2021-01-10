@@ -62,7 +62,6 @@ namespace NepseApp
             containerRegistry.RegisterSingleton<TmsClient>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
-            containerRegistry.RegisterDialog<MeroshareImportDialog, MeroshareImportDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();

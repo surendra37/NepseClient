@@ -29,7 +29,7 @@ namespace NepseApp.ViewModels
             }
             catch (System.Exception ex)
             {
-                LogErrorAndEnqueMessage(ex, "Failed to get live data");
+                LogErrorAndEnqueMessage(ex, ex.Message);
             }
         }
     }

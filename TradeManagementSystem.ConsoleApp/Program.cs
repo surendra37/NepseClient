@@ -46,11 +46,11 @@ namespace TradeManagementSystem.ConsoleApp
             Log.Debug("Application ended.");
         }
 
-        private static AuthenticationRequest GetCredentials()
+        private static TmsAuthenticationRequest GetCredentials()
         {
             Log.Debug("Getting credentials");
             var config = new Configuration().Tms;
-            var output = new AuthenticationRequest(config.Username, config.Password);
+            var output = new TmsAuthenticationRequest(config.Username, config.Password);
             return output;
         }
     }

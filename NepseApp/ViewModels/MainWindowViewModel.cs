@@ -2,10 +2,12 @@
 
 using MaterialDesignThemes.Wpf;
 
+using NepseApp.Extensions;
 using NepseApp.Models;
 using NepseApp.Views;
 
 using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
 
@@ -19,6 +21,7 @@ using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Requests;
@@ -30,6 +33,7 @@ namespace NepseApp.ViewModels
         private readonly TmsClient _client;
         private readonly IDialogService _dialog;
         private readonly MeroshareClient _meroshareClient;
+        private readonly IConfiguration _config;
         private readonly IRegionManager _regionManager;
 
         public IApplicationCommand ApplicationCommand { get; }
@@ -54,18 +58,19 @@ namespace NepseApp.ViewModels
         private object UpdateNavigationSelection(string source)
         {
             _regionManager.RequestNavigate("ContentRegion", source);
-            Settings.Default.SelectedTab = source;
-            Settings.Default.Save();
+            //Settings.Default.SelectedTab = source;
+            //Settings.Default.Save();
             return null;
         }
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
-            TmsClient nepse, IDialogService dialog, MeroshareClient meroshareClient)
+            TmsClient nepse, IDialogService dialog, MeroshareClient meroshareClient, IConfiguration config)
         {
             _regionManager = regionManager;
             _client = nepse;
             _dialog = dialog;
             _meroshareClient = meroshareClient;
+            _config = config;
             ApplicationCommand = applicationCommand;
 
             applicationCommand.ShowMessage = ShowMessage;
@@ -75,11 +80,12 @@ namespace NepseApp.ViewModels
 
         private IEnumerable<INavigationItem> GetNavigationItem()
         {
+            var selectedTab = Settings.Default.SelectedTab;
             yield return new FirstLevelNavigationItem()
             {
                 Label = "Portfolio",
                 Icon = PackIconKind.Person,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(PortfolioPage)),
+                IsSelected = selectedTab.Equals(nameof(PortfolioPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(PortfolioPage))
             };
 
@@ -87,15 +93,23 @@ namespace NepseApp.ViewModels
             {
                 Label = "My ASBA",
                 Icon = PackIconKind.Web,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(MeroShareAsbaPage)),
+                IsSelected = selectedTab.Equals(nameof(MeroShareAsbaPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MeroShareAsbaPage))
             };
             yield return new FirstLevelNavigationItem()
             {
-                Label = "Live Market",
+                Label = "Live",
                 Icon = PackIconKind.XboxLive,
-                IsSelected = Settings.Default.SelectedTab.Equals(nameof(TmsLiveMarketPage)),
+                IsSelected = selectedTab.Equals(nameof(TmsLiveMarketPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(TmsLiveMarketPage))
+            };
+
+            yield return new FirstLevelNavigationItem()
+            {
+                Label = "Settings",
+                Icon = PackIconKind.Settings,
+                IsSelected = selectedTab.Equals(nameof(SettingsPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(SettingsPage))
             };
         }
 
@@ -153,32 +167,60 @@ namespace NepseApp.ViewModels
             Message = message;
         }
 
-        private AuthenticationRequest GetTmsCredentials()
+        private TmsAuthenticationRequest GetTmsCredentials()
         {
-            AuthenticationRequest output = null;
-            _dialog.ShowDialog(nameof(AuthenticationDialog), null, result =>
-                {
-                    if(result?.Result == ButtonResult.OK)
-                    {
-                        result.Parameters.TryGetValue("Credentials", out output);
-                    }
-                    //success = result?.Result == ButtonResult.OK;
-                });
-            return output;
-        }
-
-        private MeroshareAuthRequest GetMeroShareCredentials()
-        {
-            MeroshareAuthRequest output = null;
-            _dialog.ShowDialog(nameof(MeroshareImportDialog), null,
+            var config = _config.Tms;
+            var parameters = new DialogParameters()
+                .AddTitle("Authorize TMS")
+                .AddUsername(config.Username)
+                .AddPassword(config.Password)
+                .AddRememberPassword(config.RememberPassword);
+            var success = false;
+            _dialog.ShowDialog(nameof(AuthenticationDialog), parameters,
                 result =>
                 {
                     if (result.Result == ButtonResult.OK)
                     {
-                        result.Parameters.TryGetValue("Credentials", out output);
+                        var p = result.Parameters;
+                        config.Username = p.GetUsername();
+                        config.Password = p.GetPassword();
+                        config.RememberPassword = p.GetRememberPassword();
+                        config.Save();
+                        success = true;
                     }
                 });
-            return output;
+
+            if (!success) return null;
+
+            return new TmsAuthenticationRequest(config.Username, config.Password);
+        }
+
+        private MeroshareAuthRequest GetMeroShareCredentials()
+        {
+            var config = _config.Meroshare;
+            var parameters = new DialogParameters()
+                .AddTitle("Authorize MeroShare")
+                .AddUsername(config.Username)
+                .AddPassword(config.Password)
+                .AddRememberPassword(config.RememberPassword);
+            var success = false;
+            _dialog.ShowDialog(nameof(AuthenticationDialog), parameters,
+                result =>
+                {
+                    if (result.Result == ButtonResult.OK)
+                    {
+                        var p = result.Parameters;
+                        config.Username = p.GetUsername();
+                        config.Password = p.GetPassword();
+                        config.RememberPassword = p.GetRememberPassword();
+                        config.Save();
+                        success = true;
+                    }
+                });
+
+            if (!success) return null;
+
+            return new MeroshareAuthRequest(config.ClientId, config.Username, config.Password);
         }
     }
 }

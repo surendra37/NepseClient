@@ -2,50 +2,17 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NepseApp" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SelectedTab" Type="System.String" Scope="User">
-      <Value Profile="(Default)">DashboardPage</Value>
-    </Setting>
-    <Setting Name="TmsHost" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://tms49.nepsetms.com.np</Value>
-    </Setting>
-    <Setting Name="TmsUsername" Type="System.String" Scope="User">
+    <Setting Name="TmsBaseUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TmsPassword" Type="System.String" Scope="User">
+    <Setting Name="MeroShareClientId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="MeroshareClientId" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="MeroshareUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="MerosharePassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="MeroshareRememberPassword" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="TmsRememberPassword" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AutoRefreshOnLoad" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="MeroShareBaseUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://backend.cdsc.com.np</Value>
-    </Setting>
-    <Setting Name="MeroshareDemat" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="TmsClientId" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="TmsUserId" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="MeroShareAuthorization" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="SelectedTab" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SettingsPage</Value>
     </Setting>
   </Settings>
 </SettingsFile>

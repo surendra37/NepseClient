@@ -1,10 +1,8 @@
 ﻿using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 
 using Serilog;
 
@@ -32,27 +30,38 @@ namespace TradeManagementSystemClient
         private readonly string _dataPath = "data.dat";
 
         public AuthenticationDataResponse AuthData { get; private set; }
+        public bool IsAuthenticated { get; set; }
         private ITmsConfiguration _config;
 
         public IRestClient Client { get; private set; }
-        public Func<AuthenticationRequest> PromptCredentials { get; set; }
+        public Func<TmsAuthenticationRequest> PromptCredentials { get; set; }
 
         public TmsClient(IConfiguration config)
         {
             _config = config.Tms;
+
+            ValidateBaseUrl();
+            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
+            Client.Authenticator = new TmsAuthenticator();
+
             RestoreSession();
+        }
+
+        private void ValidateBaseUrl()
+        {
+            if (string.IsNullOrEmpty(_config.BaseUrl))
+            {
+                Log.Error("Tms Base url is empty. Settings 'https://tms49.nepsetms.com.np' as default. Update the base url in settings and restart the application");
+                _config.BaseUrl = "https://tms49.nepsetms.com.np";
+            }
         }
         private void RestoreSession()
         {
             Log.Debug("Restoring session");
-            if (File.Exists(_dataPath))
-            {
-                Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
-                Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
-                var json = File.ReadAllText(_dataPath);
-                AuthData = JsonConvert.DeserializeObject<AuthenticationDataResponse>(json);
-                Client.Authenticator = new TmsAuthenticator();
-            }
+
+            Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
+            AuthData = AuthenticationDataResponse.NewInstance(_dataPath);
+            if (AuthData is null) IsAuthenticated = false;
         }
         private void SaveSession()
         {
@@ -68,8 +77,9 @@ namespace TradeManagementSystemClient
         private void ClearSession()
         {
             Log.Debug("Clearing session");
-            Client = null;
+            Client.CookieContainer = new System.Net.CookieContainer();
             AuthData = null;
+            IsAuthenticated = false;
         }
 
         #region UnAuthorized Access
@@ -87,34 +97,34 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Authorizing");
             var cred = PromptCredentials?.Invoke();
+            if (cred is null) throw new AuthenticationException("Authentication cancelled");
             SignIn(cred);
             Log.Debug("Authorized");
         }
-        private void SignIn(AuthenticationRequest body)
+        private void SignIn(TmsAuthenticationRequest body)
         {
             Log.Debug("Signing in");
             ClearSession();
-            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(body);
 
             var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
             if (!response.IsSuccessful)
             {
-                ClearSession();
-                throw new AuthenticationException(response.Content);
+                Log.Error(response.Content);
+                throw new AuthenticationException(response.Data.Message);
             }
 
             AuthData = response.Data.Data;
             CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
-            Client.Authenticator = new TmsAuthenticator();
             SaveSession();
+            IsAuthenticated = true;
             Log.Debug("Signed In");
         }
         public void SignOut()
         {
             Log.Debug("Signing out from Tms");
-            if (Client is not null)
+            if (IsAuthenticated)
             {
                 Log.Debug("Signing out");
                 var request = new RestRequest("/tmsapi/authenticate/logout");
@@ -137,61 +147,6 @@ namespace TradeManagementSystemClient
             var request = new RestRequest("/tmsapi/ws/top25securities");
             var response = this.AuthorizedGet<WebSocketResponse<WsSecurityResponse>>(request);
             return response.Data;
-        }
-
-        public async Task TestWebSockets()
-        {
-            using (var socket = new ClientWebSocket())
-            {
-                socket.Options.Cookies = Client.CookieContainer;
-                try
-                {
-                    var url = "wss://tms49.nepsetms.com.np//tmsapi/socketEnd?memberId=149&clientId=1979933&dealerId=1&userId=71620";
-                    await socket.ConnectAsync(new Uri(url), CancellationToken.None);
-
-                    var request = "{channel: \"@control\", transaction: \"start_index\"}, payload: {argument: \"undefined\"}}";
-                    Log.Debug("Sending data");
-                    await Send(socket, request);
-                    await Send(socket, "{opCode: \"0xA\"}");
-                    Log.Debug("Receiving data");
-                    await Receive(socket);
-                    Log.Debug("Data received");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Failed to get data");
-                }
-            }
-        }
-
-        static async Task Send(ClientWebSocket socket, string data) =>
-            await socket.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
-
-        static async Task Receive(ClientWebSocket socket)
-        {
-            var buffer = new ArraySegment<byte>(new byte[2048]);
-            do
-            {
-                WebSocketReceiveResult result;
-                using (var ms = new MemoryStream())
-                {
-                    do
-                    {
-                        result = await socket.ReceiveAsync(buffer, CancellationToken.None);
-                        ms.Write(buffer.Array, buffer.Offset, result.Count);
-                    } while (!result.EndOfMessage);
-
-                    if (result.MessageType == WebSocketMessageType.Close)
-                        break;
-
-                    ms.Seek(0, SeekOrigin.Begin);
-                    using (var reader = new StreamReader(ms, Encoding.UTF8))
-                    {
-                        var value = await reader.ReadToEndAsync();
-                        Log.Debug(value);
-                    }
-                }
-            } while (true);
         }
     }
 }

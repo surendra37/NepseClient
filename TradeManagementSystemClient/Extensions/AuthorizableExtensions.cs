@@ -1,5 +1,7 @@
 ﻿using System;
+
 using RestSharp;
+
 using TradeManagementSystemClient.Interfaces;
 
 namespace TradeManagementSystemClient.Extensions
@@ -18,7 +20,7 @@ namespace TradeManagementSystemClient.Extensions
 
         private static IRestResponse<T> AuthorizedMethods<T>(IAuthorizable authorizable, IRestRequest request, Method method)
         {
-            if (authorizable.Client is null)
+            if (!authorizable.IsAuthenticated)
                 authorizable.Authorize();
 
             var response = GetResponse<T>(authorizable.Client, request, method);
@@ -26,6 +28,7 @@ namespace TradeManagementSystemClient.Extensions
 
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
+                authorizable.IsAuthenticated = false;
                 authorizable.Authorize();
                 response = GetResponse<T>(authorizable.Client, request, method);
             }

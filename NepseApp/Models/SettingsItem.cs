@@ -1,5 +1,4 @@
-﻿
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 
 using Prism.Mvvm;
 

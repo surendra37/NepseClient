@@ -1,4 +1,6 @@
 ﻿
+using NepseApp.Extensions;
+
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
 
@@ -19,11 +21,9 @@ namespace NepseApp.ViewModels
 {
     public class AuthenticationDialogViewModel : BindableBase, IDialogAware
     {
-        private readonly ITmsConfiguration _config;
-        private readonly TmsClient _client;
         public event Action<IDialogResult> RequestClose;
 
-        public string Title { get; } = "TMS Authentication";
+        public string Title { get; set; }
 
         private string _host;
         public string Host
@@ -46,51 +46,35 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _password, value); }
         }
 
-        private bool _isRememberPassword = true;
+        private bool _isRememberPassword;
         public bool IsRememberPassword
         {
             get { return _isRememberPassword; }
             set { SetProperty(ref _isRememberPassword, value); }
         }
 
-        public AuthenticationDialogViewModel(IConfiguration config)
-        {
-            _config = config.Tms;
-        }
-
-        private bool _isBusy;
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set { if (SetProperty(ref _isBusy, value)) { LoginCommand.RaiseCanExecuteChanged(); } }
-        }
-
         private DelegateCommand _loginCommand;
         public DelegateCommand LoginCommand =>
-            _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand, () => !IsBusy));
+            _loginCommand ?? (_loginCommand = new DelegateCommand(ExecuteLoginCommand));
 
         void ExecuteLoginCommand()
         {
             try
             {
-                IsBusy = true;
-                var url = Host;
                 var username = Username;
                 var password = Password.GetString();
-                var request = new AuthenticationRequest(username, password);
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, new DialogParameters { { "Credentials", request } }));
-                IsBusy = false;
+                var request = new TmsAuthenticationRequest(username, password);
+                var parameters = new DialogParameters
+                {
+                    { "Username", username },
+                    { "Password", password },
+                    { "RememberPassword", IsRememberPassword },
 
-                // Save values
-                _config.BaseUrl = url;
-                _config.Username = username;
-                _config.Password = IsRememberPassword ? password : string.Empty;
-                _config.RememberPassword = IsRememberPassword;
-                _config.Save();
+                };
+                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, parameters));
             }
             catch (Exception ex)
             {
-                IsBusy = false;
                 Log.Error(ex, "Failed to login");
                 MessageBox.Show(ex.Message, "Failed to login", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -104,10 +88,10 @@ namespace NepseApp.ViewModels
         {
             try
             {
-                Host = _config.BaseUrl;
-                Username = _config.Username;
-                Password = _config.Password.ToSecuredString();
-                IsRememberPassword = _config.RememberPassword;
+                Username = parameters.GetUsername();
+                Password = parameters.GetPassword().ToSecuredString();
+                IsRememberPassword = parameters.GetRememberPassword();
+                Title = parameters.GetTitle();
             }
             catch (Exception ex)
             {

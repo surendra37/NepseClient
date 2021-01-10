@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.IO;
+
+using Newtonsoft.Json;
 
 namespace TradeManagementSystemClient.Models.Responses
 {
@@ -11,6 +13,17 @@ namespace TradeManagementSystemClient.Models.Responses
         [JsonIgnore]
         public bool IsCookieEnabled => !CookieEnabled.Equals("0");
         public ClientResponse User { get; set; }
+
+        public static AuthenticationDataResponse NewInstance(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                var json = File.ReadAllText(filePath);
+                return JsonConvert.DeserializeObject<AuthenticationDataResponse>(json);
+            }
+
+            return null;
+        }
     }
 
     public class ClientResponse

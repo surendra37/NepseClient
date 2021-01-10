@@ -57,12 +57,14 @@ namespace TradeManagementSystemClient
             }
         }
 
-        public IRestClient Client { get; set; }
+        public bool IsAuthenticated { get; set; }
+
+        public IRestClient Client { get; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
         public MeroshareClient(IConfiguration configuration)
         {
             _configuration = configuration.Meroshare;
-
+            Client = RestClientUtils.CreateNewClient("https://backend.cdsc.com.np");
             RestoreSession();
         }
 
@@ -70,14 +72,16 @@ namespace TradeManagementSystemClient
         {
             if (!string.IsNullOrEmpty(_configuration.AuthHeader))
             {
-                Client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
+                IsAuthenticated = true;
                 Client.Authenticator = new MeroshareAuthenticator(_configuration.AuthHeader);
             }
         }
 
         private void ClearSession()
         {
-            Client = null;
+            IsAuthenticated = false;
+            Client.CookieContainer = new System.Net.CookieContainer();
+            Client.Authenticator = null;
             _banks = null;
             _me = null;
         }
@@ -87,22 +91,22 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Authorizing...");
             var cred = PromptCredential?.Invoke();
-            if (cred is null) throw new AuthenticationException("Not Authorized");
+            if (cred is null) throw new AuthenticationException("Authentication cancelled");
             SignIn(cred);
             Log.Debug("Authorized");
         }
         private void SignIn(MeroshareAuthRequest credentials)
         {
             Log.Debug("Signing in...");
-            Client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
+            ClearSession();
             var request = new RestRequest("/api/meroShare/auth/");
             request.AddJsonBody(credentials);
 
             var response = Client.Post(request);
             if (!response.IsSuccessful)
             {
-                Client = null;
-                throw new AuthenticationException(response.Content);
+                Log.Warning(response.Content);
+                throw new AuthenticationException("Not Authorized");
             }
 
             var authHeader = response.Headers
@@ -115,6 +119,7 @@ namespace TradeManagementSystemClient
             _configuration.AuthHeader = authHeader;
             _configuration.Save();
 
+            IsAuthenticated = true;
             Log.Debug("Signed In");
         }
         private void SignOut()
@@ -144,8 +149,7 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Getting capitals");
             var request = new RestRequest("/api/meroShare/capital");
-            var client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
-            var response = client.Get<MeroshareCapitalResponse[]>(request);
+            var response = Client.Get<MeroshareCapitalResponse[]>(request);
             return response.Data;
         }
 
