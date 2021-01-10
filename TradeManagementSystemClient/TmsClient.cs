@@ -9,42 +9,89 @@ using RestSharp.Serializers.NewtonsoftJson;
 using Serilog;
 
 using System;
+using System.IO;
+using System.Net.WebSockets;
 using System.Security.Authentication;
-
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using TradeManagementSystemClient.Extensions;
+using TradeManagementSystemClient.Interfaces;
 using TradeManagementSystemClient.Models;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Responses;
+using TradeManagementSystemClient.Models.Responses.Tms;
 using TradeManagementSystemClient.Utils;
 
 namespace TradeManagementSystemClient
 {
-    public class TmsClient : IDisposable
+    public class TmsClient : IAuthorizable, IDisposable
     {
-        private bool _isAuthenticated;
-        private AuthenticationDataResponse _authData;
+        private readonly string _cookiPath = "cookies.dat";
+        private readonly string _dataPath = "data.dat";
 
-        public RestClient Client { get; }
+        public AuthenticationDataResponse AuthData { get; private set; }
+        private ITmsConfiguration _config;
+
+        public IRestClient Client { get; private set; }
         public Func<AuthenticationRequest> PromptCredentials { get; set; }
 
         public TmsClient(IConfiguration config)
         {
-            Client = new RestClient(config.Tms.BaseUrl)
+            _config = config.Tms;
+            Client = CreateNewClient(_config.BaseUrl);
+            RestoreSession();
+        }
+        private void RestoreSession()
+        {
+            Log.Debug("Restoring session");
+            Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
+            if (File.Exists(_dataPath))
+            {
+                var json = File.ReadAllText(_dataPath);
+                AuthData = JsonConvert.DeserializeObject<AuthenticationDataResponse>(json);
+                Client.Authenticator = new TmsAuthenticator();
+            }
+        }
+        private void SaveSession()
+        {
+            Log.Debug("Saving session");
+            if (Client is not null)
+                CookieUtils.WriteCookiesToDisk(_cookiPath, Client.CookieContainer);
+            if (AuthData is not null)
+            {
+                var json = JsonConvert.SerializeObject(AuthData);
+                File.WriteAllText(_dataPath, json);
+            }
+        }
+        private void ClearSession()
+        {
+            Log.Debug("Clearing session");
+            Client = null;
+            AuthData = null;
+        }
+
+        private IRestClient CreateNewClient(string baseUrl)
+        {
+            Log.Debug("Creating new client");
+            var output = new RestClient(baseUrl)
             {
                 CookieContainer = new System.Net.CookieContainer(),
             };
-            Client.UseNewtonsoftJson(new JsonSerializerSettings
+            output.UseNewtonsoftJson(new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = new CamelCaseNamingStrategy(),
                 },
             });
+            return output;
         }
 
         #region UnAuthorized Access
         public string GetBusinessDate()
         {
+            Log.Debug("Getting business date");
             var request = new RestRequest("/tmsapi/dashboard/businessDate");
             var response = Client.Get<string>(request);
             return response.Data;
@@ -62,36 +109,36 @@ namespace TradeManagementSystemClient
         private void SignIn(AuthenticationRequest body)
         {
             Log.Debug("Signing in");
-            Client.BaseUrl = body.BaseUrl;
+            ClearSession();
+            Client = CreateNewClient(_config.BaseUrl);
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(body);
 
             var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
             if (!response.IsSuccessful)
             {
-                _isAuthenticated = false;
+                ClearSession();
                 throw new AuthenticationException(response.Content);
             }
 
-            _authData = response.Data.Data;
+            AuthData = response.Data.Data;
             CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
             Client.Authenticator = new TmsAuthenticator();
+            SaveSession();
             Log.Debug("Signed In");
-            _isAuthenticated = true;
         }
         public void SignOut()
         {
             Log.Debug("Signing out from Tms");
-            if (!_isAuthenticated)
+            if (Client is not null)
             {
-                Log.Debug("Not authenticated. No sign out required.");
-                return;
+                Log.Debug("Signing out");
+                var request = new RestRequest("/tmsapi/authenticate/logout");
+                var response = Client.Post<ResponseBase>(request);
+                Log.Information(response.Data.Message);
             }
-            Log.Debug("Signing out");
-            var request = new RestRequest("/tmsapi/authenticate/logout");
-            var response = Client.Post<ResponseBase>(request);
-            Log.Information(response.Data.Message);
-            _isAuthenticated = false;
+            ClearSession();
+            SaveSession();
             Log.Debug("Signed out from Tms");
         }
         #endregion
@@ -100,31 +147,67 @@ namespace TradeManagementSystemClient
             SignOut();
         }
 
-        #region Helper Methods
-        private IRestResponse<T> AuthorizedGet<T>(IRestRequest request)
+        public WebSocketResponse<WsSecurityResponse> GetSecurities()
         {
-            if (!_isAuthenticated)
-            {
-                Authorize();
-            }
-            var response = Client.Get<T>(request);
-            if (response.IsUnAuthorized())
-            {
-                Authorize();
-                return Client.Get<T>(request);
-            }
-            return response;
+            Log.Debug("Getting securities");
+            var request = new RestRequest("/tmsapi/ws/top25securities");
+            var response = this.AuthorizedGet<WebSocketResponse<WsSecurityResponse>>(request);
+            return response.Data;
         }
-        private IRestResponse<T> AuthorizedPost<T>(IRestRequest request)
+
+        public async Task TestWebSockets()
         {
-            var response = Client.Post<T>(request);
-            if (response.IsUnAuthorized())
+            using (var socket = new ClientWebSocket())
             {
-                Authorize();
-                return Client.Post<T>(request);
+                socket.Options.Cookies = Client.CookieContainer;
+                try
+                {
+                    var url = "wss://tms49.nepsetms.com.np//tmsapi/socketEnd?memberId=149&clientId=1979933&dealerId=1&userId=71620";
+                    await socket.ConnectAsync(new Uri(url), CancellationToken.None);
+
+                    var request = "{channel: \"@control\", transaction: \"start_index\"}, payload: {argument: \"undefined\"}}";
+                    Log.Debug("Sending data");
+                    await Send(socket, request);
+                    await Send(socket, "{opCode: \"0xA\"}");
+                    Log.Debug("Receiving data");
+                    await Receive(socket);
+                    Log.Debug("Data received");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to get data");
+                }
             }
-            return response;
-        } 
-        #endregion
+        }
+
+        static async Task Send(ClientWebSocket socket, string data) =>
+            await socket.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
+
+        static async Task Receive(ClientWebSocket socket)
+        {
+            var buffer = new ArraySegment<byte>(new byte[2048]);
+            do
+            {
+                WebSocketReceiveResult result;
+                using (var ms = new MemoryStream())
+                {
+                    do
+                    {
+                        result = await socket.ReceiveAsync(buffer, CancellationToken.None);
+                        ms.Write(buffer.Array, buffer.Offset, result.Count);
+                    } while (!result.EndOfMessage);
+
+                    if (result.MessageType == WebSocketMessageType.Close)
+                        break;
+
+                    ms.Seek(0, SeekOrigin.Begin);
+                    using (var reader = new StreamReader(ms, Encoding.UTF8))
+                    {
+                        var value = await reader.ReadToEndAsync();
+                        Log.Debug(value);
+                    }
+                }
+            } while (true);
+        }
     }
 }

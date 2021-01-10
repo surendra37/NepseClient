@@ -8,8 +8,6 @@ namespace TradeManagementSystemClient.Models.Requests
 {
     public class AuthenticationRequest
     {
-        [JsonIgnore]
-        public Uri BaseUrl { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Otp { get; set; }
@@ -19,6 +17,7 @@ namespace TradeManagementSystemClient.Models.Requests
         {
             UserName = username;
             Password = EncodingUtils.Base64Encode(password);
+            Otp = Jwt = string.Empty;
         }
     }
 }
