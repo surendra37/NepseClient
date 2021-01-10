@@ -12,6 +12,9 @@
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="splash.jpg" />
   </ItemGroup>

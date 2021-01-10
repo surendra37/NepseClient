@@ -22,12 +22,12 @@ namespace NepseApp.ViewModels
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
-        public int TotalScrips => Items.Count();
-        public double TotalPrevious => Items.Sum(x => x.PreviousTotal);
-        public double TotalLTP => Items.Sum(x => x.LTPTotal);
-        public double TotalWacc => Items.Sum(x => x.TotalCost);
-        public double DailyGain => Items.Sum(x => x.DailyGain);
-        public double TotalGain => Items.Sum(x => x.TotalGain);
+        public int? TotalScrips => Items?.Count();
+        public double? TotalPrevious => Items?.Sum(x => x.PreviousTotal);
+        public double? TotalLTP => Items?.Sum(x => x.LTPTotal);
+        public double? TotalWacc => Items?.Sum(x => x.TotalCost);
+        public double? DailyGain => Items?.Sum(x => x.DailyGain);
+        public double? TotalGain => Items?.Sum(x => x.TotalGain);
 
         public PortfolioPageViewModel(MeroshareClient client, IApplicationCommand applicationCommand) :
             base(applicationCommand)
