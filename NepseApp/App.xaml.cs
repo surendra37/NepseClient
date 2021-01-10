@@ -66,6 +66,7 @@ namespace NepseApp
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
+            containerRegistry.RegisterForNavigation<TmsLiveMarketPage, TmsLiveMarketPageViewModel>();
             // ASBA
             containerRegistry.RegisterForNavigation<MeroShareAsbaPage, MeroShareAsbaPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();

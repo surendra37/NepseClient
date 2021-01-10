@@ -37,7 +37,7 @@ namespace NepseApp {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://tms49.nepsetms.com.np")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://tms49.nepsetms.com.np")]
         public string TmsHost {
             get {
                 return ((string)(this["TmsHost"]));

@@ -90,6 +90,13 @@ namespace NepseApp.ViewModels
                 IsSelected = Settings.Default.SelectedTab.Equals(nameof(MeroShareAsbaPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MeroShareAsbaPage))
             };
+            yield return new FirstLevelNavigationItem()
+            {
+                Label = "Live Market",
+                Icon = PackIconKind.XboxLive,
+                IsSelected = Settings.Default.SelectedTab.Equals(nameof(TmsLiveMarketPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(TmsLiveMarketPage))
+            };
         }
 
         private DelegateCommand<object> _showMessageCommand;

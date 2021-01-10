@@ -6,7 +6,7 @@
       <Value Profile="(Default)">DashboardPage</Value>
     </Setting>
     <Setting Name="TmsHost" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://tms49.nepsetms.com.np</Value>
+      <Value Profile="(Default)">https://tms49.nepsetms.com.np</Value>
     </Setting>
     <Setting Name="TmsUsername" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

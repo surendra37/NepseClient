@@ -1,11 +1,16 @@
 ﻿using Newtonsoft.Json;
+
 using Serilog;
+
 using SuperSocket.ClientEngine;
+
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+
 using TradeManagementSystemClient.Models.Requests;
+
 using WebSocket4Net;
 
 namespace TradeManagementSystemClient
@@ -15,6 +20,7 @@ namespace TradeManagementSystemClient
         private bool _isStarted;
         private WebSocket _websocket;
         private readonly TmsClient _client;
+        private System.Timers.Timer _timer;
 
         //public event EventHandler<SocketResponse[]> DeserializedMessageReceived;
 
@@ -75,12 +81,21 @@ namespace TradeManagementSystemClient
                     Log.Debug("Waiting for connection to be opened");
                     Thread.Sleep(80);
                 }
+                _timer = new System.Timers.Timer(10);
+                _timer.Elapsed += _timer_Elapsed;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to start socket connection");
                 throw;
             }
+        }
+
+        private void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            _timer.Stop();
+            SendOpCode();
+            _timer.Start();
         }
 
         public bool Received { get; set; }
@@ -130,6 +145,7 @@ namespace TradeManagementSystemClient
         {
             if (!_isStarted) return;
 
+            _timer.Dispose();
             _websocket.Close();
             _websocket.Dispose();
         }

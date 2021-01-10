@@ -15,6 +15,7 @@ using System.Security.Authentication;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using TradeManagementSystemClient.Extensions;
 using TradeManagementSystemClient.Interfaces;
 using TradeManagementSystemClient.Models;
@@ -39,15 +40,15 @@ namespace TradeManagementSystemClient
         public TmsClient(IConfiguration config)
         {
             _config = config.Tms;
-            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
             RestoreSession();
         }
         private void RestoreSession()
         {
             Log.Debug("Restoring session");
-            Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
             if (File.Exists(_dataPath))
             {
+                Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
+                Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
                 var json = File.ReadAllText(_dataPath);
                 AuthData = JsonConvert.DeserializeObject<AuthenticationDataResponse>(json);
                 Client.Authenticator = new TmsAuthenticator();
