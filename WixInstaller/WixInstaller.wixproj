@@ -62,9 +62,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="WixInstaller.wax" />
-  </ItemGroup>
-  <ItemGroup>
     <WixExtension Include="WixUtilExtension">
       <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
       <Name>WixUtilExtension</Name>
