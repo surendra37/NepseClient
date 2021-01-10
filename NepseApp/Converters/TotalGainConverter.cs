@@ -1,11 +1,28 @@
 ﻿using NepseClient.Commons.Contracts;
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
 namespace NepseApp.Converters
 {
+    public class MeroShareAsbaVisibility : IValueConverter
+    {
+        public virtual object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var link = value?.ToString() ?? string.Empty;
+
+            var visible = link.Equals("apply") || link.Equals("edit");
+
+            return visible ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public class TotalGainConverter : IValueConverter
     {
@@ -32,8 +49,8 @@ namespace NepseApp.Converters
             if (value is IScripResponse scrip)
             {
                 var output = scrip.LTPTotal - (scrip.WaccValue * scrip.CurrentBalance);
-                if(output > 0) return Brushes.Green;
-                if(output < 0) return Brushes.Red;
+                if (output > 0) return Brushes.Green;
+                if (output < 0) return Brushes.Red;
                 return Brushes.Black;
             }
 
@@ -53,8 +70,8 @@ namespace NepseApp.Converters
             if (value is IScripResponse scrip)
             {
                 var output = scrip.LTPTotal - scrip.PreviousTotal;
-                if(output > 0) return Brushes.Green;
-                if(output < 0) return Brushes.Red;
+                if (output > 0) return Brushes.Green;
+                if (output < 0) return Brushes.Red;
                 return Brushes.Black;
             }
 

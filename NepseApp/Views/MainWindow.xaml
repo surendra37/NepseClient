@@ -12,7 +12,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
         WindowStartupLocation="CenterScreen"
-        MinWidth="960" MinHeight="640">
+        MinWidth="1000" MinHeight="640">
     <mde:MaterialWindow.TitleTemplate>
         <DataTemplate>
             <Grid>

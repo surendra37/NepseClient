@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace NepseApp.Views
 {
@@ -10,6 +11,12 @@ namespace NepseApp.Views
         public MeroShareApplyForIssuePage()
         {
             InitializeComponent();
+        }
+
+        private void DG_Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Documents.Hyperlink link = (System.Windows.Documents.Hyperlink)e.OriginalSource;
+            //Process.Start(link.NavigateUri.AbsoluteUri);
         }
     }
 }

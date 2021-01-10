@@ -8,6 +8,7 @@
     <UserControl.Resources>
         <converters:IntToVisibilityConverter x:Key="ivc" />
         <converters:IntToInverseVisibilityConverter x:Key="iivc" />
+        <converters:MeroShareAsbaVisibility x:Key="asbac" />
     </UserControl.Resources>
     <DataGrid ItemsSource="{Binding Items}"
               AutoGenerateColumns="False" IsReadOnly="True"
@@ -22,11 +23,13 @@
             <DataGridTemplateColumn Header="Actions">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <Button Content="{Binding Action}" 
+                        <TextBlock Visibility="{Binding Action, Converter={StaticResource asbac}}">
+                            <Hyperlink 
                                 Command="{Binding DataContext.ApplyCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                CommandParameter="{Binding .}"
-                                Style="{DynamicResource MaterialDesignFlatButton}"
-                                Margin="0"/>                      
+                                CommandParameter="{Binding .}">
+                            <TextBlock Text="{Binding Action}" />
+                        </Hyperlink>
+                        </TextBlock>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
