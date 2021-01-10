@@ -39,7 +39,7 @@ namespace TradeManagementSystemClient
         public TmsClient(IConfiguration config)
         {
             _config = config.Tms;
-            Client = CreateNewClient(_config.BaseUrl);
+            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
             RestoreSession();
         }
         private void RestoreSession()
@@ -71,23 +71,6 @@ namespace TradeManagementSystemClient
             AuthData = null;
         }
 
-        private IRestClient CreateNewClient(string baseUrl)
-        {
-            Log.Debug("Creating new client");
-            var output = new RestClient(baseUrl)
-            {
-                CookieContainer = new System.Net.CookieContainer(),
-            };
-            output.UseNewtonsoftJson(new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy(),
-                },
-            });
-            return output;
-        }
-
         #region UnAuthorized Access
         public string GetBusinessDate()
         {
@@ -110,7 +93,7 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Signing in");
             ClearSession();
-            Client = CreateNewClient(_config.BaseUrl);
+            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
             var request = new RestRequest("/tmsapi/authenticate");
             request.AddJsonBody(body);
 

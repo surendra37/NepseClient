@@ -77,7 +77,7 @@ namespace NepseApp.ViewModels
                 var url = Host;
                 var username = Username;
                 var password = Password.GetString();
-                var request = new AuthenticationRequest(username, password) { BaseUrl = new Uri(url) };
+                var request = new AuthenticationRequest(username, password);
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK, new DialogParameters { { "Credentials", request } }));
                 IsBusy = false;
 

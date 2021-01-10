@@ -2,10 +2,8 @@
 using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 
 using Serilog;
 
@@ -16,6 +14,7 @@ using System.Linq;
 using System.Security.Authentication;
 
 using TradeManagementSystemClient.Extensions;
+using TradeManagementSystemClient.Interfaces;
 using TradeManagementSystemClient.Models.Requests;
 using TradeManagementSystemClient.Models.Requests.MeroShare;
 using TradeManagementSystemClient.Models.Responses;
@@ -24,7 +23,7 @@ using TradeManagementSystemClient.Utils;
 
 namespace TradeManagementSystemClient
 {
-    public class MeroshareClient : IDisposable
+    public class MeroshareClient : IAuthorizable, IDisposable
     {
         private readonly IMeroShareConfiguration _configuration;
 
@@ -64,7 +63,6 @@ namespace TradeManagementSystemClient
         {
             _configuration = configuration.Meroshare;
 
-            Client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
             RestoreSession();
         }
 
@@ -72,8 +70,16 @@ namespace TradeManagementSystemClient
         {
             if (!string.IsNullOrEmpty(_configuration.AuthHeader))
             {
+                Client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
                 Client.Authenticator = new MeroshareAuthenticator(_configuration.AuthHeader);
             }
+        }
+
+        private void ClearSession()
+        {
+            Client = null;
+            _banks = null;
+            _me = null;
         }
 
         #region Authentication
@@ -101,7 +107,7 @@ namespace TradeManagementSystemClient
 
             var authHeader = response.Headers
                 .FirstOrDefault(x => x.Name.Equals("Authorization"))?.Value.ToString();
-            if (string.IsNullOrEmpty(authHeader)) 
+            if (string.IsNullOrEmpty(authHeader))
                 throw new AuthenticationException("Authorization header not found");
             Client.Authenticator = new MeroshareAuthenticator(authHeader);
 
@@ -121,12 +127,10 @@ namespace TradeManagementSystemClient
             }
             var request = new RestRequest("/api/meroShare/auth/logout/");
             var response = Client.Get(request);
-            Client = null;
             Log.Debug(response.Content);
 
             // Remove all stored values
-            _me = null;
-            _banks = null;
+            ClearSession();
             _configuration.AuthHeader = string.Empty;
             _configuration.Save();
             Log.Debug("Signed out from MeroShare");
@@ -140,7 +144,8 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Getting capitals");
             var request = new RestRequest("/api/meroShare/capital");
-            var response = Client.Get<MeroshareCapitalResponse[]>(request);
+            var client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
+            var response = client.Get<MeroshareCapitalResponse[]>(request);
             return response.Data;
         }
 
@@ -148,7 +153,7 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Getting own details");
             var request = new RestRequest("/api/meroShare/ownDetail/");
-            var response = AuthorizedGet<MeroshareOwnDetailResponse>(request);
+            var response = this.AuthorizedGet<MeroshareOwnDetailResponse>(request);
             return response.Data;
         }
 
@@ -156,7 +161,7 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Getting my shares");
             var request = new RestRequest("/api/myPurchase/myShare/");
-            var response = AuthorizedGet<string[]>(request);
+            var response = this.AuthorizedGet<string[]>(request);
             return response.Data;
         }
 
@@ -165,7 +170,7 @@ namespace TradeManagementSystemClient
             Log.Debug("View my purchase");
             var request = new RestRequest("/api/myPurchase/view/");
             request.AddJsonBody(body);
-            var response = AuthorizedPost<MeroshareViewMyPurchaseResponse>(request);
+            var response = this.AuthorizedPost<MeroshareViewMyPurchaseResponse>(request);
             return response.Data;
         }
 
@@ -173,7 +178,7 @@ namespace TradeManagementSystemClient
         {
             var request = new RestRequest("/api/myPurchase/search/");
             request.AddJsonBody(body);
-            var response = AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
+            var response = this.AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
             return response.Data;
         }
 
@@ -228,7 +233,7 @@ namespace TradeManagementSystemClient
             var request = new RestRequest("/api/meroShareView/myPortfolio");
             request.AddJsonBody(body);
 
-            var response = AuthorizedPost<MerosharePortfolioResponse>(request);
+            var response = this.AuthorizedPost<MerosharePortfolioResponse>(request);
             return response.Data;
         }
 
@@ -256,42 +261,6 @@ namespace TradeManagementSystemClient
 #endif
         }
 
-        #region Helper Methods
-        private IRestResponse<T> AuthorizedGet<T>(IRestRequest request)
-        {
-            if (Client is null) Authorize();
-
-            var response = Client.Get<T>(request);
-            if (response.IsUnAuthorized())
-            {
-                Authorize();
-                return Client.Get<T>(request);
-            }
-            if (!response.IsSuccessful)
-            {
-                throw new Exception(response.Content);
-            }
-            return response;
-        }
-        private IRestResponse<T> AuthorizedPost<T>(IRestRequest request)
-        {
-            if (Client is null) Authorize();
-
-            var response = Client.Post<T>(request);
-            if (response.IsUnAuthorized())
-            {
-                Authorize();
-                return Client.Post<T>(request);
-            }
-            if (!response.IsSuccessful)
-            {
-                throw new Exception(response.Content);
-            }
-
-            return response;
-        }
-        #endregion
-
         #region ASBA
         public ApplicationReportResponse GetOldApplicationReport()
         {
@@ -299,7 +268,7 @@ namespace TradeManagementSystemClient
             var body = new GetApplicationReport("VIEW");
             request.AddJsonBody(body);
 
-            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            var response = this.AuthorizedPost<ApplicationReportResponse>(request);
             return response.Data;
         }
         public ApplicationReportResponse GetApplicationReport()
@@ -308,7 +277,7 @@ namespace TradeManagementSystemClient
             var body = new GetApplicationReport("VIEW_APPLICANT_FORM_COMPLETE");
             request.AddJsonBody(body);
 
-            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            var response = this.AuthorizedPost<ApplicationReportResponse>(request);
             return response.Data;
         }
 
@@ -316,7 +285,7 @@ namespace TradeManagementSystemClient
         {
             // For share information
             var request = new RestRequest($"/api/meroShare/active/{report.CompanyShareId}"); //288  // CompanyShareId
-            var response = AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            var response = this.AuthorizedGet<OldApplicationReportDetailResponse>(request);
             return response.Data;
 
         }
@@ -324,7 +293,7 @@ namespace TradeManagementSystemClient
         {
             // For alloted information
             var request = new RestRequest($"/api/meroShare/migrated/applicantForm/report/{report.ApplicantFormId}"); //8549728 // ApplicantFormId
-            var response = AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            var response = this.AuthorizedGet<OldApplicationReportDetailResponse>(request);
             return response.Data;
         }
 
@@ -333,14 +302,14 @@ namespace TradeManagementSystemClient
             var request = new RestRequest("/api/meroShare/companyShare/applicableIssue/");
             var body = new GetApplicationReport("VIEW_APPLICABLE_SHARE");
             request.AddJsonBody(body);
-            var response = AuthorizedPost<ApplicationReportResponse>(request);
+            var response = this.AuthorizedPost<ApplicationReportResponse>(request);
             return response.Data;
         }
 
         private MeroshareCapitalResponse[] GetMyBanks()
         {
             var request = new RestRequest("/api/meroShare/bank/");
-            var response = AuthorizedGet<MeroshareCapitalResponse[]>(request);
+            var response = this.AuthorizedGet<MeroshareCapitalResponse[]>(request);
             return response.Data;
         }
 
@@ -348,7 +317,7 @@ namespace TradeManagementSystemClient
         {
             var request = new RestRequest($"/api/meroShare/bank/{id}"); //44
 
-            var response = AuthorizedGet<BankDetailResponse>(request);
+            var response = this.AuthorizedGet<BankDetailResponse>(request);
             return response.Data;
         }
 
@@ -370,7 +339,7 @@ namespace TradeManagementSystemClient
             //};
             request.AddJsonBody(body);
 
-            var response = AuthorizedPost<ResponseBase>(request);
+            var response = this.AuthorizedPost<ResponseBase>(request);
             return response.Data;
         }
         public ResponseBase ValidateIssue(int formId, string companyShareId, string transactionPin)
@@ -383,14 +352,14 @@ namespace TradeManagementSystemClient
                 TransactionPIN = transactionPin,
             };
             request.AddJsonBody(body);
-            var response = AuthorizedPost<ResponseBase>(request);
+            var response = this.AuthorizedPost<ResponseBase>(request);
             return response.Data;
         }
         public ReApplyResponse ReApplyIssue(string companyShareId)
         {
             var request = new RestRequest($"/api/meroShare/applicantForm/reapply/{companyShareId}"); // 305
 
-            var response = AuthorizedGet<ReApplyResponse>(request);
+            var response = this.AuthorizedGet<ReApplyResponse>(request);
             return response.Data;
         }
         public ResponseBase EditIssue(int formId, ApplyIssueRequest body)
@@ -411,7 +380,7 @@ namespace TradeManagementSystemClient
             //};
             request.AddJsonBody(body);
 
-            var response = AuthorizedPost<ResponseBase>(request);
+            var response = this.AuthorizedPost<ResponseBase>(request);
             return response.Data;
         }
         #endregion
@@ -419,7 +388,7 @@ namespace TradeManagementSystemClient
         public string GetPurchaseDisclaimer()
         {
             var request = new RestRequest("/api/myPurchase/disclaimer/");
-            var response = AuthorizedGet<string>(request);
+            var response = this.AuthorizedGet<string>(request);
             return response.Data;
         }
     }
