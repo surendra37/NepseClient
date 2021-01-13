@@ -3,6 +3,8 @@
 using NepseApp.Extensions;
 using NepseApp.Models;
 
+using Prism.Commands;
+
 using Serilog;
 
 using TradeManagementSystemClient;
@@ -44,6 +46,23 @@ namespace NepseApp.ViewModels
                 EnqueMessage("Failed to get application report");
             }
             AppCommand.HideMessage();
+        }
+
+        private DelegateCommand<ApplicationReportItem> _viewReportCommand;
+        public DelegateCommand<ApplicationReportItem> ViewReportCommand =>
+            _viewReportCommand ?? (_viewReportCommand = new DelegateCommand<ApplicationReportItem>(ExecuteViewReportCommand));
+
+        void ExecuteViewReportCommand(ApplicationReportItem report)
+        {
+            try
+            {
+                var companyDetails = _client.GetAsbaCompanyDetails(report);
+                var applicantFormDetails = _client.GetApplicantFormReportDetail(report);
+            }
+            catch (Exception ex)
+            {
+                LogErrorAndEnqueMessage(ex, "Failed to view report");
+            }
         }
     }
 }

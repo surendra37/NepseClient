@@ -14,6 +14,19 @@
             <DataGridTextColumn Header="Type" Binding="{Binding ShareTypeName}" />
             <DataGridTextColumn Header="Group" Binding="{Binding ShareGroupName}" />
             <DataGridTextColumn Header="Sub Group" Binding="{Binding SubGroup}" />
+            <DataGridTemplateColumn Header="Actions">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Hyperlink  
+                                Command="{Binding DataContext.ViewReportCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                CommandParameter="{Binding .}">
+                                <TextBlock Text="Report"/>
+                            </Hyperlink>
+                        </TextBlock>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
         </DataGrid.Columns>
     </DataGrid>
 </UserControl>
