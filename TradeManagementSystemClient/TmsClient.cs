@@ -139,7 +139,11 @@ namespace TradeManagementSystemClient
         #endregion
         public void Dispose()
         {
+#if DEBUG
+            //SignOut();
+#else
             SignOut();
+#endif
         }
 
         public WebSocketResponse<WsSecurityResponse> GetSecurities()

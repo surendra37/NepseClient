@@ -261,6 +261,7 @@ namespace TradeManagementSystemClient
         public void Dispose()
         {
 #if DEBUG
+            //SignOut();
 #else
             SignOut();
 #endif
