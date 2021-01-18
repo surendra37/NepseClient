@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:NepseApp.Converters">
+    <converters:InvertBooleanToVisibilityConverter x:Key="InvertBooleanToVisibilityConverter" />
+    <converters:PolarConverter x:Key="PolarConverter" />
+    <converters:DailyGainConverter x:Key="DailyGainConverter" />
+    <converters:TotalGainConverter x:Key="TotalGainConverter" />
+    <converters:PolarBrushConverter x:Key="PolarBrushConverter" />
+</ResourceDictionary>

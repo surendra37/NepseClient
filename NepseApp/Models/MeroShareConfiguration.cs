@@ -13,7 +13,6 @@ namespace NepseApp.Models
         private static readonly string _filePath = Path.Combine(Constants.AppDataPath.Value, "meroshare-config.json");
         public string Username { get; set; }
         public string Password { get; set; }
-        public string[] Demat { get; set; }
         public bool RememberPassword { get; set; }
         public string AuthHeader { get; set; }
 
@@ -54,11 +53,6 @@ namespace NepseApp.Models
         {
             get => Settings.Default.MeroShareClientId;
             set => Settings.Default.MeroShareClientId = value;
-        }
-        public string[] Demat
-        {
-            get => _config.Demat;
-            set => _config.Demat = value;
         }
         public bool RememberPassword
         {

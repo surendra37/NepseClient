@@ -1,0 +1,39 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:NepseApp.Styles">
+    <GridView x:Key="IndexWatchGridView">
+        <GridViewColumn Header="Index Code" DisplayMemberBinding="{Binding IndexCode}" />
+        <GridViewColumn Header="Index Value" DisplayMemberBinding="{Binding IndexValue, StringFormat=N2}" />
+        <GridViewColumn Header="P. Close" DisplayMemberBinding="{Binding PrevCloseIndex, StringFormat=N2}" />
+        <GridViewColumn Header="Change" DisplayMemberBinding="{Binding Change, StringFormat=N2}" />
+        <GridViewColumn Header="% Change" DisplayMemberBinding="{Binding PercentageChange, StringFormat=N2}" />
+    </GridView>
+
+    <GridView x:Key="TopItemsGridView" x:Shared="False">
+        <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding Symbol}"/>
+        <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding Ltp}"/>
+        <GridViewColumn Header="Change" DisplayMemberBinding="{Binding PointChange}"/>
+        <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange}"/>
+    </GridView>
+    <GridView x:Key="TopTurnOverGridView">
+        <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+        <GridViewColumn Header="Turnover" DisplayMemberBinding="{Binding TotalTurnover, StringFormat=N0}"/>
+        <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+        <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+        <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+    </GridView>
+    <GridView x:Key="TopVolumeGridView">
+        <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+        <GridViewColumn Header="Volume" DisplayMemberBinding="{Binding Volume, StringFormat=N0}"/>
+        <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+        <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+        <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+    </GridView>
+    <GridView x:Key="TopTransactionGridView">
+        <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding SecuritySymbol}"/>
+        <GridViewColumn Header="Transactions" DisplayMemberBinding="{Binding TotalTransaction, StringFormat=N0}"/>
+        <GridViewColumn Header="LTP" DisplayMemberBinding="{Binding LastTradePrice, StringFormat=N2}"/>
+        <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
+        <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
+    </GridView>
+</ResourceDictionary>

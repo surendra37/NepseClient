@@ -1,13 +1,12 @@
-﻿
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-using NepseApp.Models;
-
-using Serilog;
+using Prism.Commands;
+using Prism.Mvvm;
+using Prism.Regions;
 
 namespace NepseApp.ViewModels
 {
-    public class MeroShareAsbaPageViewModel : ActiveAwareBindableBase
+    public class MeroShareAsbaPageViewModel : BindableBase
     {
         private TabItem _selectedItem;
         public TabItem SelectedItem
@@ -15,26 +14,20 @@ namespace NepseApp.ViewModels
             get { return _selectedItem; }
             set { SetProperty(ref _selectedItem, value); }
         }
-        public MeroShareAsbaPageViewModel(IApplicationCommand appCommand) : base(appCommand)
+        public MeroShareAsbaPageViewModel(IRegionManager regionManager) 
         {
+            _regionManager = regionManager;
         }
 
-        public override void ExecuteRefreshCommand()
+        private DelegateCommand<string> _navigateCommand;
+        private readonly IRegionManager _regionManager;
+
+        public DelegateCommand<string> NavigateCommand =>
+            _navigateCommand ?? (_navigateCommand = new DelegateCommand<string>(ExecuteNavigateCommand));
+
+        void ExecuteNavigateCommand(string source)
         {
-            if (SelectedItem is null || 
-                SelectedItem.Content is not ContentControl view ||
-                view.DataContext is not ActiveAwareBindableBase vm) return;
-            try
-            {
-                IsBusy = true;
-                vm.ExecuteRefreshCommand();
-                IsBusy = false;
-            }
-            catch (System.Exception ex)
-            {
-                IsBusy = false;
-                Log.Error(ex, "Unknown error");
-            }
+            _regionManager.RequestNavigate("AsbaRegion", source);
         }
     }
 }

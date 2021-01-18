@@ -15,6 +15,7 @@ namespace TradeManagementSystemClient.Models
             AddCookie(cookies, request, "accessToken");
             AddCookie(cookies, request, "refreshToken");
             AddCookie(cookies, request, "XSRF-TOKEN");
+
         }
 
         private static void AddHeader(CookieCollection cookies, IRestRequest request, string header, string headerToAdd)
@@ -28,7 +29,7 @@ namespace TradeManagementSystemClient.Models
         private static void AddCookie(CookieCollection cookies, IRestRequest request, string name)
         {
             var cookie = cookies.FirstOrDefault(x => x.Name.Equals(name));
-            if(cookie is null) return;
+            if (cookie is null) return;
 
             request.AddCookie(name, cookie.Value);
         }

@@ -25,6 +25,7 @@ namespace NepseApp.ViewModels
         {
             try
             {
+                var isin = _client.GetGraphData("NPE019A00007");
                 Items = _client.GetSecurities()?.Payload.Data;
             }
             catch (System.Exception ex)

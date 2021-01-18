@@ -1,6 +1,8 @@
 ﻿
 using Prism.Services.Dialogs;
 
+using TradeManagementSystemClient.Models.Responses.MeroShare;
+
 namespace NepseApp.Extensions
 {
     public static class DialogParameterExtensions
@@ -48,6 +50,26 @@ namespace NepseApp.Extensions
         {
             value.Add("RememberPassword", rememberPassword);
             return value;
+        }
+
+        public static IDialogParameters AddShareReport(this IDialogParameters value, AsbaShareReportDetailResponse input)
+        {
+            value.Add("ShareReport", input);
+            return value;
+        }
+        public static AsbaShareReportDetailResponse GetShareReport(this IDialogParameters value)
+        {
+            return value.GetValue<AsbaShareReportDetailResponse>("ShareReport");
+        }
+
+        public static IDialogParameters AddApplicantFormDetail(this IDialogParameters value, ApplicantFormReportDetail input)
+        {
+            value.Add("FormDetail", input);
+            return value;
+        }
+        public static ApplicantFormReportDetail GetFormDetail(this IDialogParameters value)
+        {
+            return value.GetValue<ApplicantFormReportDetail>("FormDetail");
         }
     }
 }

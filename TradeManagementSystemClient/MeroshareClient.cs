@@ -92,6 +92,7 @@ namespace TradeManagementSystemClient
             Log.Debug("Authorizing...");
             var cred = PromptCredential?.Invoke();
             if (cred is null) throw new AuthenticationException("Authentication cancelled");
+            if(string.IsNullOrEmpty(cred.ClientId)) throw new AuthenticationException("Client id is empty. Please select your DP from settings page.");
             SignIn(cred);
             Log.Debug("Authorized");
         }
@@ -260,6 +261,7 @@ namespace TradeManagementSystemClient
         public void Dispose()
         {
 #if DEBUG
+            //SignOut();
 #else
             SignOut();
 #endif
@@ -285,19 +287,26 @@ namespace TradeManagementSystemClient
             return response.Data;
         }
 
-        public OldApplicationReportDetailResponse GetApplicationReportDetails(ApplicationReportItem report)
+        public ApplicantFormReportDetail GetApplicantFormReportDetail(ApplicationReportItem report)
+        {
+            var request = new RestRequest($"/api/meroShare/applicantForm/report/detail/{report.ApplicantFormId}"); // 8094132 applicant form id
+            var response = this.AuthorizedGet<ApplicantFormReportDetail>(request);
+            return response.Data;
+        }
+
+        public AsbaShareReportDetailResponse GetAsbaCompanyDetails(ApplicationReportItem report)
         {
             // For share information
             var request = new RestRequest($"/api/meroShare/active/{report.CompanyShareId}"); //288  // CompanyShareId
-            var response = this.AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            var response = this.AuthorizedGet<AsbaShareReportDetailResponse>(request);
             return response.Data;
 
         }
-        public OldApplicationReportDetailResponse GetOldApplicationReportDetails(ApplicationReportItem report)
+        public ApplicantFormReportDetail GetOldApplicationReportDetails(ApplicationReportItem report)
         {
             // For alloted information
             var request = new RestRequest($"/api/meroShare/migrated/applicantForm/report/{report.ApplicantFormId}"); //8549728 // ApplicantFormId
-            var response = this.AuthorizedGet<OldApplicationReportDetailResponse>(request);
+            var response = this.AuthorizedGet<ApplicantFormReportDetail>(request);
             return response.Data;
         }
 

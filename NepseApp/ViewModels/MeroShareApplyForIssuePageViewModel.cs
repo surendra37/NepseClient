@@ -63,6 +63,9 @@ namespace NepseApp.ViewModels
             if (item is null) return;
 
             var isApply = item.Action.Equals("apply", StringComparison.OrdinalIgnoreCase);
+
+            if(!isApply) return;
+
             _dialog.ShowDialog(nameof(MeroShareApplicationDialogPage), new DialogParameters
             {
                 { "ShareInfo", item}

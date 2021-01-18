@@ -2,7 +2,7 @@
 
 namespace TradeManagementSystemClient.Models.Responses.MeroShare
 {
-    public class ApplicationReportDetailResponse
+    public class AsbaShareReportDetailResponse
     {
         public string ClientName { get; set; }
         public string CompanyCode { get; set; }

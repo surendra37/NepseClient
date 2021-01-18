@@ -4,10 +4,13 @@ using NepseClient.Commons.Contracts;
 using Newtonsoft.Json;
 
 using RestSharp;
+using RestSharp.Authenticators;
 
 using Serilog;
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.WebSockets;
 using System.Security.Authentication;
@@ -28,7 +31,7 @@ namespace TradeManagementSystemClient
     public class TmsClient : IAuthorizable, IDisposable
     {
         private readonly string _cookiPath = Path.Combine(Constants.AppDataPath.Value, "tms-cookies.dat");
-        private readonly string _dataPath = "data.dat";
+        private readonly string _dataPath = Path.Combine(Constants.AppDataPath.Value, "tms-data.dat");
 
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
@@ -62,7 +65,9 @@ namespace TradeManagementSystemClient
 
             Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
             AuthData = AuthenticationDataResponse.NewInstance(_dataPath);
-            if (AuthData is null) IsAuthenticated = false;
+            IsAuthenticated = AuthData is not null;
+            
+            Client.Authenticator = GetAuthenticator(AuthData);
         }
         private void SaveSession()
         {
@@ -73,8 +78,18 @@ namespace TradeManagementSystemClient
             {
                 var json = JsonConvert.SerializeObject(AuthData);
                 File.WriteAllText(_dataPath, json);
+
             }
+            Client.Authenticator = GetAuthenticator(AuthData);
         }
+
+        private static IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
+        {
+            if (authData is null || authData.IsCookieEnabled) return new TmsAuthenticator();
+
+            return new BearerAuthenticator(authData.JsonWebToken);
+        }
+
         private void ClearSession()
         {
             Log.Debug("Clearing session");
@@ -115,7 +130,6 @@ namespace TradeManagementSystemClient
                 Log.Error(response.Content);
                 throw new AuthenticationException(response.Data.Message);
             }
-
             AuthData = response.Data.Data;
             CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
             SaveSession();
@@ -139,7 +153,11 @@ namespace TradeManagementSystemClient
         #endregion
         public void Dispose()
         {
+#if DEBUG
+            //SignOut();
+#else
             SignOut();
+#endif
         }
 
         public WebSocketResponse<WsSecurityResponse> GetSecurities()
@@ -149,5 +167,18 @@ namespace TradeManagementSystemClient
             var response = this.AuthorizedGet<WebSocketResponse<WsSecurityResponse>>(request);
             return response.Data;
         }
+
+        #region Graph 
+        public GraphDataResponse[] GetGraphData(params string[] isins)
+        {
+            var request = new RestRequest("/tmsapi/graph-data/fetch/1"); // NPE019A00007 
+            foreach (var isin in isins)
+            {
+                request.AddParameter("ISIN", isin);
+            }
+            var data = this.AuthorizedGet<GraphDataResponse[]>(request);
+            return data.Data;
+        }
+        #endregion
     }
 }

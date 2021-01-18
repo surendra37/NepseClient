@@ -26,7 +26,6 @@
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Responses\Tms\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
 </Project>
