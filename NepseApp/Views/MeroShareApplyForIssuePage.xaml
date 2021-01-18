@@ -26,9 +26,10 @@
                         <TextBlock Visibility="{Binding Action, Converter={StaticResource asbac}}">
                             <Hyperlink 
                                 Command="{Binding DataContext.ApplyCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                CommandParameter="{Binding .}"
-                                Style="{DynamicResource MaterialDesignFlatButton}"
-                                Margin="0"/>                      
+                                CommandParameter="{Binding .}">
+                                <TextBlock Text="{Binding Action}" />
+                            </Hyperlink>
+                        </TextBlock>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
