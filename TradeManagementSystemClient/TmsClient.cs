@@ -1,4 +1,5 @@
-﻿using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons;
+using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
 
@@ -26,8 +27,8 @@ namespace TradeManagementSystemClient
 {
     public class TmsClient : IAuthorizable, IDisposable
     {
-        private readonly string _cookiPath = "cookies.dat";
-        private readonly string _dataPath = "data.dat";
+        private readonly string _cookiPath = Path.Combine(Constants.AppDataPath.Value, "tms-cookies.dat");
+        private readonly string _dataPath = Path.Combine(Constants.AppDataPath.Value, "tms-data.dat");
 
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }

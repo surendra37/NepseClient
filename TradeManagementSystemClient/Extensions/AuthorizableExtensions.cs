@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using RestSharp;
 
@@ -21,19 +22,31 @@ namespace TradeManagementSystemClient.Extensions
         private static IRestResponse<T> AuthorizedMethods<T>(IAuthorizable authorizable, IRestRequest request, Method method)
         {
             if (!authorizable.IsAuthenticated)
+            {
+                ClearAuthHeader(request);
                 authorizable.Authorize();
+            }
 
             var response = GetResponse<T>(authorizable.Client, request, method);
             if (response.IsSuccessful) return response;
 
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
+                ClearAuthHeader(request);
                 authorizable.IsAuthenticated = false;
-                authorizable.Authorize();
+                authorizable.Authorize();                
                 response = GetResponse<T>(authorizable.Client, request, method);
             }
 
             return response;
+        }
+
+        private static void ClearAuthHeader(IRestRequest request)
+        {
+            var authHeader = request.Parameters.FirstOrDefault(x => x.Name.Equals("Authorization"));
+            if(authHeader is null) return;
+
+            request.Parameters.Remove(authHeader);
         }
 
         private static IRestResponse<T> GetResponse<T>(IRestClient client, IRestRequest request, Method method)

@@ -91,8 +91,8 @@ namespace TradeManagementSystemClient
         {
             Log.Debug("Authorizing...");
             var cred = PromptCredential?.Invoke();
-            if(string.IsNullOrEmpty(cred.ClientId)) throw new AuthenticationException("Client id is empty. Please select your DP from settings page.");
             if (cred is null) throw new AuthenticationException("Authentication cancelled");
+            if(string.IsNullOrEmpty(cred.ClientId)) throw new AuthenticationException("Client id is empty. Please select your DP from settings page.");
             SignIn(cred);
             Log.Debug("Authorized");
         }

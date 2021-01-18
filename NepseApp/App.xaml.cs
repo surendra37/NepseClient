@@ -6,6 +6,7 @@ using NepseClient.Commons;
 using NepseClient.Commons.Contracts;
 
 using Prism.Ioc;
+using Prism.Regions;
 
 using Serilog;
 using Serilog.Formatting.Compact;
@@ -38,6 +39,9 @@ namespace NepseApp
 
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
+
+            var regionManager = Container.Resolve<IRegionManager>();            
+            regionManager.RegisterViewWithRegion("AsbaRegion", typeof(MeroShareApplyForIssuePage));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -71,6 +75,7 @@ namespace NepseApp
             containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaOldApplicationReportPage, MeroShareAsbaOldApplicationReportPageViewModel>();
 
+            containerRegistry.RegisterDialog<ViewAsbaReportDialog, ViewAsbaReportDialogViewModel>();
             containerRegistry.RegisterDialog<MeroShareApplicationDialogPage, MeroShareApplicationDialogPageViewModel>();
         }
 
