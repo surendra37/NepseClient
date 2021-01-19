@@ -25,7 +25,7 @@ namespace NepseApp {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://tms49.nepsetms.com.np")]
         public string TmsBaseUrl {
             get {
                 return ((string)(this["TmsBaseUrl"]));

@@ -41,7 +41,6 @@ namespace NepseApp.ViewModels
                 AppCommand.ShowMessage("Getting old application report");
                 Items = _client.GetOldApplicationReport().Object;
                 IsBusy = false;
-                EnqueMessage("Old application report fetched successfully");
             }
             catch (Exception ex)
             {

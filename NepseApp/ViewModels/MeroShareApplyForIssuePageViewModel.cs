@@ -43,7 +43,6 @@ namespace NepseApp.ViewModels
                 IsBusy = true;
                 Items = _client.GetApplicableIssues().Object;
                 IsBusy = false;
-                EnqueMessage("Applicable issues updated successfully");
             }
             catch (Exception ex)
             {

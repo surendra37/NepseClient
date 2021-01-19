@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="TmsBaseUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">https://tms49.nepsetms.com.np</Value>
     </Setting>
     <Setting Name="MeroShareClientId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

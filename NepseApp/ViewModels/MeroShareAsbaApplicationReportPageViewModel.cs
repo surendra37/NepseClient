@@ -45,7 +45,6 @@ namespace NepseApp.ViewModels
                     Items = _client.GetApplicationReport().Object;
                 }
                 IsBusy = false;
-                EnqueMessage("Application report updated successfully");
             }
             catch (Exception ex)
             {

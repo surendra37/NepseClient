@@ -46,9 +46,8 @@ namespace NepseApp.ViewModels
                 var newItems = portfolios.MeroShareMyPortfolio
                     .Select(x => new MeroSharePortfolioAdapter(x, waccDict))
                     .ToArray();
-                
+
                 Items = newItems;
-                AppCommand.HideMessage();
                 IsBusy = false;
                 RaisePropertyChanged(nameof(TotalScrips));
                 RaisePropertyChanged(nameof(TotalPrevious));
@@ -56,14 +55,13 @@ namespace NepseApp.ViewModels
                 RaisePropertyChanged(nameof(DailyGain));
                 RaisePropertyChanged(nameof(TotalWacc));
                 RaisePropertyChanged(nameof(TotalGain));
-                EnqueMessage("Portfolio successfully updated");
             }
             catch (Exception ex)
             {
                 IsBusy = false;
-                AppCommand.HideMessage();
                 LogDebugAndEnqueMessage(ex.Message);
             }
+            AppCommand.HideMessage();
         }
     }
 }
