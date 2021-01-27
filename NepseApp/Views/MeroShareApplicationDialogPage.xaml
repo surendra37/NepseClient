@@ -1,9 +1,10 @@
 ﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseApp.Views.MeroShareApplicationDialogPage"             
              prism:ViewModelLocator.AutoWireViewModel="True" 
-             av:DesignWidth="400" av:DesignHeight="300"
+             av:DesignWidth="400" av:DesignHeight="414"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              Background="{DynamicResource MaterialDesignPaper}"
              TextElement.FontWeight="Medium"
@@ -25,7 +26,7 @@
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="8">
-            <StackPanel Orientation="Horizontal" DataContext="{Binding Issue}">
+            <WrapPanel Orientation="Horizontal" DataContext="{Binding Issue}">
                 <TextBlock Text="{Binding CompanyName}" av:Text="Chandragiri Hill Limited"/>
                 <Separator Margin="4"/>
                 <TextBlock Text="{Binding SubGroup}" av:Text="General Public"/>
@@ -33,52 +34,44 @@
                 <TextBlock Text="{Binding ShareTypeName}" av:Text="IPO" Padding="2" Background="LightBlue" Margin="2 0"/>
                 <Separator Margin="4" />
                 <TextBlock Text="{Binding ShareGroupName}" av:Text="Ordinary Shares" />
-            </StackPanel>
+            </WrapPanel>
             <Separator />
-            <Grid Margin="0 4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="128" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="24" />
-                </Grid.RowDefinitions>
+            <StackPanel Margin="0 4">
+                <TextBox Text="{Binding Boid}" av:Text="1301180000XXXXXX" 
+                         md:HintAssist.Hint="BOID" md:HintAssist.IsFloating="True"
+                         IsEnabled="False"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="BOID" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Boid}" av:Text="1301180000XXXXXX" />
-
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Bank"/>
-                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Banks}" 
+                <ComboBox ItemsSource="{Binding Banks}" 
                           SelectedItem="{Binding SelectedBank}"
+                          md:HintAssist.Hint="Bank" md:HintAssist.IsFloating="True"
                           DisplayMemberPath="Name"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Branch" />
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Branch}" av:Text="NICA Bank Ltd. Pulchowk branch"/>
+                <TextBox Text="{Binding Branch}"
+                         md:HintAssist.Hint="Branch" md:HintAssist.IsFloating="True"
+                         av:Text="NICA Bank Ltd. Pulchowk branch"
+                         IsEnabled="False"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Account Number" />
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding AccountNumber}" av:Text="4787799326XXXXXX"/>
-
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="AppliedKitta" />
+                <TextBox Text="{Binding AccountNumber}" 
+                         md:HintAssist.Hint="Account Number" md:HintAssist.IsFloating="True"
+                         av:Text="4787799326XXXXXX"/>
                 <TextBox Grid.Row="4" Grid.Column="1" 
+                         md:HintAssist.Hint="Applied Kitta" md:HintAssist.IsFloating="True"
                          Text="{Binding AppliedKitta, UpdateSourceTrigger=PropertyChanged}" 
                          av:Text="10"/>
 
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="Amount" />
-                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Amount}" av:Text="1000" />
-
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="CRN" />
-                <TextBox Grid.Row="6" Grid.Column="1" 
-                         Text="{Binding CrnNumber, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox Text="{Binding Amount, StringFormat=N0, Mode=OneWay}" 
+                          md:HintAssist.Hint="Amount" md:HintAssist.IsFloating="True"
+                         IsEnabled="False"
+                         av:Text="1000" />
+                <TextBox Text="{Binding CrnNumber, UpdateSourceTrigger=PropertyChanged}"
+                         md:HintAssist.Hint="CRN" md:HintAssist.IsFloating="True"
                          av:Text="33-R12312312" />
-            </Grid>
+            </StackPanel>
             <Separator />
-            <CheckBox Content="{Binding Disclaimer}" av:Content="This is a disclaimer"/>
+            <CheckBox >
+                <TextBlock Text="{Binding Disclaimer}" TextWrapping="WrapWithOverflow" 
+                           av:Text="This is a disclaimer."/>
+            </CheckBox>
 
             <StackPanel Orientation="Horizontal" Margin="8">
                 <Button Content="Proceed" Width="96"/>

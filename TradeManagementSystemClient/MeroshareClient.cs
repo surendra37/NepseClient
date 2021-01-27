@@ -398,10 +398,11 @@ namespace TradeManagementSystemClient
         }
         #endregion
 
-        public string GetPurchaseDisclaimer()
+        public MeroShareDisclaimerResponse GetPurchaseDisclaimer()
         {
-            var request = new RestRequest("/api/myPurchase/disclaimer/");
-            var response = this.AuthorizedGet<string>(request);
+            // /api/meroShare/disclaimer/
+            var request = new RestRequest("/api/meroShare/disclaimer/");
+            var response = this.AuthorizedGet<MeroShareDisclaimerResponse>(request);
             return response.Data;
         }
     }

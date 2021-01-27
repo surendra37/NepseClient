@@ -140,7 +140,9 @@ namespace NepseApp.ViewModels
                 Boid = _client.Me.Demat;
                 Branch = BankDetails.BranchName;
                 AccountNumber = BankDetails.AccountNumber;
-                Disclaimer = _client.GetPurchaseDisclaimer();
+                var disclaimer = _client.GetPurchaseDisclaimer();
+
+                Disclaimer = disclaimer?.FieldValue;
             }
             else
             {
