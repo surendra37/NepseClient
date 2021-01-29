@@ -7,7 +7,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                
+
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />
 
@@ -19,9 +19,5 @@
                 <ResourceDictionary Source="pack://application:,,,/NepseApp;component/Styles/DashboardViews.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
-        <!--<Style TargetType="TabItem">
-            <Setter Property="Header" Value="{Binding Title}" />
-        </Style>-->
     </Application.Resources>
 </prism:PrismApplication>

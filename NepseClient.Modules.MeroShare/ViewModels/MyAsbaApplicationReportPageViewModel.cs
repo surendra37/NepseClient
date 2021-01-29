@@ -1,14 +1,11 @@
-﻿
-using System;
-
-using NepseApp.Views;
+﻿using System;
 
 using NepseClient.Commons.Contracts;
 using NepseClient.Modules.Commons.Extensions;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Extensions;
-
+using NepseClient.Modules.MeroShare.Views;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 
@@ -17,14 +14,14 @@ using Serilog;
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Responses.MeroShare;
 
-namespace NepseApp.ViewModels
+namespace NepseClient.Modules.MeroShare.ViewModels
 {
-    public class MeroShareAsbaOldApplicationReportPageViewModel : ActiveAwareBindableBase, ITabPage
+    public class MyAsbaApplicationReportPageViewModel : ActiveAwareBindableBase, ITabPage
     {
         private readonly MeroshareClient _client;
         private readonly IDialogService _dialog;
 
-        public string Title { get; } = "Old Application Report";
+        public string Title { get; } = "Application Report";
 
         private ApplicationReportItem[] _items;
         public ApplicationReportItem[] Items
@@ -33,7 +30,7 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public MeroShareAsbaOldApplicationReportPageViewModel(IApplicationCommand appCommand,
+        public MyAsbaApplicationReportPageViewModel(IApplicationCommand appCommand,
             MeroshareClient client, IDialogService dialog) : base(appCommand)
         {
             _client = client;
@@ -45,15 +42,20 @@ namespace NepseApp.ViewModels
             try
             {
                 IsBusy = true;
-                AppCommand.ShowMessage("Getting old application report");
-                Items = _client.GetOldApplicationReport().Object;
+                AppCommand.ShowMessage("Getting application report");
+                Items = _client.GetApplicationReport().Object;
+                if (Items is null)
+                {
+                    _client.IsAuthenticated = false;
+                    Items = _client.GetApplicationReport().Object;
+                }
                 IsBusy = false;
             }
             catch (Exception ex)
             {
                 IsBusy = false;
-                EnqueMessage("Failed to get old application report");
-                Log.Debug(ex, "Failed to get old application report");
+                Log.Debug(ex, "Failed to get application report");
+                EnqueMessage("Failed to get application report");
             }
             AppCommand.HideMessage();
         }
@@ -67,13 +69,13 @@ namespace NepseApp.ViewModels
             try
             {
                 var companyDetails = _client.GetAsbaCompanyDetails(report);
-                var applicantFormDetails = _client.GetOldApplicationReportDetails(report);
+                var applicantFormDetails = _client.GetApplicantFormReportDetail(report);
 
                 var dialogParams = new DialogParameters()
                     .AddShareReport(companyDetails)
                     .AddApplicantFormDetail(applicantFormDetails);
 
-                _dialog.ShowDialog(nameof(ViewAsbaReportDialog), dialogParams, result =>
+                _dialog.ShowDialog(nameof(MyAsbaApplicationReportPage), dialogParams, result =>
                 {
 
                 });
@@ -85,3 +87,4 @@ namespace NepseApp.ViewModels
         }
     }
 }
+

@@ -8,9 +8,9 @@ using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Responses;
 using TradeManagementSystemClient.Models.Responses.MeroShare;
 
-namespace NepseApp.ViewModels
+namespace NepseClient.Modules.MeroShare.ViewModels
 {
-    public class MeroShareApplicationDialogPageViewModel : BindableBase, IDialogAware
+    public class MyAsbaApplicationFormDialogViewModel : BindableBase, IDialogAware
     {
         public event Action<IDialogResult> RequestClose;
         private readonly MeroshareClient _client;
@@ -115,7 +115,7 @@ namespace NepseApp.ViewModels
         }
         #endregion
 
-        public MeroShareApplicationDialogPageViewModel(MeroshareClient client)
+        public MyAsbaApplicationFormDialogViewModel(MeroshareClient client)
         {
             _client = client;
         }

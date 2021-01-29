@@ -10,7 +10,7 @@ using Prism.Regions.Behaviors;
 
 namespace NepseClient.Modules.Commons.Adapters
 {
-    public class TabControlAdapter : RegionAdapterBase<TabControl> 
+    public class TabControlAdapter : RegionAdapterBase<TabControl>
     {
         public TabControlAdapter(IRegionBehaviorFactory regionBehaviorFactory) : base(regionBehaviorFactory)
         {

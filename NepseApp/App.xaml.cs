@@ -7,6 +7,7 @@ using NepseClient.Commons.Contracts;
 using NepseClient.Modules.Commons.Adapters;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.Commons.Views;
 using NepseClient.Modules.MeroShare;
 using NepseClient.Modules.TradeManagementSystem;
 
@@ -46,12 +47,6 @@ namespace NepseApp
 
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
-
-            var regionManager = Container.Resolve<IRegionManager>();
-            // Register tab views
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareApplyForIssuePage));
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareAsbaApplicationReportPage));
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareAsbaOldApplicationReportPage));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -82,12 +77,7 @@ namespace NepseApp
             
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
             containerRegistry.RegisterForNavigation<TmsLiveMarketPage, TmsLiveMarketPageViewModel>();
-            // ASBA
-            containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();
-            containerRegistry.RegisterForNavigation<MeroShareAsbaOldApplicationReportPage, MeroShareAsbaOldApplicationReportPageViewModel>();
-
-            containerRegistry.RegisterDialog<ViewAsbaReportDialog, ViewAsbaReportDialogViewModel>();
-            containerRegistry.RegisterDialog<MeroShareApplicationDialogPage, MeroShareApplicationDialogPageViewModel>();
+            
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -109,7 +99,7 @@ namespace NepseApp
         {
             base.ConfigureRegionAdapterMappings(regionAdapterMappings);
             // old Mapping == Prism.Regions.SelectorRegionAdapter
-            regionAdapterMappings.RegisterMapping(typeof(TabControl), Container.Resolve<TabControlAdapter>());
+            //regionAdapterMappings.RegisterMapping(typeof(TabControl), Container.Resolve<TabControlAdapter>());
         }
     }
 }

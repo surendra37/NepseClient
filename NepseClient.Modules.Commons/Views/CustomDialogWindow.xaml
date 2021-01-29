@@ -1,4 +1,4 @@
-﻿<mde:MaterialWindow x:Class="NepseApp.Views.CustomDialogWindow"
+﻿<mde:MaterialWindow x:Class="NepseClient.Modules.Commons.Views.CustomDialogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{Binding Title}"

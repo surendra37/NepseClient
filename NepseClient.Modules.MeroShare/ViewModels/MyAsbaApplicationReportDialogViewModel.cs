@@ -7,11 +7,11 @@ using Prism.Services.Dialogs;
 
 using TradeManagementSystemClient.Models.Responses.MeroShare;
 
-namespace NepseApp.ViewModels
+namespace NepseClient.Modules.MeroShare.ViewModels
 {
-    public class ViewAsbaReportDialogViewModel : BindableBase, IDialogAware
+    public class MyAsbaApplicationReportDialogViewModel : BindableBase, IDialogAware
     {
-        public string Title { get; set;}
+        public string Title { get; set; }
 
         public event Action<IDialogResult> RequestClose;
 

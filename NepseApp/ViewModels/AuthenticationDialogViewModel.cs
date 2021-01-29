@@ -1,6 +1,5 @@
 ﻿using NepseClient.Commons.Extensions;
 using NepseClient.Modules.MeroShare.Extensions;
-
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -10,7 +9,6 @@ using Serilog;
 using System;
 using System.Security;
 using System.Windows;
-
 using TradeManagementSystemClient.Models.Requests;
 
 namespace NepseApp.ViewModels

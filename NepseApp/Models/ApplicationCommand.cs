@@ -9,7 +9,11 @@ namespace NepseApp.Models
 {
     public class ApplicationCommand : IApplicationCommand
     {
-        public bool RefreshOnActive { get; set; } = true;
+        public bool RefreshOnActive
+        {
+            get => Settings.Default.AutoRefreshOnLoad;
+            set => Settings.Default.AutoRefreshOnLoad = value;
+        }
         public CompositeCommand RefreshCommand { get; } = new CompositeCommand(true);
         public ISnackbarMessageQueue MessageQueue { get; } = new SnackbarMessageQueue();
         public CompositeCommand SnackbarMessageQueueCommand { get; } = new CompositeCommand();

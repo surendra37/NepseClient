@@ -5,6 +5,6 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:const="clr-namespace:NepseClient.Commons.Constants;assembly=NepseClient.Commons">
     <TabControl 
-        prism:RegionManager.RegionName="{x:Static const:RegionNames.MyAsbaTabRegion}"
-        Style="{StaticResource MaterialDesignTabControl}"/>
+        prism:RegionManager.RegionName="{x:Static const:RegionNames.MyAsbaTabRegion}">
+    </TabControl>
 </UserControl>

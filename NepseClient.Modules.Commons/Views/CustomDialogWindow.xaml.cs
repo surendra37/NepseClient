@@ -1,8 +1,7 @@
 ﻿using MaterialDesignExtensions.Controls;
-
 using Prism.Services.Dialogs;
 
-namespace NepseApp.Views
+namespace NepseClient.Modules.Commons.Views
 {
     /// <summary>
     /// Interaction logic for CustomDialogWindow.xaml

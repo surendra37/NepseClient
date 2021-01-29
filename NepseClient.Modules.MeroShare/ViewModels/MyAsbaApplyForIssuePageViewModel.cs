@@ -1,24 +1,21 @@
-﻿using System;
-
-using NepseApp.Views;
-
-using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons.Contracts;
 using NepseClient.Modules.Commons.Extensions;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
-
+using NepseClient.Modules.MeroShare.Views;
 using Prism.Commands;
-using Prism.Regions;
+using Prism.Mvvm;
 using Prism.Services.Dialogs;
-
 using Serilog;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Responses.MeroShare;
 
-namespace NepseApp.ViewModels
+namespace NepseClient.Modules.MeroShare.ViewModels
 {
-    public class MeroShareApplyForIssuePageViewModel : ActiveAwareBindableBase, ITabPage, IConfirmNavigationRequest
+    public class MyAsbaApplyForIssuePageViewModel : ActiveAwareBindableBase, ITabPage
     {
         private readonly MeroshareClient _client;
         private readonly IDialogService _dialog;
@@ -32,7 +29,7 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public MeroShareApplyForIssuePageViewModel(IApplicationCommand appCommand,
+        public MyAsbaApplyForIssuePageViewModel(IApplicationCommand appCommand,
             MeroshareClient client, IDialogService dialog) : base(appCommand)
         {
             _client = client;
@@ -69,7 +66,7 @@ namespace NepseApp.ViewModels
 
             if (!isApply) return;
 
-            _dialog.ShowDialog(nameof(MeroShareApplicationDialogPage), new DialogParameters
+            _dialog.ShowDialog(nameof(MyAsbaApplicationFormDialog), new DialogParameters
             {
                 { "ShareInfo", item}
             }, result =>
@@ -79,26 +76,6 @@ namespace NepseApp.ViewModels
                     RefreshCommand.Execute();
                 }
             });
-        }
-
-        public void ConfirmNavigationRequest(NavigationContext navigationContext, Action<bool> continuationCallback)
-        {
-         continuationCallback(true);   
-        }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-           return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-            
         }
     }
 }

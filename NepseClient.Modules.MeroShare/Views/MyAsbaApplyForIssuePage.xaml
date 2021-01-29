@@ -1,9 +1,15 @@
-﻿<UserControl x:Class="NepseApp.Views.MeroShareAsbaApplicationReportPage"
+﻿<UserControl x:Class="NepseClient.Modules.MeroShare.Views.MyAsbaApplyForIssuePage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:prism="http://prismlibrary.com/"                  
-             xmlns:behaviors="clr-namespace:NepseClient.Modules.Commons.Behaviors;assembly=NepseClient.Modules.Commons"
+             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:behaviors="clr-namespace:NepseClient.Modules.Commons.Behaviors;assembly=NepseClient.Modules.Commons" 
+             xmlns:converters="clr-namespace:NepseClient.Modules.Commons.Converters;assembly=NepseClient.Modules.Commons"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <converters:IntToVisibilityConverter x:Key="ivc" />
+        <converters:IntToInverseVisibilityConverter x:Key="iivc" />
+        <converters:MeroShareAsbaVisibility x:Key="asbac" />
+    </UserControl.Resources>
     <DataGrid ItemsSource="{Binding Items}"
               AutoGenerateColumns="False" IsReadOnly="True"
               behaviors:DataGridBehavior.DisplayRowNumber="True" 
@@ -17,11 +23,11 @@
             <DataGridTemplateColumn Header="Actions">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock>
-                            <Hyperlink  
-                                Command="{Binding DataContext.ViewReportCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                        <TextBlock Visibility="{Binding Action, Converter={StaticResource asbac}}">
+                            <Hyperlink 
+                                Command="{Binding DataContext.ApplyCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                 CommandParameter="{Binding .}">
-                                <TextBlock Text="Report"/>
+                                <TextBlock Text="{Binding Action}" />
                             </Hyperlink>
                         </TextBlock>
                     </DataTemplate>
