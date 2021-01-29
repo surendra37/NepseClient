@@ -6,6 +6,7 @@ using NepseClient.Modules.Commons.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Adapters;
@@ -35,14 +36,14 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             _client = client;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Loading portfolio...");
-                var portfolios = _client.GetMyPortfolios();
-                var waccDict = _client.ReadWaccFromFile().ToDictionary(x => x.ScripName);
+                var portfolios = await Task.Run(() => _client.GetMyPortfolios());
+                var waccDict = await Task.Run(() =>_client.ReadWaccFromFile().ToDictionary(x => x.ScripName));
                 var newItems = portfolios.MeroShareMyPortfolio
                     .Select(x => new MeroSharePortfolioAdapter(x, waccDict))
                     .ToArray();

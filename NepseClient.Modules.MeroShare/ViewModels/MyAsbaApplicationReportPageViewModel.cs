@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using NepseClient.Commons.Contracts;
 using NepseClient.Modules.Commons.Extensions;
@@ -6,6 +7,7 @@ using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Extensions;
 using NepseClient.Modules.MeroShare.Views;
+
 using Prism.Commands;
 using Prism.Services.Dialogs;
 
@@ -37,17 +39,17 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             _dialog = dialog;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Getting application report");
-                Items = _client.GetApplicationReport().Object;
+                Items = await Task.Run(() => _client.GetApplicationReport().Object);
                 if (Items is null)
                 {
                     _client.IsAuthenticated = false;
-                    Items = _client.GetApplicationReport().Object;
+                    Items = await Task.Run(() => _client.GetApplicationReport().Object);
                 }
                 IsBusy = false;
             }
@@ -64,12 +66,13 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         public DelegateCommand<ApplicationReportItem> ViewReportCommand =>
             _viewReportCommand ?? (_viewReportCommand = new DelegateCommand<ApplicationReportItem>(ExecuteViewReportCommand));
 
-        void ExecuteViewReportCommand(ApplicationReportItem report)
+        async void ExecuteViewReportCommand(ApplicationReportItem report)
         {
             try
             {
-                var companyDetails = _client.GetAsbaCompanyDetails(report);
-                var applicantFormDetails = _client.GetApplicantFormReportDetail(report);
+                AppCommand.ShowMessage("Getting application report");
+                var companyDetails = await Task.Run(() =>_client.GetAsbaCompanyDetails(report));
+                var applicantFormDetails = await Task.Run(() =>_client.GetApplicantFormReportDetail(report));
 
                 var dialogParams = new DialogParameters()
                     .AddShareReport(companyDetails)
@@ -84,6 +87,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             {
                 LogErrorAndEnqueMessage(ex, "Failed to view report");
             }
+            AppCommand.HideMessage();
         }
     }
 }

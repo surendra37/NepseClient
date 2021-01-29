@@ -10,6 +10,8 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Responses.MeroShare;
 
@@ -36,13 +38,13 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             _dialog = dialog;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 AppCommand.ShowMessage("Getting applicable issues");
                 IsBusy = true;
-                Items = _client.GetApplicableIssues().Object;
+                Items = await Task.Run(() => _client.GetApplicableIssues().Object);
                 IsBusy = false;
             }
             catch (Exception ex)

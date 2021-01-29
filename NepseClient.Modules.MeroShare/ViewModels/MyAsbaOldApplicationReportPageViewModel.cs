@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using NepseClient.Commons.Contracts;
 using NepseClient.Modules.Commons.Extensions;
@@ -37,13 +38,13 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             _dialog = dialog;
         }
 
-        public override void ExecuteRefreshCommand()
+        public override async void ExecuteRefreshCommand()
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Getting old application report");
-                Items = _client.GetOldApplicationReport().Object;
+                Items = await Task.Run(() =>_client.GetOldApplicationReport().Object);
                 IsBusy = false;
             }
             catch (Exception ex)
@@ -59,12 +60,13 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         public DelegateCommand<ApplicationReportItem> ViewReportCommand =>
             _viewReportCommand ?? (_viewReportCommand = new DelegateCommand<ApplicationReportItem>(ExecuteViewReportCommand));
 
-        void ExecuteViewReportCommand(ApplicationReportItem report)
+        async void ExecuteViewReportCommand(ApplicationReportItem report)
         {
             try
             {
-                var companyDetails = _client.GetAsbaCompanyDetails(report);
-                var applicantFormDetails = _client.GetOldApplicationReportDetails(report);
+                AppCommand.ShowMessage("Getting application report");
+                var companyDetails = await Task.Run(() =>_client.GetAsbaCompanyDetails(report));
+                var applicantFormDetails = await Task.Run(() =>_client.GetOldApplicationReportDetails(report));
 
                 var dialogParams = new DialogParameters()
                     .AddShareReport(companyDetails)
@@ -79,6 +81,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             {
                 LogErrorAndEnqueMessage(ex, "Failed to view report");
             }
+            AppCommand.HideMessage();
         }
     }
 }
