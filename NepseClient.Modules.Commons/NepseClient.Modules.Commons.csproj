@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>NepseClient.Modules.Commons</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
+    <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+  </ItemGroup>
+</Project>

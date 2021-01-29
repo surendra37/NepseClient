@@ -19,5 +19,9 @@
                 <ResourceDictionary Source="pack://application:,,,/NepseApp;component/Styles/DashboardViews.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+
+        <!--<Style TargetType="TabItem">
+            <Setter Property="Header" Value="{Binding Title}" />
+        </Style>-->
     </Application.Resources>
 </prism:PrismApplication>

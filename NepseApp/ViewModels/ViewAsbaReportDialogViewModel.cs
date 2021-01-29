@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using NepseApp.Extensions;
+using NepseClient.Modules.MeroShare.Extensions;
 
-using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 

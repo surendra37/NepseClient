@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="NepseClient.Modules.TradeManagementSystem.Views.TopSecuritiesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:const="clr-namespace:NepseClient.Commons.Constants;assembly=NepseClient.Commons">
+    <TabControl prism:RegionManager.RegionName="{x:Static const:RegionNames.TopSecuritiesRegion}" 
+                Style="{StaticResource MaterialDesignTabControl}"/>
+</UserControl>

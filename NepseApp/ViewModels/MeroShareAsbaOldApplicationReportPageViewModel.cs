@@ -1,9 +1,13 @@
 ﻿
 using System;
 
-using NepseApp.Extensions;
-using NepseApp.Models;
 using NepseApp.Views;
+
+using NepseClient.Commons.Contracts;
+using NepseClient.Modules.Commons.Extensions;
+using NepseClient.Modules.Commons.Interfaces;
+using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.MeroShare.Extensions;
 
 using Prism.Commands;
 using Prism.Services.Dialogs;
@@ -15,10 +19,13 @@ using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace NepseApp.ViewModels
 {
-    public class MeroShareAsbaOldApplicationReportPageViewModel : ActiveAwareBindableBase
+    public class MeroShareAsbaOldApplicationReportPageViewModel : ActiveAwareBindableBase, ITabPage
     {
         private readonly MeroshareClient _client;
         private readonly IDialogService _dialog;
+
+        public string Title { get; } = "Old Application Report";
+
         private ApplicationReportItem[] _items;
         public ApplicationReportItem[] Items
         {
@@ -26,7 +33,7 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public MeroShareAsbaOldApplicationReportPageViewModel(IApplicationCommand appCommand, 
+        public MeroShareAsbaOldApplicationReportPageViewModel(IApplicationCommand appCommand,
             MeroshareClient client, IDialogService dialog) : base(appCommand)
         {
             _client = client;

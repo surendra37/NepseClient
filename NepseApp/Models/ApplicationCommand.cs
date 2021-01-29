@@ -1,4 +1,7 @@
 ﻿using MaterialDesignThemes.Wpf;
+
+using NepseClient.Modules.Commons.Interfaces;
+
 using Prism.Commands;
 using System;
 

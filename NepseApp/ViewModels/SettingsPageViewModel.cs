@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Windows;
 
-using NepseApp.Models;
 using NepseApp.Views;
+
+using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.MeroShare.Views;
 
 using Prism.Commands;
 using Prism.Mvvm;
@@ -43,7 +45,7 @@ namespace NepseApp.ViewModels
             var pageItems = new List<SelectedTabItem>
             {
                 new SelectedTabItem { ViewName = nameof(PortfolioPage), DisplayName = "Portfolio" },
-                new SelectedTabItem { ViewName = nameof(MeroShareAsbaPage), DisplayName = "My ASBA" },
+                new SelectedTabItem { ViewName = nameof(AsbaPage), DisplayName = "My ASBA" },
                 new SelectedTabItem { ViewName = nameof(TmsLiveMarketPage), DisplayName = "Live Market" },
                 new SelectedTabItem { ViewName = nameof(SettingsPage), DisplayName = "Settings" },
             };

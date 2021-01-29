@@ -2,12 +2,14 @@
 
 using MaterialDesignThemes.Wpf;
 
-using NepseApp.Extensions;
-using NepseApp.Models;
 using NepseApp.Views;
 
-using NepseClient.Commons;
+using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Modules.Commons.Interfaces;
+using NepseClient.Modules.MeroShare.Extensions;
+using NepseClient.Modules.MeroShare.Views;
+using NepseClient.Modules.TradeManagementSystem.Views;
 
 using Newtonsoft.Json;
 
@@ -21,7 +23,6 @@ using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Authentication;
 
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Requests;
@@ -57,7 +58,7 @@ namespace NepseApp.ViewModels
 
         private object UpdateNavigationSelection(string source)
         {
-            _regionManager.RequestNavigate("ContentRegion", source);
+            _regionManager.RequestNavigate(RegionNames.ContentRegion, source);
             //Settings.Default.SelectedTab = source;
             //Settings.Default.Save();
             return null;
@@ -93,8 +94,8 @@ namespace NepseApp.ViewModels
             {
                 Label = "My ASBA",
                 Icon = PackIconKind.Web,
-                IsSelected = selectedTab.Equals(nameof(MeroShareAsbaPage)),
-                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(MeroShareAsbaPage))
+                IsSelected = selectedTab.Equals(nameof(AsbaPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(AsbaPage))
             };
             yield return new FirstLevelNavigationItem()
             {
@@ -102,6 +103,14 @@ namespace NepseApp.ViewModels
                 Icon = PackIconKind.XboxLive,
                 IsSelected = selectedTab.Equals(nameof(TmsLiveMarketPage)),
                 NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(TmsLiveMarketPage))
+            };
+
+            yield return new FirstLevelNavigationItem()
+            {
+                Label = "Live",
+                Icon = PackIconKind.ArrowTop,
+                IsSelected = selectedTab.Equals(nameof(TopSecuritiesPage)),
+                NavigationItemSelectedCallback = _ => UpdateNavigationSelection(nameof(AsbaPage))
             };
 
             yield return new FirstLevelNavigationItem()
@@ -149,7 +158,7 @@ namespace NepseApp.ViewModels
                 var myShares = _meroshareClient.GetMyShares();
                 var waccs = _meroshareClient.GetWaccs(myShares).ToArray();
 
-                var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
+                var path = Path.Combine(PathConstants.AppDataPath.Value, "wacc.json");
                 File.WriteAllText(path, JsonConvert.SerializeObject(waccs));
                 MessageQueue.Enqueue("Wacc imported.");
                 IsImporting = false;

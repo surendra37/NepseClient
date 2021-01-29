@@ -2,10 +2,16 @@
 using NepseApp.ViewModels;
 using NepseApp.Views;
 
-using NepseClient.Commons;
+using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Modules.Commons.Adapters;
+using NepseClient.Modules.Commons.Interfaces;
+using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.MeroShare;
+using NepseClient.Modules.TradeManagementSystem;
 
 using Prism.Ioc;
+using Prism.Modularity;
 using Prism.Regions;
 
 using Serilog;
@@ -13,6 +19,7 @@ using Serilog.Formatting.Compact;
 
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 using TradeManagementSystemClient;
@@ -26,7 +33,7 @@ namespace NepseApp
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            var logPath = Path.Combine(Constants.AppDataPath.Value, "Logs", "log-.jl");
+            var logPath = Path.Combine(PathConstants.AppDataPath.Value, "Logs", "log-.jl");
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
 #if DEBUG
@@ -40,8 +47,11 @@ namespace NepseApp
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
 
-            var regionManager = Container.Resolve<IRegionManager>();            
-            regionManager.RegisterViewWithRegion("AsbaRegion", typeof(MeroShareApplyForIssuePage));
+            var regionManager = Container.Resolve<IRegionManager>();
+            // Register tab views
+            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareApplyForIssuePage));
+            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareAsbaApplicationReportPage));
+            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MeroShareAsbaOldApplicationReportPage));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -60,6 +70,8 @@ namespace NepseApp
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterDialogWindow<CustomDialogWindow>();
+
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
             containerRegistry.RegisterSingleton<MeroshareClient>();
@@ -67,16 +79,23 @@ namespace NepseApp
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 
-            containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
+            
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
             containerRegistry.RegisterForNavigation<TmsLiveMarketPage, TmsLiveMarketPageViewModel>();
             // ASBA
-            containerRegistry.RegisterForNavigation<MeroShareAsbaPage, MeroShareAsbaPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaApplicationReportPage, MeroShareAsbaApplicationReportPageViewModel>();
             containerRegistry.RegisterForNavigation<MeroShareAsbaOldApplicationReportPage, MeroShareAsbaOldApplicationReportPageViewModel>();
 
             containerRegistry.RegisterDialog<ViewAsbaReportDialog, ViewAsbaReportDialogViewModel>();
             containerRegistry.RegisterDialog<MeroShareApplicationDialogPage, MeroShareApplicationDialogPageViewModel>();
+        }
+
+        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
+        {
+            base.ConfigureModuleCatalog(moduleCatalog);
+
+            moduleCatalog.AddModule<MeroShareModule>();
+            moduleCatalog.AddModule<TradeManagementSystemModule>();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -85,6 +104,12 @@ namespace NepseApp
             Container.Resolve<MeroshareClient>().Dispose();
             Log.CloseAndFlush();
             base.OnExit(e);
+        }
+        protected override void ConfigureRegionAdapterMappings(RegionAdapterMappings regionAdapterMappings)
+        {
+            base.ConfigureRegionAdapterMappings(regionAdapterMappings);
+            // old Mapping == Prism.Regions.SelectorRegionAdapter
+            regionAdapterMappings.RegisterMapping(typeof(TabControl), Container.Resolve<TabControlAdapter>());
         }
     }
 }

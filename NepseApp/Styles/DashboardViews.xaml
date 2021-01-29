@@ -1,6 +1,5 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:NepseApp.Styles">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <GridView x:Key="IndexWatchGridView">
         <GridViewColumn Header="Index Code" DisplayMemberBinding="{Binding IndexCode}" />
         <GridViewColumn Header="Index Value" DisplayMemberBinding="{Binding IndexValue, StringFormat=N2}" />
@@ -36,4 +35,7 @@
         <GridViewColumn Header="%Change" DisplayMemberBinding="{Binding PerChange, StringFormat=N2}"/>
         <GridViewColumn Header="P. Closing" DisplayMemberBinding="{Binding PrevClosePrice, StringFormat=N2}"/>
     </GridView>
+    <Style TargetType="TabItem">
+        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+    </Style>
 </ResourceDictionary>

@@ -1,4 +1,5 @@
 ﻿using NepseClient.Commons;
+using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
@@ -30,8 +31,8 @@ namespace TradeManagementSystemClient
 {
     public class TmsClient : IAuthorizable, IDisposable
     {
-        private readonly string _cookiPath = Path.Combine(Constants.AppDataPath.Value, "tms-cookies.dat");
-        private readonly string _dataPath = Path.Combine(Constants.AppDataPath.Value, "tms-data.dat");
+        private readonly string _cookiPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-cookies.dat");
+        private readonly string _dataPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-data.dat");
 
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
@@ -66,7 +67,7 @@ namespace TradeManagementSystemClient
             Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
             AuthData = AuthenticationDataResponse.NewInstance(_dataPath);
             IsAuthenticated = AuthData is not null;
-            
+
             Client.Authenticator = GetAuthenticator(AuthData);
         }
         private void SaveSession()
@@ -178,6 +179,45 @@ namespace TradeManagementSystemClient
             }
             var data = this.AuthorizedGet<GraphDataResponse[]>(request);
             return data.Data;
+        }
+        #endregion
+
+        #region Top
+        public TopGainerResponse[] GetTopGainers(int count = 10)
+        {
+            var api = new RestRequest($"/tmsapi/stock/top/gainer/{count}");
+
+            var response= this.AuthorizedGet<TopGainerResponse[]>(api);
+            return response.Data;
+        }
+        public TopGainerResponse[] GetTopLosers(int count = 8)
+        {
+            var api = new RestRequest($"/tmsapi/stock/top/loser/{count}");
+
+            var response= this.AuthorizedGet<TopGainerResponse[]>(api);
+            return response.Data;
+        }
+
+        public TopTurnoverResponse[] GetTopTurnover(int count = 9)
+        {
+            var api = new RestRequest($"/tmsapi/stock/top-securities/turnover/{count}");
+
+            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
+            return response.Data;
+        }
+        public TopTurnoverResponse[] GetTopTransaction(int count = 9)
+        {
+            var api = new RestRequest($"/tmsapi/stock/top-securities/transaction/{count}");
+
+            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
+            return response.Data;
+        }
+        public TopTurnoverResponse[] GetTopVolume(int count = 9)
+        {
+            var api = new RestRequest($"/tmsapi/stock/top-securities/volume/{count}");
+
+            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
+            return response.Data;
         }
         #endregion
     }

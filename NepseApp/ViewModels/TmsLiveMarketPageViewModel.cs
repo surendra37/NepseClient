@@ -1,4 +1,5 @@
-﻿using NepseApp.Models;
+﻿using NepseClient.Modules.Commons.Interfaces;
+using NepseClient.Modules.Commons.Models;
 
 using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Responses.Tms;

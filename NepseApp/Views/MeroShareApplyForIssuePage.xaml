@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"          
-             xmlns:behaviors="clr-namespace:NepseApp.Behaviors"   
-             xmlns:converters="clr-namespace:NepseApp.Converters"
+             xmlns:behaviors="clr-namespace:NepseClient.Modules.Commons.Behaviors;assembly=NepseClient.Modules.Commons" 
+             xmlns:converters="clr-namespace:NepseClient.Modules.Commons.Converters;assembly=NepseClient.Modules.Commons"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <converters:IntToVisibilityConverter x:Key="ivc" />

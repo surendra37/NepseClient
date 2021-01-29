@@ -1,4 +1,5 @@
 ﻿using NepseClient.Commons;
+using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
 
 using Newtonsoft.Json;
@@ -244,7 +245,7 @@ namespace TradeManagementSystemClient
 
         public MeroshareViewMyPurchaseResponse[] ReadWaccFromFile()
         {
-            var path = Path.Combine(Constants.AppDataPath.Value, "wacc.json");
+            var path = Path.Combine(PathConstants.AppDataPath.Value, "wacc.json");
             if (!File.Exists(path))
             {
                 var output = GetWaccs(GetMyShares()).ToArray();

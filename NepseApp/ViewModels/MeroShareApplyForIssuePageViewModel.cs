@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using NepseApp.Extensions;
-using NepseApp.Models;
 using NepseApp.Views;
 
+using NepseClient.Commons.Contracts;
+using NepseClient.Modules.Commons.Extensions;
+using NepseClient.Modules.Commons.Interfaces;
+using NepseClient.Modules.Commons.Models;
+
 using Prism.Commands;
-using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 
 using Serilog;
@@ -17,10 +18,13 @@ using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace NepseApp.ViewModels
 {
-    public class MeroShareApplyForIssuePageViewModel : ActiveAwareBindableBase
+    public class MeroShareApplyForIssuePageViewModel : ActiveAwareBindableBase, ITabPage, IConfirmNavigationRequest
     {
         private readonly MeroshareClient _client;
         private readonly IDialogService _dialog;
+
+        public string Title { get; } = "Apply For Issue";
+
         private ApplicationReportItem[] _items;
         public ApplicationReportItem[] Items
         {
@@ -63,7 +67,7 @@ namespace NepseApp.ViewModels
 
             var isApply = item.Action.Equals("apply", StringComparison.OrdinalIgnoreCase);
 
-            if(!isApply) return;
+            if (!isApply) return;
 
             _dialog.ShowDialog(nameof(MeroShareApplicationDialogPage), new DialogParameters
             {
@@ -75,6 +79,26 @@ namespace NepseApp.ViewModels
                     RefreshCommand.Execute();
                 }
             });
+        }
+
+        public void ConfirmNavigationRequest(NavigationContext navigationContext, Action<bool> continuationCallback)
+        {
+         continuationCallback(true);   
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+           return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            
         }
     }
 }

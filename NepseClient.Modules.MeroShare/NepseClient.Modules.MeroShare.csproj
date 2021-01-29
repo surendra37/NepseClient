@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>NepseClient.Modules.MeroShare</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Prism.Wpf" Version="8.0.0.1909" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+    <ProjectReference Include="..\NepseClient.Modules.Commons\NepseClient.Modules.Commons.csproj" />
+    <ProjectReference Include="..\TradeManagementSystemClient\TradeManagementSystemClient.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\PortfolioPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\PortfolioPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+</Project>

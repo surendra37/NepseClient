@@ -1,8 +1,5 @@
-﻿
-using NepseApp.Extensions;
-
-using NepseClient.Commons.Contracts;
-using NepseClient.Commons.Extensions;
+﻿using NepseClient.Commons.Extensions;
+using NepseClient.Modules.MeroShare.Extensions;
 
 using Prism.Commands;
 using Prism.Mvvm;
@@ -14,7 +11,6 @@ using System;
 using System.Security;
 using System.Windows;
 
-using TradeManagementSystemClient;
 using TradeManagementSystemClient.Models.Requests;
 
 namespace NepseApp.ViewModels

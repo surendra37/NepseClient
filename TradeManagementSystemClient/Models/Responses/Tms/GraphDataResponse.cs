@@ -15,4 +15,41 @@
         public int? Volume { get; set; }
         public string Date { get; set; }
     }
+    public class TopGainerResponse
+    {
+        public string Symbol { get; set; }
+        public double Ltp { get; set; }
+        public double PointChange { get; set; }
+        public double PerChange { get; set; }
+        public string SecurityName { get; set; }
+    }
+    public class TopTurnoverResponse
+    {
+        public string SecuritySymbol { get; set; }
+        public string SecurityName { get; set; }
+        public double TotalTurnover { get; set; }
+        public int Volume { get; set; }
+        public int TotalTransaction { get; set; }
+        public double LastTradePrice { get; set; }
+        public double PerChange { get; set; }
+        public double PrevClosePrice { get; set; }
+    }
+
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    public class TopVolume    {
+        public string SecuritySymbol { get; set; } 
+        public string SecurityName { get; set; } 
+        public double TotalTurnover { get; set; } 
+        public int Volume { get; set; } 
+        public int TotalTransaction { get; set; } 
+        public double LastTradePrice { get; set; } 
+        public double PerChange { get; set; } 
+        public double PrevClosePrice { get; set; } 
+    }
+
+
+
+
+
+
 }
