@@ -4,6 +4,8 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.TradeManagementSystem;
 using NepseClient.Modules.Commons.Adapters;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
@@ -22,8 +24,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-
-using TradeManagementSystemClient;
 
 namespace NepseApp
 {

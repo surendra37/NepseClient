@@ -6,6 +6,10 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Models.Requests;
+using NepseClient.Libraries.TradeManagementSystem;
+using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.MeroShare.Extensions;
 using NepseClient.Modules.MeroShare.Views;
@@ -23,9 +27,6 @@ using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Requests;
 
 namespace NepseApp.ViewModels
 {

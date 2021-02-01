@@ -42,7 +42,6 @@
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
     <ProjectReference Include="..\NepseClient.Modules.MeroShare\NepseClient.Modules.MeroShare.csproj" />
     <ProjectReference Include="..\NepseClient.Modules.TradeManagementSystem\NepseClient.Modules.TradeManagementSystem.csproj" />
-    <ProjectReference Include="..\TradeManagementSystemClient\TradeManagementSystemClient.csproj" />
   </ItemGroup>
   <ItemGroup>
     <SplashScreen Include="splash.jpg" />

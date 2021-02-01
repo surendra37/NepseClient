@@ -1,4 +1,6 @@
 ﻿using NepseClient.Commons.Contracts;
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Adapters;
 using NepseClient.Modules.Commons.Extensions;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
@@ -7,9 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Adapters;
 
 namespace NepseClient.Modules.MeroShare.ViewModels
 {

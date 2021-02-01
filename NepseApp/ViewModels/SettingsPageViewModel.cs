@@ -4,6 +4,8 @@ using System.Windows;
 
 using NepseApp.Views;
 
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Models.Responses;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Views;
 
@@ -11,9 +13,6 @@ using Prism.Commands;
 using Prism.Mvvm;
 
 using Serilog;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Responses;
 
 namespace NepseApp.ViewModels
 {

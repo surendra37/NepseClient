@@ -1,11 +1,10 @@
 ﻿using System;
 
+using NepseClient.Libraries.MeroShare.Models.Responses;
 using NepseClient.Modules.MeroShare.Extensions;
 
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-
-using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace NepseClient.Modules.MeroShare.ViewModels
 {

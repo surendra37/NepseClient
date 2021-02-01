@@ -1,7 +1,6 @@
-﻿
-using Prism.Services.Dialogs;
+﻿using NepseClient.Libraries.MeroShare.Models.Responses;
 
-using TradeManagementSystemClient.Models.Responses.MeroShare;
+using Prism.Services.Dialogs;
 
 namespace NepseClient.Modules.MeroShare.Extensions
 {

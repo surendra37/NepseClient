@@ -2,18 +2,18 @@
 using System.Threading.Tasks;
 
 using NepseClient.Commons.Contracts;
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Models.Responses;
 using NepseClient.Modules.Commons.Extensions;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Extensions;
 using NepseClient.Modules.MeroShare.Views;
+
 using Prism.Commands;
 using Prism.Services.Dialogs;
 
 using Serilog;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace NepseClient.Modules.MeroShare.ViewModels
 {

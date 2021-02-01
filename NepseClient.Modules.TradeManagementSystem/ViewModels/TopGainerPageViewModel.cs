@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
+﻿using NepseClient.Libraries.TradeManagementSystem;
+using NepseClient.Libraries.TradeManagementSystem.Models.Responses;
 
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Responses.Tms;
+using Prism.Mvvm;
 
 namespace NepseClient.Modules.TradeManagementSystem.ViewModels
 {

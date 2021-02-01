@@ -9,6 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
-    <ProjectReference Include="..\TradeManagementSystemClient\TradeManagementSystemClient.csproj" />
+    <ProjectReference Include="..\NepseClient.Libraries.TradeManagementSystem\NepseClient.Libraries.TradeManagementSystem.csproj" />
   </ItemGroup>
 </Project>

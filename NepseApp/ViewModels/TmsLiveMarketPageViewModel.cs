@@ -1,8 +1,7 @@
-﻿using NepseClient.Modules.Commons.Interfaces;
+﻿using NepseClient.Libraries.TradeManagementSystem;
+using NepseClient.Libraries.TradeManagementSystem.Models.Responses;
+using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Responses.Tms;
 
 namespace NepseApp.ViewModels
 {

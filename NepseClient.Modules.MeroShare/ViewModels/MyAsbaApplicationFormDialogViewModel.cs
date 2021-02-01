@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 
+using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Models.Responses;
+
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-
-using TradeManagementSystemClient;
-using TradeManagementSystemClient.Models.Responses;
-using TradeManagementSystemClient.Models.Responses.MeroShare;
 
 namespace NepseClient.Modules.MeroShare.ViewModels
 {
