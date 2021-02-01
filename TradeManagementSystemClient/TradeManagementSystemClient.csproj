@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+    <ProjectReference Include="..\NepseClient.Libraries.MeroShare\NepseClient.Libraries.MeroShare.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Interfaces\" />

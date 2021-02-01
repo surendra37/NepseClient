@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Modules.MeroSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Modules.Commons", "NepseClient.Modules.Commons\NepseClient.Modules.Commons.csproj", "{0227A9B8-2999-4333-9984-406367FD4BE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseClient.Libraries.MeroShare", "NepseClient.Libraries.MeroShare\NepseClient.Libraries.MeroShare.csproj", "{0539252E-EA4B-41F5-BA0E-9CE205DA5022}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Libraries.MeroShare", "NepseClient.Libraries.MeroShare\NepseClient.Libraries.MeroShare.csproj", "{0539252E-EA4B-41F5-BA0E-9CE205DA5022}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
