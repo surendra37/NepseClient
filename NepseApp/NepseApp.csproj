@@ -40,7 +40,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+    <ProjectReference Include="..\NepseClient.Libraries.MeroShare\NepseClient.Libraries.MeroShare.csproj" />
+    <ProjectReference Include="..\NepseClient.Libraries.TradeManagementSystem\NepseClient.Libraries.TradeManagementSystem.csproj" />
+    <ProjectReference Include="..\NepseClient.Modules.Commons\NepseClient.Modules.Commons.csproj" />
     <ProjectReference Include="..\NepseClient.Modules.MeroShare\NepseClient.Modules.MeroShare.csproj" />
+    <ProjectReference Include="..\NepseClient.Modules.Stocks\NepseClient.Modules.Stocks.csproj" />
     <ProjectReference Include="..\NepseClient.Modules.TradeManagementSystem\NepseClient.Modules.TradeManagementSystem.csproj" />
   </ItemGroup>
   <ItemGroup>

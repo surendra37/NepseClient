@@ -4,14 +4,8 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
-using NepseClient.Libraries.MeroShare;
-using NepseClient.Libraries.TradeManagementSystem;
-using NepseClient.Modules.Commons.Adapters;
 using NepseClient.Modules.Commons.Interfaces;
-using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.Commons.Views;
-using NepseClient.Modules.MeroShare;
-using NepseClient.Modules.TradeManagementSystem;
 
 using Prism.Ioc;
 using Prism.Modularity;
@@ -22,7 +16,6 @@ using Serilog.Formatting.Compact;
 
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace NepseApp
@@ -69,8 +62,8 @@ namespace NepseApp
 
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
-            containerRegistry.RegisterSingleton<MeroshareClient>();
-            containerRegistry.RegisterSingleton<TmsClient>();
+            //containerRegistry.RegisterSingleton<MeroshareClient>();
+            //containerRegistry.RegisterSingleton<TmsClient>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 
@@ -84,14 +77,16 @@ namespace NepseApp
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            moduleCatalog.AddModule<MeroShareModule>();
-            moduleCatalog.AddModule<TradeManagementSystemModule>();
+            moduleCatalog.AddModule<NepseClient.Modules.Stocks.StocksModule>();
+
+            //moduleCatalog.AddModule<MeroShareModule>();
+            //moduleCatalog.AddModule<TradeManagementSystemModule>();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Container.Resolve<TmsClient>().Dispose();
-            Container.Resolve<MeroshareClient>().Dispose();
+            //Container.Resolve<TmsClient>().Dispose();
+            //Container.Resolve<MeroshareClient>().Dispose();
             Log.CloseAndFlush();
             base.OnExit(e);
         }

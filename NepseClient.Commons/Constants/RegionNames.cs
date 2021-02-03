@@ -6,5 +6,6 @@
         public static string MyAsbaTabRegion { get; } = "MyAsabTabRegion";
 
         public static string TopSecuritiesRegion { get; } = "TopSecuritiesRegion";
+        public static string StocksRegion { get; } = "StocksRegion";
     }
 }

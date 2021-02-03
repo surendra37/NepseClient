@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="pack://application:,,,/NepseApp;component/Styles/SettingsItemStyles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/NepseApp;component/Styles/NepseAppConverters.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/NepseApp;component/Styles/DashboardViews.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/NepseClient.Modules.Stocks;component/Styles/ContentStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

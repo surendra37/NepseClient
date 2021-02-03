@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Modules.Commons
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Libraries.MeroShare", "NepseClient.Libraries.MeroShare\NepseClient.Libraries.MeroShare.csproj", "{0539252E-EA4B-41F5-BA0E-9CE205DA5022}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseClient.Modules.Stocks", "NepseClient.Modules.Stocks\NepseClient.Modules.Stocks.csproj", "{63E42FC2-E392-474A-AE24-3B30D75B03C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,18 @@ Global
 		{0539252E-EA4B-41F5-BA0E-9CE205DA5022}.Release|x64.Build.0 = Release|Any CPU
 		{0539252E-EA4B-41F5-BA0E-9CE205DA5022}.Release|x86.ActiveCfg = Release|Any CPU
 		{0539252E-EA4B-41F5-BA0E-9CE205DA5022}.Release|x86.Build.0 = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|x64.Build.0 = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +157,7 @@ Global
 		{C35DB76C-8B98-4441-A6A4-5301E6A92974} = {76ABE260-40F4-4E7B-8564-2A4C21C1AC85}
 		{0227A9B8-2999-4333-9984-406367FD4BE2} = {76ABE260-40F4-4E7B-8564-2A4C21C1AC85}
 		{0539252E-EA4B-41F5-BA0E-9CE205DA5022} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+		{63E42FC2-E392-474A-AE24-3B30D75B03C5} = {76ABE260-40F4-4E7B-8564-2A4C21C1AC85}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFFE650E-64D7-44A4-9E1E-A2C6B6A730E0}

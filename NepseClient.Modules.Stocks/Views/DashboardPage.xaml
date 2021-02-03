@@ -1,0 +1,84 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.Stocks.Views.DashboardPage"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             av:DesignHeight="154.333"
+             xmlns:const="clr-namespace:NepseClient.Commons.Constants;assembly=NepseClient.Commons">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Menu IsMainMenu="True">
+            <MenuItem Header="View">
+                <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" Icon="{materialDesign:PackIcon Kind=Refresh}"/>
+                <Separator />
+                <MenuItem Header="Price change" IsCheckable="True" IsChecked="{Binding IsPriceChangedSelected}"/>
+                <MenuItem Header="Percentage change" IsCheckable="True" IsChecked="{Binding IsPercentageChangedSelected}"/>
+                <MenuItem Header="Market Cap" IsCheckable="True" IsChecked="{Binding IsMarketCapSelected}"/>
+            </MenuItem>
+        </Menu>        
+        
+        <Grid Grid.Row="1" Background="LightGray">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <materialDesign:ColorZone
+                Mode="Standard"
+                Padding="8 4 8 4"
+                CornerRadius="2"
+                Panel.ZIndex="1"
+                Margin="4"
+                materialDesign:ShadowAssist.ShadowDepth="Depth1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Style="{DynamicResource MaterialDesignToolButton}">
+                        <materialDesign:PackIcon Kind="Magnify" Opacity=".56" />
+                    </Button>
+                    <TextBox 
+                        Grid.Column="1" 
+                        Margin="8 0 0 0"
+                        materialDesign:HintAssist.Hint="Build a search bar"
+                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                        BorderThickness="0"
+                        MinWidth="200"
+                        VerticalAlignment="Center" />
+                    <Button 
+                        Style="{DynamicResource MaterialDesignToolButton}"
+                        Grid.Column="2">
+                        <materialDesign:PackIcon
+                            Kind="Close"
+                            Opacity=".56"
+                            Margin="8 0 0 0" />
+                    </Button>
+                </Grid>
+            </materialDesign:ColorZone>
+
+            <ListBox Grid.Row="1" ItemsSource="{Binding Items}" HorizontalContentAlignment="Stretch"/>
+
+            <Separator Grid.Row="2" />
+
+            <TextBlock Grid.Row="3" Text="{Binding MarketStatusText}" 
+                       av:Text="Market Closed" 
+                       HorizontalAlignment="Center" Margin="4"/>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="8" ResizeBehavior="PreviousAndNext"/>
+
+        <ContentControl Grid.Row="1" Grid.Column="2" prism:RegionManager.RegionName="{x:Static const:RegionNames.StocksRegion}" />
+    </Grid>
+</UserControl>
