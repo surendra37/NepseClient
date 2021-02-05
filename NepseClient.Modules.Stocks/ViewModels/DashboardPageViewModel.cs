@@ -1,15 +1,26 @@
-﻿using NepseClient.Modules.Stocks.Models;
-using NepseClient.Modules.Stocks.Utils;
+﻿using NepseClient.Libraries.NepalStockExchange;
+using NepseClient.Libraries.NepalStockExchange.Contexts;
+using NepseClient.Libraries.NepalStockExchange.Responses;
+using NepseClient.Modules.Stocks.Extensions;
+using NepseClient.Modules.Stocks.Models;
 
 using Prism.Commands;
 using Prism.Mvvm;
 
+using Serilog;
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Threading;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
     public class DashboardPageViewModel : BindableBase
     {
+        private readonly ServiceClient _client;
+        private readonly DatabaseContext _context;
+
         private string _marketStatusText = "Market Open";
         public string MarketStatusText
         {
@@ -17,13 +28,19 @@ namespace NepseClient.Modules.Stocks.ViewModels
             set { SetProperty(ref _marketStatusText, value); }
         }
 
-        private SideNavigationItem[] _items;
-        public SideNavigationItem[] Items
+        private string _searchText;
+        public string SearchText
         {
-            get { return _items; }
-            set { SetProperty(ref _items, value); }
+            get { return _searchText; }
+            set
+            {
+                SetProperty(ref _searchText, value);
+            }
         }
 
+        public SideNavigationItem[] Items => string.IsNullOrWhiteSpace(SearchText) ? WatchingItems : SearchItems;
+
+        #region Menu Items
         private bool _isPriceChangedSelected = true;
         public bool IsPriceChangedSelected
         {
@@ -89,33 +106,126 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 }
             }
         }
+        #endregion
 
-        public DashboardPageViewModel()
+        #region Side Nav Watching
+        public IEnumerable<TodayPriceContent> AllPrices { get; set; }
+        public IEnumerable<TodayPriceContent> WatchingPrices { get; set; }
+        public SideNavigationItem[] WatchingItems => WatchingPrices
+            .Select(x => x.AdaptToWatchlistItem())
+            .Prepend<SideNavigationItem>(new BusinessNewsSideNavigationItem())
+            .ToArray();
+
+        public SideNavigationItem[] SearchItems => AllPrices
+            .Where(Filter)
+            .Select(x => x.AdaptToWatchlistItem())
+            .ToArray();
+        #endregion
+
+        private bool Filter(TodayPriceContent content)
         {
-            Items = new SideNavigationItem[]
+            if (SearchText.Equals(content.Symbol, System.StringComparison.OrdinalIgnoreCase)) return true;
+
+            if (content.SecurityName.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+
+        public DashboardPageViewModel(ServiceClient client, DatabaseContext context)
+        {
+            _client = client;
+            _context = context;
+
+            //Update();
+            RefreshUI();
+            Timer_Tick(this, EventArgs.Empty);
+            var timer = new DispatcherTimer(new TimeSpan(0, 0, 10), DispatcherPriority.Background,
+                    Timer_Tick, Dispatcher.CurrentDispatcher);
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            // check for market status
+            var status = _client.GetMarketStatus();
+            if (status.IsClosed)
             {
-                new BusinessNewsSideNavigationItem(),
-                new WatchlistSideNavigationItem
-                {
-                    Title= "DIS",
-                    SubTitle = "The Walt Disney Company",
-                    LastTradedPrice = 176.96,
-                    PointChange = 5.99,
-                    PercentChange =0.035,
-                    MarketCap = 310_000_000_000,
-                }
-            };
+                MarketStatusText = "Market Closed";
+            }
+            else
+            {
+                MarketStatusText = "Market Open";
+                Update();
+            }
+        }
 
+        private void Update()
+        {
+            try
+            {
+                var prices = _client.GetTodaysPriceAll();
+                // clear database
+                _context.TodayPrice.Delete();
 
+                // insert to database
+                _context.TodayPrice.AddTodayPrice(prices);
+
+                // Refresh UI
+                RefreshUI();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to update");
+            }
+        }
+
+        private void RefreshUI()
+        {
+            try
+            {
+                // Refresh UI
+                AllPrices = _context.TodayPrice.Get();
+                WatchingPrices = _context.TodayPrice.Get(_context.Watchlist.Get());
+                RaisePropertyChanged(nameof(WatchingItems));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to refresh UI");
+            }
         }
 
         private DelegateCommand _refreshCommand;
+
         public DelegateCommand RefreshCommand =>
             _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand));
 
         void ExecuteRefreshCommand()
         {
+            try
+            {
 
+            }
+            catch (System.Exception ex)
+            {
+                Log.Error(ex, "Failed to refresh dashboard");
+            }
+        }
+
+        private DelegateCommand _searchCommand;
+        public DelegateCommand SearchCommand =>
+            _searchCommand ?? (_searchCommand = new DelegateCommand(ExecuteSearchCommand));
+
+        void ExecuteSearchCommand()
+        {
+            RaisePropertyChanged(nameof(Items));
+        }
+
+        private DelegateCommand _cancelCommand;
+        public DelegateCommand CancelCommand =>
+            _cancelCommand ?? (_cancelCommand = new DelegateCommand(ExecuteCancelCommand));
+
+        void ExecuteCancelCommand()
+        {
+            SearchText = string.Empty;
+            SearchCommand.Execute();
         }
     }
 }

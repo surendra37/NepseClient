@@ -4,6 +4,7 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Views;
 
@@ -64,6 +65,7 @@ namespace NepseApp
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
             //containerRegistry.RegisterSingleton<MeroshareClient>();
             //containerRegistry.RegisterSingleton<TmsClient>();
+            containerRegistry.RegisterSingleton<DatabaseContext, SQLiteDatabaseContext>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 

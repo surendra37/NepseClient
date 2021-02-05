@@ -46,20 +46,25 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Button Style="{DynamicResource MaterialDesignToolButton}">
-                        <materialDesign:PackIcon Kind="Magnify" Opacity=".56" />
+                    <Button Style="{DynamicResource MaterialDesignToolButton}"
+                            Command="{Binding SearchCommand}"
+                            IsDefault="True">
+                        <materialDesign:PackIcon Kind="Magnify" Opacity=".56"/>
                     </Button>
                     <TextBox 
                         Grid.Column="1" 
                         Margin="8 0 0 0"
-                        materialDesign:HintAssist.Hint="Build a search bar"
+                        materialDesign:HintAssist.Hint="Search"
                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                         BorderThickness="0"
                         MinWidth="200"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center"
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
                     <Button 
                         Style="{DynamicResource MaterialDesignToolButton}"
-                        Grid.Column="2">
+                        Grid.Column="2"
+                        Command="{Binding CancelCommand}"
+                        IsCancel="True">
                         <materialDesign:PackIcon
                             Kind="Close"
                             Opacity=".56"

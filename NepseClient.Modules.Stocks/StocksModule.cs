@@ -1,4 +1,5 @@
 ﻿using NepseClient.Commons.Constants;
+using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Modules.Stocks.ViewModels;
 using NepseClient.Modules.Stocks.Views;
 
@@ -18,6 +19,7 @@ namespace NepseClient.Modules.Stocks
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<ServiceClient>();
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
         }
     }

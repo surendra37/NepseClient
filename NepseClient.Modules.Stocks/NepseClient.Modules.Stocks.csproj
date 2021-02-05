@@ -10,6 +10,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
+    <ProjectReference Include="..\NepseClient.Libraries.NepalStockExchange\NepseClient.Libraries.NepalStockExchange.csproj" />
     <ProjectReference Include="..\NepseClient.Modules.Commons\NepseClient.Modules.Commons.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Adapters\" />
   </ItemGroup>
 </Project>
