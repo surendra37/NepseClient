@@ -20,7 +20,9 @@ namespace NepseClient.Modules.Stocks
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<ServiceClient>();
+
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
+            containerRegistry.RegisterForNavigation<NewsAndAlertPage, NewsAndAlertPageViewModel>();
         }
     }
 }

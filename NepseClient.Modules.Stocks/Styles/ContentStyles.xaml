@@ -5,7 +5,8 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:adapters="clr-namespace:NepseClient.Modules.Stocks.Adapters"
-                    xmlns:converters="clr-namespace:NepseClient.Modules.Stocks.Converters">
+                    xmlns:converters="clr-namespace:NepseClient.Modules.Stocks.Converters"
+                    xmlns:responses="clr-namespace:NepseClient.Libraries.NepalStockExchange.Responses;assembly=NepseClient.Libraries.NepalStockExchange">
     <converters:WatchlistSeparatorBackgroundConverter x:Key="WatchingBackgroundBrushConverter" />
     <DataTemplate DataType="{x:Type adapters:NewsSideNavAdapter}">
         <StackPanel HorizontalAlignment="Stretch">
@@ -48,5 +49,19 @@
                 </ContextMenu>
             </Grid.ContextMenu>
         </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type responses:NewsAndAlertResponse}">
+        <StackPanel>
+            <TextBlock Text="{Binding Remarks}" d:Text="Corporate Action Approval" FontSize="14" Opacity="0.6"/>
+            <TextBlock Text="{Binding MessageBody}" FontWeight="Bold" FontSize="18"
+                   TextWrapping="Wrap"
+                   d:Text="Adjusted Price for Lumbini Bikas Bank Ltd. is Rs. 194.29 for 5 % of Bonus Share."/>
+            <TextBlock Text="{Binding ExpiryDate}" 
+                   d:Text="	 2020-01-07"
+                   Opacity="0.6"
+                   FontSize="14"/>
+            <Separator />
+        </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

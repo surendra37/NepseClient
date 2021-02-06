@@ -1,10 +1,13 @@
-﻿using NepseClient.Commons.Interfaces;
+﻿using NepseClient.Commons.Constants;
+using NepseClient.Commons.Interfaces;
 using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Modules.Stocks.Adapters;
+using NepseClient.Modules.Stocks.Views;
 
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 
 using Serilog;
 
@@ -16,6 +19,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
 {
     public class DashboardPageViewModel : BindableBase
     {
+        private readonly IRegionManager _regionManager;
         private readonly ServiceClient _client;
         private readonly DatabaseContext _context;
 
@@ -124,7 +128,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             if (value is INewsNavItem news)
             {
-
+                _regionManager.RequestNavigate(RegionNames.StocksRegion, nameof(NewsAndAlertPage));
             }
             else if (value is IStockSideNavItem stocks)
             {
@@ -159,8 +163,9 @@ namespace NepseClient.Modules.Stocks.ViewModels
         }
         #endregion
 
-        public DashboardPageViewModel(ServiceClient client, DatabaseContext context)
+        public DashboardPageViewModel(IRegionManager regionManager, ServiceClient client, DatabaseContext context)
         {
+            _regionManager = regionManager;
             _client = client;
             _context = context;
 
@@ -191,7 +196,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             {
                 AllItems = _context.TodayPrice.GetWatchables()
                       .Select(x => new StockSideNavAdapter(x, ChangeType, AddCommand))
-                      .Prepend<ISideNavItem>(new NewsSideNavAdapter { Title = "Business News", SubTitle = "From ShareSansar" })
+                      .Prepend<ISideNavItem>(new NewsSideNavAdapter { Title = "Business News", SubTitle = "From Nepal Stock Exchange" })
                       .ToArray();
 
                 // Refresh UI

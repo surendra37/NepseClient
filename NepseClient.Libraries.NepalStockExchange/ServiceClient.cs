@@ -55,5 +55,12 @@ namespace NepseClient.Libraries.NepalStockExchange
             var response = Client.Get<MarketStatusResponse>(request);
             return response.Data;
         }
+
+        public NewsAndAlertResponse[] GetNews()
+        {
+            var api = new RestRequest("/api/nots/news/media/news-and-alerts");
+            var response = Client.Get<NewsAndAlertResponse[]>(api);
+            return response.Data;
+        }
     }
 }
