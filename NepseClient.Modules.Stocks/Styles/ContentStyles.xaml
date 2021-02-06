@@ -32,6 +32,18 @@
             <TextBlock  Grid.Row="1" Grid.Column="1" Text="{Binding DisplayChangeText}" d:Text="+0.50" FontSize="12" d:Foreground="Green" HorizontalAlignment="Right"/>
 
             <Separator Grid.Row="2" Grid.ColumnSpan="3"/>
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add To Watchlist" 
+                              Visibility="{Binding IsWatching, Converter={StaticResource InverseBoolToVisConverter}}"
+                              Command="{Binding UpdateWatchingCommand}"
+                              CommandParameter="{Binding}"/>
+                    <MenuItem Header="Remove From Watchlist" 
+                              Visibility="{Binding IsWatching, Converter={StaticResource BooleanToVisibilityConverter}}"
+                              Command="{Binding UpdateWatchingCommand}"
+                              CommandParameter="{Binding}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

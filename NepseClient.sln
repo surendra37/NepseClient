@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Libraries.MeroS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Modules.Stocks", "NepseClient.Modules.Stocks\NepseClient.Modules.Stocks.csproj", "{63E42FC2-E392-474A-AE24-3B30D75B03C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseClient.Libraries.NepalStockExchange", "NepseClient.Libraries.NepalStockExchange\NepseClient.Libraries.NepalStockExchange.csproj", "{04C7ECB0-527D-45E2-AF0E-78716C141FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NepseClient.Libraries.NepalStockExchange", "NepseClient.Libraries.NepalStockExchange\NepseClient.Libraries.NepalStockExchange.csproj", "{04C7ECB0-527D-45E2-AF0E-78716C141FAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NepseApp.Service", "NepseApp.Service\NepseApp.Service.csproj", "{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +161,18 @@ Global
 		{04C7ECB0-527D-45E2-AF0E-78716C141FAF}.Release|x64.Build.0 = Release|Any CPU
 		{04C7ECB0-527D-45E2-AF0E-78716C141FAF}.Release|x86.ActiveCfg = Release|Any CPU
 		{04C7ECB0-527D-45E2-AF0E-78716C141FAF}.Release|x86.Build.0 = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|x64.Build.0 = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Debug|x86.Build.0 = Debug|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|x64.ActiveCfg = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|x64.Build.0 = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|x86.ActiveCfg = Release|Any CPU
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +187,7 @@ Global
 		{0539252E-EA4B-41F5-BA0E-9CE205DA5022} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
 		{63E42FC2-E392-474A-AE24-3B30D75B03C5} = {76ABE260-40F4-4E7B-8564-2A4C21C1AC85}
 		{04C7ECB0-527D-45E2-AF0E-78716C141FAF} = {177EC4C8-1907-43FE-8DED-8A9A39E32B80}
+		{F10F61A4-881B-4B3A-B25C-1D5DE373C04E} = {B59FCE9B-6A71-4363-A613-C977EA033301}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFFE650E-64D7-44A4-9E1E-A2C6B6A730E0}

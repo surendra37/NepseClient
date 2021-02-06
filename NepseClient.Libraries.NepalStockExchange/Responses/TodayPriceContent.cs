@@ -35,4 +35,9 @@ namespace NepseClient.Libraries.NepalStockExchange.Responses
             }
         }
     }
+
+    public class WatchableTodayPrice : TodayPriceContent
+    {
+        public bool IsWatching { get; set; }
+    }
 }

@@ -109,16 +109,18 @@ namespace NepseClient.Modules.Stocks.ViewModels
         #endregion
 
         #region Side Nav Watching
-        public IEnumerable<TodayPriceContent> AllPrices { get; set; }
-        public IEnumerable<TodayPriceContent> WatchingPrices { get; set; }
-        public SideNavigationItem[] WatchingItems => WatchingPrices
-            .Select(x => x.AdaptToWatchlistItem())
+        public IEnumerable<WatchableTodayPrice> AllPrices { get; set; }
+        public SideNavigationItem[] WatchingItems => AllPrices
+            .Where(x => x.IsWatching)
+            .Select(x => x.AdaptToWatchlistItem(AddCommand))
             .Prepend<SideNavigationItem>(new BusinessNewsSideNavigationItem())
             .ToArray();
 
         public SideNavigationItem[] SearchItems => AllPrices
             .Where(Filter)
-            .Select(x => x.AdaptToWatchlistItem())
+            .OrderByDescending(x => x.IsWatching)
+            .ThenBy(x => x.Symbol)
+            .Select(x => x.AdaptToWatchlistItem(AddCommand))
             .ToArray();
         #endregion
 
@@ -163,10 +165,10 @@ namespace NepseClient.Modules.Stocks.ViewModels
             {
                 var prices = _client.GetTodaysPriceAll();
                 // clear database
-                _context.TodayPrice.Delete();
+                _context.TodayPrice.Clear();
 
                 // insert to database
-                _context.TodayPrice.AddTodayPrice(prices);
+                _context.TodayPrice.AddRange(prices);
 
                 // Refresh UI
                 RefreshUI();
@@ -182,9 +184,8 @@ namespace NepseClient.Modules.Stocks.ViewModels
             try
             {
                 // Refresh UI
-                AllPrices = _context.TodayPrice.Get();
-                WatchingPrices = _context.TodayPrice.Get(_context.Watchlist.Get());
-                RaisePropertyChanged(nameof(WatchingItems));
+                AllPrices = _context.TodayPrice.GetWatchables();
+                RaisePropertyChanged(nameof(Items));
             }
             catch (Exception ex)
             {
@@ -226,6 +227,29 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             SearchText = string.Empty;
             SearchCommand.Execute();
+        }
+
+        private DelegateCommand<WatchlistSideNavigationItem> _addCommand;
+        public DelegateCommand<WatchlistSideNavigationItem> AddCommand =>
+            _addCommand ?? (_addCommand = new DelegateCommand<WatchlistSideNavigationItem>(ExecuteAddCommand));
+
+        void ExecuteAddCommand(WatchlistSideNavigationItem parameter)
+        {
+            if (parameter is null) return;
+
+            try
+            {
+                _context.Watchlist.Update(new Libraries.NepalStockExchange.Models.WatchlistItem
+                {
+                    Symbol = parameter.Title,
+                    IsWatching = !parameter.IsWatching,
+                });
+                RefreshUI();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to update watching");
+            }
         }
     }
 }

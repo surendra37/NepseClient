@@ -1,37 +1,20 @@
-﻿using NepseClient.Modules.Stocks.Utils;
+﻿using NepseClient.Libraries.NepalStockExchange.Responses;
+using NepseClient.Modules.Stocks.Utils;
+
+using System.Windows.Input;
 
 namespace NepseClient.Modules.Stocks.Models
 {
 
     public class WatchlistSideNavigationItem : SideNavigationItem
     {
-        private double _lastTradedPrice;
-        public double LastTradedPrice
-        {
-            get { return _lastTradedPrice; }
-            set { SetProperty(ref _lastTradedPrice, value); }
-        }
+        private readonly WatchableTodayPrice _price;
 
-        private double _pointChange;
-        public double PointChange
-        {
-            get { return _pointChange; }
-            set { SetProperty(ref _pointChange, value); }
-        }
-
-        private double _percentChange;
-        public double PercentChange
-        {
-            get { return _percentChange; }
-            set { SetProperty(ref _percentChange, value); }
-        }
-
-        private double _marketCap;
-        public double MarketCap
-        {
-            get { return _marketCap; }
-            set { SetProperty(ref _marketCap, value); }
-        }
+        public double LastTradedPrice => _price.LastUpdatedPrice;
+        public double PointChange => _price.LastUpdatedPrice - _price.PreviousDayClosePrice;
+        public double PercentChange => PointChange / _price.PreviousDayClosePrice;
+        public double MarketCap => _price.MarketCapitalization ?? double.NaN;
+        public bool IsWatching => _price.IsWatching;
 
         private ChangeType _changeType = ChangeType.Point;
         public ChangeType ChangeType
@@ -58,6 +41,16 @@ namespace NepseClient.Modules.Stocks.Models
                     _ => "N/A",
                 };
             }
+        }
+
+        public ICommand UpdateWatchingCommand { get; }
+
+        public WatchlistSideNavigationItem(WatchableTodayPrice price, ICommand watchCommand)
+        {
+           _price = price;
+            UpdateWatchingCommand = watchCommand;
+            Title = _price.Symbol;
+            SubTitle = _price.SecurityName;
         }
     }
 }
