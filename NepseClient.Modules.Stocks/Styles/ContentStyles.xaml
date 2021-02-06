@@ -1,18 +1,20 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:models="clr-namespace:NepseClient.Modules.Stocks.Models"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                     mc:Ignorable="d" 
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
-    <DataTemplate DataType="{x:Type models:BusinessNewsSideNavigationItem}">
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:adapters="clr-namespace:NepseClient.Modules.Stocks.Adapters"
+                    xmlns:converters="clr-namespace:NepseClient.Modules.Stocks.Converters">
+    <converters:WatchlistSeparatorBackgroundConverter x:Key="WatchingBackgroundBrushConverter" />
+    <DataTemplate DataType="{x:Type adapters:NewsSideNavAdapter}">
         <StackPanel HorizontalAlignment="Stretch">
             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="18" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding SubTitle}" FontSize="14" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <Separator />
         </StackPanel>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type models:WatchlistSideNavigationItem}">
+    <DataTemplate DataType="{x:Type adapters:StockSideNavAdapter}">
         <Grid TextBlock.FontSize="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -31,17 +33,18 @@
 
             <TextBlock  Grid.Row="1" Grid.Column="1" Text="{Binding DisplayChangeText}" d:Text="+0.50" FontSize="12" d:Foreground="Green" HorizontalAlignment="Right"/>
 
-            <Separator Grid.Row="2" Grid.ColumnSpan="3"/>
+            <Separator Grid.Row="2" Grid.ColumnSpan="3" Background="{Binding IsWatching, Converter={StaticResource WatchingBackgroundBrushConverter}}"/>
+
             <Grid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Add To Watchlist" 
-                              Visibility="{Binding IsWatching, Converter={StaticResource InverseBoolToVisConverter}}"
+                    <MenuItem Header="Add to watchlist" Icon="{md:PackIcon Kind=Add}"
                               Command="{Binding UpdateWatchingCommand}"
-                              CommandParameter="{Binding}"/>
-                    <MenuItem Header="Remove From Watchlist" 
-                              Visibility="{Binding IsWatching, Converter={StaticResource BooleanToVisibilityConverter}}"
+                              CommandParameter="{Binding}"
+                              Visibility="{Binding IsWatching, Converter={StaticResource InverseBoolToVisConverter}}"/>
+                    <MenuItem Header="Remove from watchlist" Icon="{md:PackIcon Kind=Remove}"
                               Command="{Binding UpdateWatchingCommand}"
-                              CommandParameter="{Binding}"/>
+                              CommandParameter="{Binding}"
+                              Visibility="{Binding IsWatching, Converter={StaticResource boolToVisibilityConverter}}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
         </Grid>

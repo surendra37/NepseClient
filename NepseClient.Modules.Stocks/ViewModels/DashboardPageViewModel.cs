@@ -1,8 +1,7 @@
-﻿using NepseClient.Libraries.NepalStockExchange;
+﻿using NepseClient.Commons.Interfaces;
+using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Contexts;
-using NepseClient.Libraries.NepalStockExchange.Responses;
-using NepseClient.Modules.Stocks.Extensions;
-using NepseClient.Modules.Stocks.Models;
+using NepseClient.Modules.Stocks.Adapters;
 
 using Prism.Commands;
 using Prism.Mvvm;
@@ -10,7 +9,6 @@ using Prism.Mvvm;
 using Serilog;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Threading;
 
@@ -28,117 +26,145 @@ namespace NepseClient.Modules.Stocks.ViewModels
             set { SetProperty(ref _marketStatusText, value); }
         }
 
+        #region Menu Items
+        public bool IsPriceChangedSelected
+        {
+            get => ChangeType == ChangeType.PointChange;
+            set
+            {
+                if (value)
+                {
+                    ChangeType = ChangeType.PointChange;
+                    //RaisePropertyChanged(nameof(IsPriceChangedSelected));
+                    RaisePropertyChanged(nameof(IsPercentageChangedSelected));
+                    RaisePropertyChanged(nameof(IsMarketCapSelected));
+                }
+            }
+        }
+
+        public bool IsPercentageChangedSelected
+        {
+            get => ChangeType == ChangeType.PercentChange;
+            set
+            {
+                if (value)
+                {
+                    ChangeType = ChangeType.PercentChange;
+                    RaisePropertyChanged(nameof(IsPriceChangedSelected));
+                    //RaisePropertyChanged(nameof(IsPercentageChangedSelected));
+                    RaisePropertyChanged(nameof(IsMarketCapSelected));
+                }
+            }
+        }
+
+        public bool IsMarketCapSelected
+        {
+            get => ChangeType == ChangeType.MarketCap;
+            set
+            {
+                if (value)
+                {
+                    ChangeType = ChangeType.MarketCap;
+                    RaisePropertyChanged(nameof(IsPriceChangedSelected));
+                    RaisePropertyChanged(nameof(IsPercentageChangedSelected));
+                    //RaisePropertyChanged(nameof(IsMarketCapSelected));
+                }
+            }
+        }
+
+        private ChangeType changeType = ChangeType.PointChange;
+        public ChangeType ChangeType
+        {
+            get { return changeType; }
+            set
+            {
+                if (SetProperty(ref changeType, value))
+                {
+                    Update();
+                }
+            }
+        }
+        #endregion
+
+        #region Side Nav
         private string _searchText;
         public string SearchText
         {
             get { return _searchText; }
             set
             {
-                SetProperty(ref _searchText, value);
+                if (SetProperty(ref _searchText, value))
+                {
+                    SearchCommand.Execute();
+                }
             }
         }
 
-        public SideNavigationItem[] Items => string.IsNullOrWhiteSpace(SearchText) ? WatchingItems : SearchItems;
+        public ISideNavItem[] AllItems { get; set; }
+        public ISideNavItem[] FilteredItems => string.IsNullOrWhiteSpace(SearchText) ?
+            AllItems.Where(WatchlistFilter).ToArray() :
+            AllItems.Where(SearchFilter)
+            .Cast<IStockSideNavItem>()
+            .OrderByDescending(x => x.IsWatching).ToArray();
 
-        #region Menu Items
-        private bool _isPriceChangedSelected = true;
-        public bool IsPriceChangedSelected
+        private ISideNavItem _selectedItem;
+        public ISideNavItem SelectedItem
         {
-            get { return _isPriceChangedSelected; }
+            get { return _selectedItem; }
             set
             {
-                if (SetProperty(ref _isPriceChangedSelected, value) && value)
+                if (SetProperty(ref _selectedItem, value))
                 {
-                    IsPercentageChangedSelected = false;
-                    IsMarketCapSelected = false;
-                    UpdateChangeText();
+                    UpdateContentPage(value);
                 }
             }
         }
 
-        private bool _isPercentageChangedSelected;
-        public bool IsPercentageChangedSelected
+        private void UpdateContentPage(ISideNavItem value)
         {
-            get { return _isPercentageChangedSelected; }
-            set
+            if (value is INewsNavItem news)
             {
-                if (SetProperty(ref _isPercentageChangedSelected, value) && value)
-                {
-                    IsPriceChangedSelected = false;
-                    IsMarketCapSelected = false;
-                    UpdateChangeText();
-                }
+
+            }
+            else if (value is IStockSideNavItem stocks)
+            {
+
             }
         }
 
-        private bool _isMarketCapSelected;
-        public bool IsMarketCapSelected
+        private bool SearchFilter(ISideNavItem item)
         {
-            get { return _isMarketCapSelected; }
-            set
-            {
-                if (SetProperty(ref _isMarketCapSelected, value) && value)
-                {
-                    IsPriceChangedSelected = false;
-                    IsPercentageChangedSelected = false;
-                    UpdateChangeText();
-                }
-            }
-        }
+            if (item is INewsNavItem)
+                return false;
 
-        private void UpdateChangeText()
-        {
-            var items = Items.Where(x => x is WatchlistSideNavigationItem)
-                 .Cast<WatchlistSideNavigationItem>();
-            foreach (var item in items)
+            if (item is IStockSideNavItem stock)
             {
-                if (IsPriceChangedSelected)
-                {
-                    item.ChangeType = ChangeType.Point;
-                }
-                else if (IsPercentageChangedSelected)
-                {
-                    item.ChangeType = ChangeType.Percent;
-                }
-                else if (IsMarketCapSelected)
-                {
-                    item.ChangeType = ChangeType.MarketCap;
-                }
+                if (SearchText.Equals(stock.Title, StringComparison.OrdinalIgnoreCase)) return true;
+
+                if (stock.SubTitle.Contains(SearchText, StringComparison.OrdinalIgnoreCase)) return true;
+                return false;
             }
+            return true;
+        }
+        private bool WatchlistFilter(ISideNavItem item)
+        {
+            if (item is INewsNavItem)
+                return true;
+
+            if (item is IStockSideNavItem stock)
+            {
+                return stock.IsWatching;
+            }
+            return true;
         }
         #endregion
-
-        #region Side Nav Watching
-        public IEnumerable<WatchableTodayPrice> AllPrices { get; set; }
-        public SideNavigationItem[] WatchingItems => AllPrices
-            .Where(x => x.IsWatching)
-            .Select(x => x.AdaptToWatchlistItem(AddCommand))
-            .Prepend<SideNavigationItem>(new BusinessNewsSideNavigationItem())
-            .ToArray();
-
-        public SideNavigationItem[] SearchItems => AllPrices
-            .Where(Filter)
-            .OrderByDescending(x => x.IsWatching)
-            .ThenBy(x => x.Symbol)
-            .Select(x => x.AdaptToWatchlistItem(AddCommand))
-            .ToArray();
-        #endregion
-
-        private bool Filter(TodayPriceContent content)
-        {
-            if (SearchText.Equals(content.Symbol, System.StringComparison.OrdinalIgnoreCase)) return true;
-
-            if (content.SecurityName.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase)) return true;
-            return false;
-        }
 
         public DashboardPageViewModel(ServiceClient client, DatabaseContext context)
         {
             _client = client;
             _context = context;
 
-            //Update();
-            RefreshUI();
+            Update();
             Timer_Tick(this, EventArgs.Empty);
             var timer = new DispatcherTimer(new TimeSpan(0, 0, 10), DispatcherPriority.Background,
                     Timer_Tick, Dispatcher.CurrentDispatcher);
@@ -163,12 +189,10 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             try
             {
-                var prices = _client.GetTodaysPriceAll();
-                // clear database
-                _context.TodayPrice.Clear();
-
-                // insert to database
-                _context.TodayPrice.AddRange(prices);
+                AllItems = _context.TodayPrice.GetWatchables()
+                      .Select(x => new StockSideNavAdapter(x, ChangeType, AddCommand))
+                      .Prepend<ISideNavItem>(new NewsSideNavAdapter { Title = "Business News", SubTitle = "From ShareSansar" })
+                      .ToArray();
 
                 // Refresh UI
                 RefreshUI();
@@ -184,8 +208,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             try
             {
                 // Refresh UI
-                AllPrices = _context.TodayPrice.GetWatchables();
-                RaisePropertyChanged(nameof(Items));
+                RaisePropertyChanged(nameof(FilteredItems));
             }
             catch (Exception ex)
             {
@@ -216,7 +239,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
         void ExecuteSearchCommand()
         {
-            RaisePropertyChanged(nameof(Items));
+            RefreshUI();
         }
 
         private DelegateCommand _cancelCommand;
@@ -229,22 +252,18 @@ namespace NepseClient.Modules.Stocks.ViewModels
             SearchCommand.Execute();
         }
 
-        private DelegateCommand<WatchlistSideNavigationItem> _addCommand;
-        public DelegateCommand<WatchlistSideNavigationItem> AddCommand =>
-            _addCommand ?? (_addCommand = new DelegateCommand<WatchlistSideNavigationItem>(ExecuteAddCommand));
+        private DelegateCommand<IStockSideNavItem> _addCommand;
+        public DelegateCommand<IStockSideNavItem> AddCommand =>
+            _addCommand ?? (_addCommand = new DelegateCommand<IStockSideNavItem>(ExecuteAddCommand));
 
-        void ExecuteAddCommand(WatchlistSideNavigationItem parameter)
+        void ExecuteAddCommand(IStockSideNavItem parameter)
         {
             if (parameter is null) return;
 
             try
             {
-                _context.Watchlist.Update(new Libraries.NepalStockExchange.Models.WatchlistItem
-                {
-                    Symbol = parameter.Title,
-                    IsWatching = !parameter.IsWatching,
-                });
-                RefreshUI();
+                _context.Watchlist.Update(parameter.Title, !parameter.IsWatching);
+                Update();
             }
             catch (Exception ex)
             {

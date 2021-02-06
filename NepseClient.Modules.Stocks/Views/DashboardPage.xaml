@@ -11,7 +11,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="300" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
@@ -73,7 +73,9 @@
                 </Grid>
             </materialDesign:ColorZone>
 
-            <ListBox Grid.Row="1" ItemsSource="{Binding Items}" HorizontalContentAlignment="Stretch"/>
+            <ListBox Grid.Row="1" ItemsSource="{Binding FilteredItems}" 
+                     HorizontalContentAlignment="Stretch"
+                     SelectedItem="{Binding SelectedItem}"/>
 
             <Separator Grid.Row="2" />
 
