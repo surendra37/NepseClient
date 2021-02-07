@@ -8,6 +8,23 @@
                     xmlns:converters="clr-namespace:NepseClient.Modules.Stocks.Converters"
                     xmlns:responses="clr-namespace:NepseClient.Libraries.NepalStockExchange.Responses;assembly=NepseClient.Libraries.NepalStockExchange">
     <converters:WatchlistSeparatorBackgroundConverter x:Key="WatchingBackgroundBrushConverter" />
+    <converters:LargeNumberConverter x:Key="LargeNumberConverter" />
+    <Style x:Key="VerticalSeparatorStyle" 
+       TargetType="{x:Type Separator}"
+       BasedOn="{StaticResource MaterialDesignSeparator}">
+        <Setter Property="Margin" Value="6,0,6,0"/>
+        <Setter Property="LayoutTransform">
+            <Setter.Value>
+                <TransformGroup>
+                    <TransformGroup.Children>
+                        <TransformCollection>
+                            <RotateTransform Angle="90"/>
+                        </TransformCollection>
+                    </TransformGroup.Children>
+                </TransformGroup>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <DataTemplate DataType="{x:Type adapters:NewsSideNavAdapter}">
         <StackPanel HorizontalAlignment="Stretch">
             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="18" TextTrimming="CharacterEllipsis"/>

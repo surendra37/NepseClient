@@ -14,7 +14,9 @@ namespace NepseClient.Modules.Stocks
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var regionManager = containerProvider.Resolve<IRegionManager>();
+
             regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(DashboardPage));
+            regionManager.RegisterViewWithRegion(RegionNames.StocksRegion, typeof(NewsAndAlertPage));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
@@ -23,6 +25,7 @@ namespace NepseClient.Modules.Stocks
 
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
             containerRegistry.RegisterForNavigation<NewsAndAlertPage, NewsAndAlertPageViewModel>();
+            containerRegistry.RegisterForNavigation<StockContentPage, StockContentPageViewModel>();
         }
     }
 }

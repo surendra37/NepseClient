@@ -18,6 +18,7 @@ namespace NepseClient.Libraries.NepalStockExchange.Contexts
         const string SelectQuery = "SELECT * FROM today_prices";
         const string SelectWatchableQuery = "SELECT t.*, w.is_watching FROM " + TableName + " t LEFT JOIN watchlist w on t.symbol=w.symbol";
         const string SelectQueryBySymbols = "SELECT * FROM today_prices WHERE symbol IN @symbols";
+        const string SelectQueryBySymbol = "SELECT * FROM today_prices WHERE symbol=@Symbol";
         const string CreateQuery = "INSERT INTO today_prices (id, business_date, security_id, symbol, security_name, open_price, high_price, low_price, close_price, total_traded_quantity, total_traded_value, previous_day_close_price, fifty_two_week_high, fifty_two_week_low, last_updated_time, last_updated_price, total_trades," +
             "average_traded_price, market_capitalization) VALUES (@Id, @BusinessDate, @SecurityId, @Symbol, @SecurityName, @OpenPrice, @HighPrice, @LowPrice, @ClosePrice, @TotalTradedQuantity, @TotalTradedValue, @PreviousDayClosePrice, @FiftyTwoWeekHigh, @FiftyTwoWeekLow, @LastUpdatedTime, @LastUpdatedPrice, @TotalTrades, @AverageTradedPrice, @MarketCapitalization)";
         const string DeleteQuery = "DELETE FROM today_prices";
@@ -67,6 +68,12 @@ namespace NepseClient.Libraries.NepalStockExchange.Contexts
         {
             using var connection = GetConnectionReadOnly();
             return connection.Query<TodayPriceContent>(SelectQueryBySymbols, new { symbols }) ?? Enumerable.Empty<TodayPriceContent>();
+        }
+
+        public WatchableTodayPrice Find(string symbol)
+        {
+            using var connection = GetConnectionReadOnly();
+            return connection.QueryFirstOrDefault<WatchableTodayPrice>(SelectQueryBySymbol, new { Symbol= symbol });
         }
         public IEnumerable<TodayPriceContent> Get()
         {

@@ -132,7 +132,11 @@ namespace NepseClient.Modules.Stocks.ViewModels
             }
             else if (value is IStockSideNavItem stocks)
             {
-
+                var p = new NavigationParameters
+                {
+                    { "Stock", stocks }
+                };
+                _regionManager.RequestNavigate(RegionNames.StocksRegion, nameof(StockContentPage), p);
             }
         }
 

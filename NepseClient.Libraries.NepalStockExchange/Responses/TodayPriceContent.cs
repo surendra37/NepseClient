@@ -24,6 +24,8 @@ namespace NepseClient.Libraries.NepalStockExchange.Responses
         public double AverageTradedPrice { get; set; }
         public double? MarketCapitalization { get; set; }
 
+        public double AverageVolume => TotalTradedValue/TotalTradedQuantity;
+
         public double ActualMarketCapitalization
         {
             get

@@ -1,0 +1,71 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.Stocks.Views.StockContentPage"             
+             prism:ViewModelLocator.AutoWireViewModel="True" av:DesignWidth="450.333" av:DesignHeight="53.96">
+    <Grid>
+        <Grid DataContext="{Binding Price}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Open" Margin="8 0"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OpenPrice, StringFormat=N2}" av:Text="137.35" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Volume" Margin="8 0" />
+            <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding TotalTradedQuantity, StringFormat=N0}" av:Text="72.32M" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="6" Text="52W H" Margin="8 0" />
+            <TextBlock Grid.Row="0" Grid.Column="7" Text="{Binding FiftyTwoWeekHigh, StringFormat=N2}" av:Text="145.09" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="9" Text="Yield" Margin="8 0" />
+            <TextBlock Grid.Row="0" Grid.Column="10" Text="{Binding Text}" av:Text="0.60%" FontWeight="Bold" TextAlignment="Right"/>
+
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="High" Margin="8 0"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HighPrice, StringFormat=N2}" av:Text="137.41" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="P/E" Margin="8 0" />
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Text}" av:Text="37.09" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="6" Text="52W L" Margin="8 0" />
+            <TextBlock Grid.Row="1" Grid.Column="7" Text="{Binding FiftyTwoWeekLow, StringFormat=N2}" av:Text="53.15" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="9" Text="Beta" Margin="8 0" />
+            <TextBlock Grid.Row="1" Grid.Column="10" Text="{Binding Text}" av:Text="1.27" FontWeight="Bold" TextAlignment="Right"/>
+
+            
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Low" Margin="8 0"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LowPrice, StringFormat=F2}" av:Text="135.86" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="3" Text="Mkt Cap" Margin="8 0" />
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding ActualMarketCapitalization, Converter={StaticResource LargeNumberConverter}}" av:Text="2.296T" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="6" Text="Avg Price" Margin="8 0" />
+            <TextBlock Grid.Row="2" Grid.Column="7" Text="{Binding AverageTradedPrice, StringFormat=N2}" av:Text="106.9M" FontWeight="Bold" TextAlignment="Right"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="9" Text="EPS" Margin="8 0" />
+            <TextBlock Grid.Row="2" Grid.Column="10" Text="{Binding Text}" av:Text="3.69" FontWeight="Bold" TextAlignment="Right"/>
+
+            <Separator Grid.Column="2" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+            <Separator Grid.Column="5" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+            <Separator Grid.Column="8" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+        </Grid>
+    </Grid>
+</UserControl>

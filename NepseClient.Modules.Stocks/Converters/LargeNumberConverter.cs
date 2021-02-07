@@ -1,20 +1,18 @@
-﻿using System;
+﻿using NepseClient.Modules.Stocks.Utils;
+using System;
 using System.Globalization;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace NepseClient.Modules.Stocks.Converters
 {
-    public class WatchlistSeparatorBackgroundConverter : IValueConverter
+
+    public class LargeNumberConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool isWatching)
+            if (value is double largeNumber)
             {
-                if (isWatching)
-                    return Brushes.Yellow;
-                else
-                    return Brushes.Gray;
+                return NumberUtils.GetMarketCapText(largeNumber);
             }
 
             return null;
