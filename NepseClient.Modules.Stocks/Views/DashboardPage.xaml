@@ -26,6 +26,7 @@
                           InputGestureText="F5"/>
                 <Separator />
                 <MenuItem Header="Nepse Notice" IsCheckable="True" IsChecked="{Binding ShowNepseNotice}"/>
+                <MenuItem Header="Show Floorsheet" IsCheckable="True" IsChecked="{Binding ShowFloorsheet}"/>
             </MenuItem>
         </Menu>        
         

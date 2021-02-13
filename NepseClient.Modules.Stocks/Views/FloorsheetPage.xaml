@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="NepseClient.Modules.Stocks.Views.FloorsheetPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" 
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" av:DesignWidth="700.076" av:DesignHeight="256"
+             xmlns:local="clr-namespace:NepseClient.Modules.Stocks.Views">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 8">
+            <TextBox Text="{Binding Buyer}" av:Text="49" md:HintAssist.Hint="Buyer" md:HintAssist.IsFloating="True" Width="96"/>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <TextBox Text="{Binding Seller}" av:Text="49" md:HintAssist.Hint="Seller" md:HintAssist.IsFloating="True" Width="96"/>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <ComboBox ItemsSource="{Binding Limits}" SelectedItem="{Binding Limit}" md:HintAssist.Hint="Limit" md:HintAssist.IsFloating="True" Width="96"/>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <Button Content="Filter" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding FilterCommand}" IsDefault="True"/>
+            <Button Content="Reset" Style="{StaticResource MaterialDesignFlatAccentButton}" Command="{Binding ResetFilterCommand}" IsCancel="True"/>
+        </StackPanel>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" HorizontalContentAlignment="Stretch" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Contract" Binding="{Binding ContractId}"/>
+                <DataGridTextColumn Header="Symbol" Binding="{Binding StockSymbol}"/>
+                <DataGridTextColumn Header="Buyer" Binding="{Binding BuyerMemberId}" CellStyle="{StaticResource RightCellStyle}"/>
+                <DataGridTextColumn Header="Seller" Binding="{Binding SellerMemberId}" CellStyle="{StaticResource RightCellStyle}"/>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding ContractQuantity, StringFormat=N2}" CellStyle="{StaticResource RightCellStyle}"/>
+                <DataGridTextColumn Header="Rate(Rs)" Binding="{Binding ContractRate, StringFormat=N2}" CellStyle="{StaticResource RightCellStyle}"/>
+                <DataGridTextColumn Header="Amount(Rs)" Binding="{Binding ContractAmount, StringFormat=N2}" CellStyle="{StaticResource RightCellStyle}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="4">
+            <TextBlock FontSize="14">
+                <Run Text="Total Amount:" FontWeight="Bold"/>
+                <Run Text="{Binding TotalAmount, StringFormat=N2}" av:Text="100"/>                
+            </TextBlock>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}" />
+            <TextBlock FontSize="14">
+                <Run Text="Total Quantity:" FontWeight="Bold"/>
+                <Run Text="{Binding TotalQty, StringFormat=N0}" av:Text="100"/>
+            </TextBlock>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}" />
+            <TextBlock FontSize="14">
+                <Run Text="Total Trades:" FontWeight="Bold"/>
+                <Run Text="{Binding TotalTrades, StringFormat=N0}" av:Text="100"/>
+            </TextBlock>
+        </StackPanel>
+        <local:PaginationNavigationUC Grid.Row="3" />
+    </Grid>
+</UserControl>

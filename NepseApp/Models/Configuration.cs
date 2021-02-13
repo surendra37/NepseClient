@@ -13,6 +13,15 @@ namespace NepseApp.Models
                 Settings.Default.Save();
             }
         }
+        public bool ShowFloorsheet
+        {
+            get => Settings.Default.ShowFloorsheet;
+            set
+            {
+                Settings.Default.ShowFloorsheet = value;
+                Settings.Default.Save();
+            }
+        }
         public bool AutoRefreshOnLoad
         {
             get => Settings.Default.AutoRefreshOnLoad;

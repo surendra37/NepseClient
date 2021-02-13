@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="NepseClient.Modules.Stocks.Views.PaginationNavigationUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="av" 
+             av:DesignHeight="141.385" av:DesignWidth="635.811"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="4">
+        <StackPanel.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}" />
+        </StackPanel.Resources>
+        <Button Content="{md:PackIcon Kind=ChevronDoubleLeft}" Command="{Binding FirstCommand}" ToolTip="Go to first page"/>
+        <Button Content="{md:PackIcon Kind=ChevronLeft}" Command="{Binding PreviousCommand}" ToolTip="Go to previous page"/>
+        <Button Command="{Binding RefreshCommand}" ToolTip="Refresh">
+            <TextBlock>
+                <Run Text="{Binding CurrentPage}" av:Text="1"/>
+                /
+                <Run Text="{Binding TotalPage}" av:Text="10"/>
+            </TextBlock>
+        </Button>
+        <Button Content="{md:PackIcon Kind=ChevronRight}" Command="{Binding NextCommand}" ToolTip="Go to next page"/>
+        <Button Content="{md:PackIcon Kind=ChevronDoubleRight}" Command="{Binding LastCommand}" ToolTip="Go to last page"/>
+    </StackPanel>
+</UserControl>

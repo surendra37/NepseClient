@@ -24,8 +24,4 @@ namespace NepseClient.Libraries.NepalStockExchange.Responses
             }
         }
     }
-
-
-
-
 }
