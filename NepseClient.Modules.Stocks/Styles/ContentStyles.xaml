@@ -25,12 +25,63 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="RightCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Grid Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Right"
+                                          VerticalAlignment="Center" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <DataTemplate DataType="{x:Type adapters:NewsSideNavAdapter}">
         <StackPanel HorizontalAlignment="Stretch">
             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="18" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding SubTitle}" FontSize="14" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
             <Separator />
         </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type responses:SecurityStatResponse}">
+        <Grid TextBlock.FontSize="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Symbol}" d:Text="DIS"  TextTrimming="CharacterEllipsis" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding SecurityName}" d:Text="The Walt Disney Company" TextTrimming="CharacterEllipsis" FontSize="14" Opacity="0.6"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding LastTradedPrice, StringFormat=N2}" d:Text="176.96" FontWeight="Bold" HorizontalAlignment="Right"/>
+
+            <TextBlock  Grid.Row="1" Grid.Column="1" Text="{Binding PointChange, StringFormat='+#.00;-#.00;0.00'}"
+                        d:Text="+0.50" FontSize="12" 
+                        Foreground="{Binding PointChange, Converter={StaticResource PolarBrushConverter}}"
+                        HorizontalAlignment="Right"/>
+
+            <Separator Grid.Row="2" Grid.ColumnSpan="3" Background="{Binding IsWatching, Converter={StaticResource WatchingBackgroundBrushConverter}}"/>
+
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add to watchlist" Icon="{md:PackIcon Kind=Add}"
+                              Command="{Binding UpdateWatchingCommand}"
+                              CommandParameter="{Binding}"
+                              Visibility="{Binding IsWatching, Converter={StaticResource InverseBoolToVisConverter}}"/>
+                    <MenuItem Header="Remove from watchlist" Icon="{md:PackIcon Kind=Remove}"
+                              Command="{Binding UpdateWatchingCommand}"
+                              CommandParameter="{Binding}"
+                              Visibility="{Binding IsWatching, Converter={StaticResource boolToVisibilityConverter}}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
+        </Grid>
     </DataTemplate>
     <DataTemplate DataType="{x:Type adapters:StockSideNavAdapter}">
         <Grid TextBlock.FontSize="16">
@@ -68,16 +119,28 @@
         </Grid>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type responses:NewsAndAlertResponse}">
+    <DataTemplate DataType="{x:Type responses:NoticeContent}">
         <StackPanel>
-            <TextBlock Text="{Binding Remarks}" d:Text="Corporate Action Approval" FontSize="14" Opacity="0.6"/>
-            <TextBlock Text="{Binding MessageBody}" FontWeight="Bold" FontSize="18"
+            <TextBlock FontSize="14" Opacity="0.6">
+                <Run Text="{Binding NoticeHeading}" d:Text="Corporate Action Approval" />
+                
+            </TextBlock>
+            <TextBlock Text="{Binding NoticeBody}" FontWeight="Bold" FontSize="18"
                    TextWrapping="Wrap"
                    d:Text="Adjusted Price for Lumbini Bikas Bank Ltd. is Rs. 194.29 for 5 % of Bonus Share."/>
-            <TextBlock Text="{Binding ExpiryDate}" 
+            <TextBlock Text="{Binding NoticeExpiryDate}" 
                    d:Text="	 2020-01-07"
                    Opacity="0.6"
                    FontSize="14"/>
+            <TextBlock FontSize="14" 
+                       Visibility="{Binding HasAttachment, Converter={StaticResource boolToVisibilityConverter}}"
+                       ToolTip="{Binding NoticeFileFullPath}">
+                <Hyperlink Command="{Binding OpenAttachmentCommand}"
+                           CommandParameter="{Binding .}">
+                    <md:PackIcon Kind="Attachment" />
+                    <Run Text="{Binding NoticeFilePath}" />
+                </Hyperlink>
+            </TextBlock>
             <Separator />
         </StackPanel>
     </DataTemplate>

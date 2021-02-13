@@ -62,5 +62,50 @@ namespace NepseClient.Libraries.NepalStockExchange
             var response = Client.Get<NewsAndAlertResponse[]>(api);
             return response.Data;
         }
+
+        public GraphResponse[] GetGraphData(int id)
+        {
+            var api = new RestRequest($"/api/nots/market/graphdata/{id}");
+            var response = Client.Get<GraphResponse[]>(api);
+            return response.Data;
+        }
+
+        public SecurityDetailResponse GetSecurityDetail(int id)
+        {
+            var api = new RestRequest($"/api/nots/security/{id}"); // 132 NIB
+            var response = Client.Get<SecurityDetailResponse>(api);
+            return response.Data;
+        }
+
+        public CorporteActionResponse[] GetCorporateActions(int id)
+        {
+            var api = new RestRequest($"/api/nots/security/corporate-actions/{id}");
+            var response = Client.Get<CorporteActionResponse[]>(api);
+            return response.Data;
+        }
+
+        public SecurityStatResponse[] GetDailyTradStats()
+        {
+            var api = new RestRequest($"/api/nots/securityDailyTradeStat/58");
+            var response = Client.Get<SecurityStatResponse[]>(api);
+            return response.Data;
+        }
+
+        public NoticeReponse GetNotices(int? pageNumber = null)
+        {
+            var request = new RestRequest("/api/nots/news/notice/all");
+            request.AddParameter("page", pageNumber);
+
+            var response = Client.Get<NoticeReponse>(request);
+            foreach (var item in response.Data.Content)
+            {
+                if (item.HasAttachment)
+                {
+                    //https://newweb.nepalstock.com.np/api/nots/news/notice/fetchFiles/8f0c90db48d40e37aac05936f9fa7708.pdf
+                    item.NoticeFileFullPath = $"{Client.BaseUrl}api/nots/news/notice/fetchFiles/{item.NoticeFilePath}";
+                }
+            }
+            return response.Data;
+        }
     }
 }

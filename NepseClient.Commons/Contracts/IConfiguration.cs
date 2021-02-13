@@ -4,5 +4,7 @@
     {
         IMeroShareConfiguration Meroshare { get; }
         ITmsConfiguration Tms { get; }
+        bool ShowNepseNotice { get; set; }
+        bool AutoRefreshOnLoad { get; set; }
     }
 }

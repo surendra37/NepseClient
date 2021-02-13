@@ -16,6 +16,9 @@
     MinWidth="1000" MinHeight="640"
     Title="{Binding Title}"
     xmlns:const="clr-namespace:NepseClient.Commons.Constants;assembly=NepseClient.Commons">
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding ApplicationCommand.RefreshCommand}" />
+    </Window.InputBindings>
     <mde:MaterialWindow.TitleTemplate>
         <DataTemplate>
             <Grid>
@@ -29,14 +32,6 @@
                     <Button Style="{StaticResource WindowButtonStyle}" 
                             Command="{Binding DataContext.ApplicationCommand.RefreshCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
                         <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Refresh" />
-                    </Button>
-                    <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
-                            Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />
-
-                    <Button Style="{StaticResource WindowButtonStyle}" 
-                            ToolTip="Import WACC from meroshare"
-                            Command="{Binding DataContext.ImportPortfolioCommand, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}">
-                        <md:PackIcon Style="{StaticResource WindowButtonIconStyle}" Kind="Import" />
                     </Button>
                     <Border Width="1" VerticalAlignment="Stretch" SnapsToDevicePixels="True" Margin="8,4,8,4"
                             Background="{Binding Path=BorderForegroundBrush, RelativeSource={RelativeSource AncestorType={x:Type mde:MaterialWindow}}}" />

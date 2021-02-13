@@ -4,6 +4,24 @@ namespace NepseApp.Models
 {
     public class Configuration : IConfiguration
     {
+        public bool ShowNepseNotice
+        {
+            get => Settings.Default.ShowNepseNotice;
+            set
+            {
+                Settings.Default.ShowNepseNotice = value;
+                Settings.Default.Save();
+            }
+        }
+        public bool AutoRefreshOnLoad
+        {
+            get => Settings.Default.AutoRefreshOnLoad;
+            set
+            {
+                Settings.Default.AutoRefreshOnLoad = value;
+                Settings.Default.Save();
+            }
+        }
         public ITmsConfiguration Tms { get; } = new TmsConfiguration();
         public IMeroShareConfiguration Meroshare { get; } = new MeroShareConfiguration();
     }

@@ -70,5 +70,17 @@ namespace NepseApp {
                 this["SelectedTab"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowNepseNotice {
+            get {
+                return ((bool)(this["ShowNepseNotice"]));
+            }
+            set {
+                this["ShowNepseNotice"] = value;
+            }
+        }
     }
 }

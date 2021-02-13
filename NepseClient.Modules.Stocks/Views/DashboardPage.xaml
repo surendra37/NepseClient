@@ -18,11 +18,14 @@
 
         <Menu IsMainMenu="True">
             <MenuItem Header="View">
-                <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" Icon="{materialDesign:PackIcon Kind=Refresh}"/>
+                <MenuItem Header="Auto Refresh" IsCheckable="True" 
+                          IsChecked="{Binding AutoRefreshOnLoad}"
+                          Icon="{materialDesign:PackIcon Kind=AutoAwesome}"/>
+                <MenuItem Header="Refresh" Command="{Binding AppCommand.RefreshCommand}" 
+                          Icon="{materialDesign:PackIcon Kind=Refresh}"
+                          InputGestureText="F5"/>
                 <Separator />
-                <MenuItem Header="Price change" IsCheckable="True" IsChecked="{Binding IsPriceChangedSelected}"/>
-                <MenuItem Header="Percentage change" IsCheckable="True" IsChecked="{Binding IsPercentageChangedSelected}"/>
-                <MenuItem Header="Market Cap" IsCheckable="True" IsChecked="{Binding IsMarketCapSelected}"/>
+                <MenuItem Header="Nepse Notice" IsCheckable="True" IsChecked="{Binding ShowNepseNotice}"/>
             </MenuItem>
         </Menu>        
         
