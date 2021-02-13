@@ -6,5 +6,6 @@
         ITmsConfiguration Tms { get; }
         bool ShowNepseNotice { get; set; }
         bool AutoRefreshOnLoad { get; set; }
+        bool ShowFloorsheet { get; set; }
     }
 }

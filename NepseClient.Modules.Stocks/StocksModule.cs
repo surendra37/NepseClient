@@ -25,6 +25,7 @@ namespace NepseClient.Modules.Stocks
             containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
             containerRegistry.RegisterForNavigation<NewsAndAlertPage, NewsAndAlertPageViewModel>();
             containerRegistry.RegisterForNavigation<StockContentPage, StockContentPageViewModel>();
+            containerRegistry.RegisterForNavigation<FloorsheetPage, FloorsheetPageViewModel>();
         }
     }
 }

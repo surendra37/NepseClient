@@ -4,5 +4,6 @@
     {
         string Title { get; }
         string SubTitle { get; }
+        string ViewName { get; }
     }
 }

@@ -107,5 +107,24 @@ namespace NepseClient.Libraries.NepalStockExchange
             }
             return response.Data;
         }
+
+        public FloorsheetResponse GetFloorsheet(int page = 0, string buyer = null, string seller = null, int size = 10, string sort = "contractId,desc")
+        {
+            var api = new RestRequest("/api/nots/nepse-data/floorsheet");
+            api.AddParameter("size", size);
+            api.AddParameter("sort", sort);
+            api.AddParameter("page", page);
+            if (!string.IsNullOrWhiteSpace(buyer))
+            {
+                api.AddParameter("buyerBroker", buyer);
+            }
+            if (!string.IsNullOrWhiteSpace(seller))
+            {
+                api.AddParameter("sellerBroker", seller);
+            }
+
+            var response = Client.Get<FloorsheetResponse>(api);
+            return response.Data;
+        }
     }
 }

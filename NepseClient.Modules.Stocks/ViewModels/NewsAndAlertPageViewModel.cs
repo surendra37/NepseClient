@@ -1,7 +1,7 @@
 ﻿using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Responses;
 using NepseClient.Modules.Commons.Interfaces;
-using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.Stocks.Models;
 
 using Prism.Commands;
 using Prism.Regions;
@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
-    public class NewsAndAlertPageViewModel : ActiveAwareBindableBase, INavigationAware
+    public class NewsAndAlertPageViewModel : PaginationBase, INavigationAware
     {
         private readonly ServiceClient _service;
 
@@ -22,34 +22,15 @@ namespace NepseClient.Modules.Stocks.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        private int _currentPage = 1;
-        public int CurrentPage
-        {
-            get { return _currentPage; }
-            set { SetProperty(ref _currentPage, value); }
-        }
-
-        private int _totalPage = 1;
-        public int TotalPage
-        {
-            get { return _totalPage; }
-            set { SetProperty(ref _totalPage, value); }
-        }
-
         public NewsAndAlertPageViewModel(ServiceClient service, IApplicationCommand applicationCommand)
             : base(applicationCommand)
         {
             _service = service;
         }
 
-        public override void ExecuteRefreshCommand()
-        {
-            Navigate(CurrentPage);
-        }
-
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            RefreshCommand.Execute();
+            //RefreshCommand.Execute();
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
@@ -60,55 +41,9 @@ namespace NepseClient.Modules.Stocks.ViewModels
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
 
-        }
+        }        
 
-        private DelegateCommand _firstCommand;
-        public DelegateCommand FirstCommand =>
-            _firstCommand ?? (_firstCommand = new DelegateCommand(ExecuteFirstCommand, CanExecutePreviousCommand));
-
-        void ExecuteFirstCommand()
-        {
-            Navigate(1);
-        }
-
-        private DelegateCommand _previousCommand;
-        public DelegateCommand PreviousCommand =>
-            _previousCommand ?? (_previousCommand = new DelegateCommand(ExecutePreviousCommand, CanExecutePreviousCommand));
-
-        void ExecutePreviousCommand()
-        {
-            Navigate(CurrentPage - 1);
-        }
-
-        bool CanExecutePreviousCommand()
-        {
-            return CurrentPage > 1;
-        }
-
-        private DelegateCommand _nextCommand;
-        public DelegateCommand NextCommand =>
-            _nextCommand ?? (_nextCommand = new DelegateCommand(ExecuteNextCommand, CanExecuteNextCommand));
-
-        void ExecuteNextCommand()
-        {
-            Navigate(CurrentPage + 1);
-        }
-
-        bool CanExecuteNextCommand()
-        {
-            return CurrentPage < TotalPage;
-        }
-
-        private DelegateCommand _lastCommand;
-        public DelegateCommand LastCommand =>
-            _lastCommand ?? (_lastCommand = new DelegateCommand(ExecuteLastCommand, CanExecuteNextCommand));
-
-        void ExecuteLastCommand()
-        {
-            Navigate(TotalPage);
-        }
-
-        private void Navigate(int page)
+        protected override void Navigate(int page)
         {
 
             try
@@ -124,10 +59,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 CurrentPage = notices.Number + 1;
                 IsBusy = false;
 
-                FirstCommand.RaiseCanExecuteChanged();
-                PreviousCommand.RaiseCanExecuteChanged();
-                NextCommand.RaiseCanExecuteChanged();
-                LastCommand.RaiseCanExecuteChanged();
+                base.Navigate(page);
             }
             catch (Exception ex)
             {

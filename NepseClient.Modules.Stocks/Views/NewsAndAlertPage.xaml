@@ -3,7 +3,8 @@
              xmlns:prism="http://prismlibrary.com/"             
              xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.Stocks.Views.NewsAndAlertPage"             
              prism:ViewModelLocator.AutoWireViewModel="True" av:DesignWidth="512" av:DesignHeight="512"
-             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:NepseClient.Modules.Stocks.Views">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -11,19 +12,6 @@
         </Grid.RowDefinitions>
         <ListBox ItemsSource="{Binding Items}" HorizontalContentAlignment="Stretch" />
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="4">
-            <StackPanel.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}" />
-            </StackPanel.Resources>
-            <Button Content="{md:PackIcon Kind=ChevronDoubleLeft}" Command="{Binding FirstCommand}"/>
-            <Button Content="{md:PackIcon Kind=ChevronLeft}" Command="{Binding PreviousCommand}"/>
-            <TextBlock FontWeight="Bold" FontSize="20" VerticalAlignment="Center">
-                <Run Text="{Binding CurrentPage}" av:Text="1"/>
-                /
-                <Run Text="{Binding TotalPage}" av:Text="10"/>
-            </TextBlock>
-            <Button Content="{md:PackIcon Kind=ChevronRight}" Command="{Binding NextCommand}"/>
-            <Button Content="{md:PackIcon Kind=ChevronDoubleRight}" Command="{Binding LastCommand}"/>
-        </StackPanel>
+        <local:PaginationNavigationUC Grid.Row="1" />
     </Grid>
 </UserControl>

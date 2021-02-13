@@ -34,6 +34,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             get { return _marketStatusText; }
             set { SetProperty(ref _marketStatusText, value); }
         }
+
         public bool ShowNepseNotice
         {
             get => _configuration.ShowNepseNotice;
@@ -42,6 +43,18 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 if (_configuration.ShowNepseNotice != value)
                 {
                     _configuration.ShowNepseNotice = value;
+                    UpdateUI();
+                }
+            }
+        }
+        public bool ShowFloorsheet
+        {
+            get => _configuration.ShowFloorsheet;
+            set
+            {
+                if (_configuration.ShowFloorsheet != value)
+                {
+                    _configuration.ShowFloorsheet = value;
                     UpdateUI();
                 }
             }
@@ -67,7 +80,18 @@ namespace NepseClient.Modules.Stocks.ViewModels
             }
         }
 
-        public NewsSideNavAdapter NepseNotice { get; } = new NewsSideNavAdapter { Title = "Notices", SubTitle = "From Nepse" };
+        public SideNavItem NepseNotice { get; } = new SideNavItem
+        {
+            Title = "Notices",
+            SubTitle = "From Nepse",
+            ViewName = nameof(NewsAndAlertPage),
+        };
+        public SideNavItem Floorsheet { get; } = new SideNavItem
+        {
+            Title = "Floorsheet",
+            SubTitle = "From Nepse",
+            ViewName = nameof(FloorsheetPage),
+        };
 
         public object[] FilteredItems
         {
@@ -79,6 +103,10 @@ namespace NepseClient.Modules.Stocks.ViewModels
                     if (ShowNepseNotice)
                     {
                         list.Add(NepseNotice);
+                    }
+                    if (ShowFloorsheet)
+                    {
+                        list.Add(Floorsheet);
                     }
                     if (Items != null)
                     {
@@ -109,9 +137,13 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
         private void UpdateContentPage(object value)
         {
-            if (value is INewsNavItem news)
+            if (value is ISideNavItem item)
             {
-                _regionManager.RequestNavigate(RegionNames.StocksRegion, nameof(NewsAndAlertPage));
+                var p = new NavigationParameters
+                {
+                    { "Item", item }
+                };
+                _regionManager.RequestNavigate(RegionNames.StocksRegion, item.ViewName);
             }
             else if (value is SecurityStatResponse stocks)
             {

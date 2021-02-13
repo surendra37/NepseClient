@@ -82,5 +82,17 @@ namespace NepseApp {
                 this["ShowNepseNotice"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowFloorsheet {
+            get {
+                return ((bool)(this["ShowFloorsheet"]));
+            }
+            set {
+                this["ShowFloorsheet"] = value;
+            }
+        }
     }
 }
