@@ -58,7 +58,25 @@
                 <MenuItem Header="Refresh" Icon="{md:PackIcon Kind=Refresh}" Command="{Binding ApplicationCommand.RefreshCommand}" InputGestureText="F5"/>
                 <Separator />
                 <MenuItem Header="Show Notices" IsCheckable="True" IsChecked="{Binding ShowNotices}"/>
-                <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>                
+                <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>
+            </MenuItem>
+            <MenuItem Header="TMS">
+                <MenuItem Header="Update Base URL" Command="{Binding UpdateTmsBaseUrl}" Icon="{md:PackIcon Kind=Web}" />
+                <MenuItem Header="Log In" Command="{Binding TmsLogInCommand}" 
+                          Icon="{md:PackIcon Kind=Login}" 
+                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
+                <MenuItem Header="Log Out" Command="{Binding TmsLogOutCommand}" 
+                          Icon="{md:PackIcon Kind=Logout}"
+                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </MenuItem>
+            <MenuItem Header="MeroShare">
+                <MenuItem Header="Update Client Id" Command="{Binding UpdateMeroShareClientId}" Icon="{md:PackIcon Kind=Person}" />
+                <MenuItem Header="Log In" Command="{Binding MeroShareLogInCommand}" 
+                          Icon="{md:PackIcon Kind=Login}" 
+                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
+                <MenuItem Header="Log Out" Command="{Binding MeroShareLogOutCommand}" 
+                          Icon="{md:PackIcon Kind=Logout}"
+                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About" />

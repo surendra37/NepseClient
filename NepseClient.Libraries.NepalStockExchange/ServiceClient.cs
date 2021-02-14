@@ -3,6 +3,7 @@ using NepseClient.Libraries.NepalStockExchange.Responses;
 
 using RestSharp;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -125,6 +126,35 @@ namespace NepseClient.Libraries.NepalStockExchange
 
             var response = Client.Get<FloorsheetResponse>(api);
             return response.Data;
+        }
+
+        public LiveMarketResponse[] GetLiveMarket()
+        {
+            var api = new RestRequest("/api/nots/live-market");
+            var response = Client.Get<LiveMarketResponse[]>(api);
+            return response.Data;
+        }
+
+        public KeyValuePair<DateTime, double>[] GetNepseIndex()
+        {
+            var api = new RestRequest("/api/nots/graph/index/58");
+            var response = Client.Get<double[][]>(api);
+            return response.Data
+                .Select(SelectGraphPredicate).ToArray();
+        }
+        public KeyValuePair<DateTime, double>[] GetSensitiveIndex()
+        {
+            var api = new RestRequest("/api/nots/graph/index/57");
+            var response = Client.Get<double[][]>(api);
+            return response.Data
+                .Select(SelectGraphPredicate).ToArray();
+        }
+
+        private KeyValuePair<DateTime, double> SelectGraphPredicate(double[] args)
+        {
+            var date = new DateTime(1970, 1, 1).AddSeconds(args[0]).ToLocalTime();
+            var value = args[1];
+            return new KeyValuePair<DateTime, double>(date, value);
         }
     }
 }

@@ -81,7 +81,7 @@ namespace NepseApp
 
             moduleCatalog.AddModule<NepseClient.Modules.Stocks.StocksModule>();
 
-            //moduleCatalog.AddModule<MeroShareModule>();
+            moduleCatalog.AddModule<NepseClient.Modules.MeroShare.MeroShareModule>();
             //moduleCatalog.AddModule<TradeManagementSystemModule>();
         }
 

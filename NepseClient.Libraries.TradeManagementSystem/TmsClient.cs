@@ -19,7 +19,7 @@ using System.Security.Authentication;
 
 namespace NepseClient.Libraries.TradeManagementSystem
 {
-    public class TmsClient : IAuthorizable, IDisposable
+    public class TmsClient : IAuthorizable
     {
         private readonly string _cookiPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-cookies.dat");
         private readonly string _dataPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-data.dat");
@@ -102,19 +102,17 @@ namespace NepseClient.Libraries.TradeManagementSystem
         #region Authentication
         public virtual void Authorize()
         {
-            Log.Debug("Authorizing");
-            var cred = PromptCredentials?.Invoke();
-            if (cred is null) throw new AuthenticationException("Authentication cancelled");
-            SignIn(cred);
-            Log.Debug("Authorized");
+
         }
-        private void SignIn(TmsAuthenticationRequest body)
+        public void SignIn(string url, string username, string password)
         {
             Log.Debug("Signing in");
-            ClearSession();
-            var request = new RestRequest("/tmsapi/authenticate");
-            request.AddJsonBody(body);
 
+            var request = new RestRequest("/tmsapi/authenticate");
+            var json = new TmsAuthenticationRequest(username, password);
+            request.AddJsonBody(json);
+
+            Client = RestClientUtils.CreateNewClient(url);
             var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
             if (!response.IsSuccessful)
             {
@@ -122,8 +120,6 @@ namespace NepseClient.Libraries.TradeManagementSystem
                 throw new AuthenticationException(response.Data.Message);
             }
             AuthData = response.Data.Data;
-            CookieUtils.ParseCookies(response, Client.CookieContainer, Client.BaseUrl);
-            SaveSession();
             IsAuthenticated = true;
             Log.Debug("Signed In");
         }

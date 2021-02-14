@@ -37,6 +37,7 @@ namespace NepseApp.Models
     }
     public class MeroShareConfiguration : IMeroShareConfiguration
     {
+        public string BaseUrl => "https://backend.cdsc.com.np";
         private readonly MeroShareConfigurationFile _config;
         public string Username
         {

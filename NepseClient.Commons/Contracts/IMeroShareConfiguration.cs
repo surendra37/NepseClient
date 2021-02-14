@@ -2,6 +2,7 @@
 {
     public interface IMeroShareConfiguration
     {
+        string BaseUrl { get; }
         string Username { get; set; }
         string Password { get; set; }
         string ClientId { get; set; }

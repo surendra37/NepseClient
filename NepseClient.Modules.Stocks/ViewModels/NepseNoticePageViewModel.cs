@@ -34,6 +34,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
             try
             {
+                var live = _service.GetLiveMarket();
                 IsBusy = true;
                 var notices = _service.GetNotices(page - 1);
                 foreach (var item in notices.Content)

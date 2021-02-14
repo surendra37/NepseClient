@@ -85,19 +85,14 @@ namespace NepseClient.Libraries.MeroShare
         #region Authentication
         public virtual void Authorize()
         {
-            Log.Debug("Authorizing...");
-            var cred = PromptCredential?.Invoke();
-            if (cred is null) throw new AuthenticationException("Authentication cancelled");
-            if (string.IsNullOrEmpty(cred.ClientId)) throw new AuthenticationException("Client id is empty. Please select your DP from settings page.");
-            SignIn(cred);
-            Log.Debug("Authorized");
         }
-        private void SignIn(MeroshareAuthRequest credentials)
+        public void SignIn(string clientId, string username, string password)
         {
             Log.Debug("Signing in...");
-            ClearSession();
+
             var request = new RestRequest("/api/meroShare/auth/");
-            request.AddJsonBody(credentials);
+            var json = new MeroshareAuthRequest(clientId, username, password);
+            request.AddJsonBody(json);
 
             var response = Client.Post(request);
             if (!response.IsSuccessful)
@@ -119,14 +114,9 @@ namespace NepseClient.Libraries.MeroShare
             IsAuthenticated = true;
             Log.Debug("Signed In");
         }
-        private void SignOut()
+        public void SignOut()
         {
             Log.Debug("Signing out from MeroShare");
-            if (Client is null)
-            {
-                Log.Debug("Not authorized. No sign out required");
-                return;
-            }
             var request = new RestRequest("/api/meroShare/auth/logout/");
             var response = Client.Get(request);
             Log.Debug(response.Content);

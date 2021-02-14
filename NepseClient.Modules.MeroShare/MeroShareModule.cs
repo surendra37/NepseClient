@@ -24,6 +24,7 @@ namespace NepseClient.Modules.MeroShare
         {
             containerRegistry.RegisterDialog<MyAsbaApplicationFormDialog, MyAsbaApplicationFormDialogViewModel>();
             containerRegistry.RegisterDialog<MyAsbaApplicationReportDialog, MyAsbaApplicationReportDialogViewModel>();
+            containerRegistry.RegisterDialog<UpdateClientDialog, UpdateClientDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<LoginPage, LoginPageViewModel>();
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
