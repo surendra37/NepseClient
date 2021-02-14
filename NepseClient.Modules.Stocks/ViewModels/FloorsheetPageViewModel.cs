@@ -75,29 +75,22 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             try
             {
-                try
-                {
-                    IsBusy = true;
-                    var items = _client.GetFloorsheet(page - 1, Buyer, Seller, Limit);
-                    Items = items.Floorsheets.Content;
-                    TotalPage = items.Floorsheets.TotalPages;
-                    CurrentPage = items.Floorsheets.Number + 1;
-                    TotalAmount = items.TotalAmount;
-                    TotalQty = items.TotalQty;
-                    TotalTrades = items.TotalTrades;
-                    IsBusy = false;
+                IsBusy = true;
+                var items = _client.GetFloorsheet(page - 1, Buyer, Seller, Limit);
+                Items = items.Floorsheets.Content;
+                TotalPage = items.Floorsheets.TotalPages;
+                CurrentPage = items.Floorsheets.Number + 1;
+                TotalAmount = items.TotalAmount;
+                TotalQty = items.TotalQty;
+                TotalTrades = items.TotalTrades;
+                IsBusy = false;
 
-                    base.Navigate(page);
-                }
-                catch (Exception ex)
-                {
-                    IsBusy = false;
-                    LogErrorAndEnqueMessage(ex, "Failed to get news");
-                }
+                base.Navigate(page);
             }
             catch (Exception ex)
             {
-                LogErrorAndEnqueMessage(ex, "Failed to navigate");
+                IsBusy = false;
+                LogErrorAndEnqueMessage(ex, "Failed to get floorsheet");
             }
         }
 

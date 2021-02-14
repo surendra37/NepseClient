@@ -156,5 +156,12 @@ namespace NepseClient.Libraries.NepalStockExchange
             var value = args[1];
             return new KeyValuePair<DateTime, double>(date, value);
         }
+
+        public MarketDepthResonse GetMarketDepth(int id)
+        {
+            var api = new RestRequest($"/api/nots/nepse-data/marketdepth/{id}");//139
+            var response = Client.Get<MarketDepthResonse>(api);
+            return response.Data;
+        }
     }
 }
