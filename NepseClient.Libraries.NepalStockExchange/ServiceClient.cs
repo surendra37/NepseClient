@@ -71,13 +71,6 @@ namespace NepseClient.Libraries.NepalStockExchange
             return response.Data;
         }
 
-        public SecurityDetailResponse GetSecurityDetail(int id)
-        {
-            var api = new RestRequest($"/api/nots/security/{id}"); // 132 NIB
-            var response = Client.Get<SecurityDetailResponse>(api);
-            return response.Data;
-        }
-
         public CorporteActionResponse[] GetCorporateActions(int id)
         {
             var api = new RestRequest($"/api/nots/security/corporate-actions/{id}");
@@ -135,33 +128,74 @@ namespace NepseClient.Libraries.NepalStockExchange
             return response.Data;
         }
 
-        public KeyValuePair<DateTime, double>[] GetNepseIndex()
-        {
-            var api = new RestRequest("/api/nots/graph/index/58");
-            var response = Client.Get<double[][]>(api);
-            return response.Data
-                .Select(SelectGraphPredicate).ToArray();
-        }
-        public KeyValuePair<DateTime, double>[] GetSensitiveIndex()
-        {
-            var api = new RestRequest("/api/nots/graph/index/57");
-            var response = Client.Get<double[][]>(api);
-            return response.Data
-                .Select(SelectGraphPredicate).ToArray();
-        }
-
-        private KeyValuePair<DateTime, double> SelectGraphPredicate(double[] args)
-        {
-            var date = new DateTime(1970, 1, 1).AddSeconds(args[0]).ToLocalTime();
-            var value = args[1];
-            return new KeyValuePair<DateTime, double>(date, value);
-        }
-
         public MarketDepthResonse GetMarketDepth(int id)
         {
             var api = new RestRequest($"/api/nots/nepse-data/marketdepth/{id}");//139
             var response = Client.Get<MarketDepthResonse>(api);
             return response.Data;
         }
+
+        public IndexResponse[] GetIndices()
+        {
+            var request = new RestRequest("/api/nots/nepse-index");
+            var response = Client.Get<IndexResponse[]>(request);
+            return response.Data;
+        }
+
+        #region Securities
+        public SecurityResponse[] GetSecurities(bool nonDelisted = true)
+        {
+            var request = new RestRequest("/api/nots/security");
+            request.AddParameter("nonDelisted", nonDelisted);
+            var response = Client.Get<SecurityResponse[]>(request);
+            return response.Data;
+        }        
+        public SecurityDetailResponse GetSecurityDetail(int id)
+        {
+            var api = new RestRequest($"/api/nots/security/{id}"); // 132 NIB
+            var response = Client.Get<SecurityDetailResponse>(api);
+            return response.Data;
+        }
+        #endregion
+
+        #region Graph
+        public KeyValuePair<DateTime, double>[] GetDailyIndexGraph(int index)
+        {
+            var request = new RestRequest($"/api/nots/graph/index/{index}");
+            return GetGraphResponse(request);
+        }
+        public KeyValuePair<DateTime, double>[] GetPeriodicIndexGraph(int index, DateTime start, DateTime end)
+        {
+            var request = new RestRequest($"/api/nots/graph/index");
+            request.AddParameter("indexCode", index);
+            request.AddParameter("startDate", start.ToString("yyyy-mm-dd"));
+            request.AddParameter("endDate", end.ToString("yyyy-mm-dd"));
+            return GetGraphResponse(request);
+        }
+
+        public KeyValuePair<DateTime, double>[] GetDailyCompanyGraph(int id)
+        {
+            var request = new RestRequest($"/api/nots/market/graphdata/daily/{id}");
+            return GetGraphResponse(request);
+        }
+        public KeyValuePair<DateTime, double>[] GetPeriodicCompanyGraph(int id)
+        {
+            var request = new RestRequest($"/api/nots/market/graphdata/{id}");
+            return GetGraphResponse(request);
+        }
+
+        private KeyValuePair<DateTime, double>[] GetGraphResponse(IRestRequest request)
+        {
+            var response = Client.Get<double[][]>(request);
+            return response.Data
+                .Select(SelectGraphPredicate).ToArray();
+        }
+        private KeyValuePair<DateTime, double> SelectGraphPredicate(double[] args)
+        {
+            var date = new DateTime(1970, 1, 1).AddSeconds(args[0]).ToLocalTime();
+            var value = args[1];
+            return new KeyValuePair<DateTime, double>(date, value);
+        }
+        #endregion
     }
 }

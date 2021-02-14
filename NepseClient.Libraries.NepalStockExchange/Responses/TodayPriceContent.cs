@@ -42,4 +42,6 @@ namespace NepseClient.Libraries.NepalStockExchange.Responses
     {
         public bool IsWatching { get; set; }
     }
+
+
 }

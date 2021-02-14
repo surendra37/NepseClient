@@ -21,7 +21,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
     public class StockContentPageViewModel : ActiveAwareBindableBase, INavigationAware
     {
         private readonly ServiceClient _client;
-        private SecurityStatResponse _navItem;
+        private int _id;
 
         #region Details
         private CorporteActionResponse[] _corporteActions;
@@ -43,6 +43,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
         public FinancialMapper<GraphResponse> OhlcConfiguration { get; }
 
         public GraphResponse[] Items { get; private set; }
+
         private ChartValues<GraphResponse> _closePriceValues;
         public ChartValues<GraphResponse> ClosePriceValues
         {
@@ -94,10 +95,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks)).ToString("d");
         }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return navigationContext.Parameters.TryGetValue("Stock", out _navItem);
-        }
+        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
         public void OnNavigatedFrom(NavigationContext navigationContext)
         {
@@ -106,7 +104,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
-            var success = navigationContext.Parameters.TryGetValue("Stock", out _navItem);
+            var success = navigationContext.Parameters.TryGetValue("Id", out _id);
             if (!success) return;
             RefreshCommand.Execute();
         }
@@ -161,12 +159,9 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
         private void UpdateData()
         {
-            if (_navItem is null) return;
-
-            var id = _navItem.SecurityId;
-            Security = _client.GetSecurityDetail(id);
-            Items = _client.GetGraphData(id);
-            CorporteActions = _client.GetCorporateActions(id);
+            Security = _client.GetSecurityDetail(_id);
+            Items = _client.GetGraphData(_id);
+            CorporteActions = _client.GetCorporateActions(_id);
             LastPrice = Items.LastOrDefault()?.ClosePrice ?? 0;
         }
     }

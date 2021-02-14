@@ -121,7 +121,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             {
                 var p = new NavigationParameters
                 {
-                    { "Stock", stocks }
+                    { "Id", stocks.SecurityId }
                 };
                 _regionManager.RequestNavigate(RegionNames.ContentRegion, nameof(StockContentPage), p);
             }
