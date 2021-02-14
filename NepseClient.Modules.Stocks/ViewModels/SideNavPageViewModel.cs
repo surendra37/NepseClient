@@ -4,12 +4,14 @@ using NepseClient.Commons.Interfaces;
 using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Libraries.NepalStockExchange.Responses;
+using NepseClient.Modules.Commons.Events;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.Stocks.Adapters;
 using NepseClient.Modules.Stocks.Views;
 
 using Prism.Commands;
+using Prism.Events;
 using Prism.Regions;
 
 using Serilog;
@@ -21,10 +23,11 @@ using System.Windows.Threading;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
-    public class DashboardPageViewModel : ActiveAwareBindableBase
+    public class SideNavPageViewModel : ActiveAwareBindableBase
     {
         private readonly IRegionManager _regionManager;
         private readonly IConfiguration _configuration;
+        private readonly IEventAggregator _events;
         private readonly ServiceClient _client;
         private readonly DatabaseContext _context;
 
@@ -33,37 +36,6 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             get { return _marketStatusText; }
             set { SetProperty(ref _marketStatusText, value); }
-        }
-
-        public bool ShowNepseNotice
-        {
-            get => _configuration.ShowNepseNotice;
-            set
-            {
-                if (_configuration.ShowNepseNotice != value)
-                {
-                    _configuration.ShowNepseNotice = value;
-                    UpdateUI();
-                }
-            }
-        }
-        public bool ShowFloorsheet
-        {
-            get => _configuration.ShowFloorsheet;
-            set
-            {
-                if (_configuration.ShowFloorsheet != value)
-                {
-                    _configuration.ShowFloorsheet = value;
-                    UpdateUI();
-                }
-            }
-        }
-
-        public bool AutoRefreshOnLoad
-        {
-            get => _configuration.AutoRefreshOnLoad;
-            set => _configuration.AutoRefreshOnLoad = value;
         }
 
         #region Side Nav
@@ -84,7 +56,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
         {
             Title = "Notices",
             SubTitle = "From Nepse",
-            ViewName = nameof(NewsAndAlertPage),
+            ViewName = nameof(NepseNoticePage),
         };
         public SideNavItem Floorsheet { get; } = new SideNavItem
         {
@@ -100,11 +72,11 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 if (string.IsNullOrWhiteSpace(SearchText))
                 {
                     var list = new List<object>();
-                    if (ShowNepseNotice)
+                    if (_configuration.ShowNepseNotice)
                     {
                         list.Add(NepseNotice);
                     }
-                    if (ShowFloorsheet)
+                    if (_configuration.ShowFloorsheet)
                     {
                         list.Add(Floorsheet);
                     }
@@ -143,7 +115,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 {
                     { "Item", item }
                 };
-                _regionManager.RequestNavigate(RegionNames.StocksRegion, item.ViewName);
+                _regionManager.RequestNavigate(RegionNames.ContentRegion, item.ViewName);
             }
             else if (value is SecurityStatResponse stocks)
             {
@@ -151,7 +123,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
                 {
                     { "Stock", stocks }
                 };
-                _regionManager.RequestNavigate(RegionNames.StocksRegion, nameof(StockContentPage), p);
+                _regionManager.RequestNavigate(RegionNames.ContentRegion, nameof(StockContentPage), p);
             }
         }
 
@@ -171,12 +143,14 @@ namespace NepseClient.Modules.Stocks.ViewModels
         }
         #endregion
 
-        public DashboardPageViewModel(IRegionManager regionManager, IApplicationCommand appCommand, IConfiguration configuration,
+        public SideNavPageViewModel(IRegionManager regionManager, IApplicationCommand appCommand,
+            IConfiguration configuration, IEventAggregator events,
             ServiceClient client, DatabaseContext context)
             : base(appCommand)
         {
             _regionManager = regionManager;
             _configuration = configuration;
+            _events = events;
             _client = client;
             _context = context;
 
@@ -184,6 +158,15 @@ namespace NepseClient.Modules.Stocks.ViewModels
             var timer = new DispatcherTimer(new TimeSpan(0, 0, 10), DispatcherPriority.Background,
                     Timer_Tick, Dispatcher.CurrentDispatcher);
             //RefreshCommand.Execute();
+            _events.GetEvent<UpdateUIEvent>().Subscribe(UpdateUI_Triggered);
+        }
+
+        private void UpdateUI_Triggered(string regionName)
+        {
+            if (nameof(RegionNames.SideNavRegion).Equals(regionName))
+            {
+                UpdateUI();
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)

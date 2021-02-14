@@ -42,24 +42,34 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <!--<mde:NavigationRail 
-            Grid.Column="0" Grid.RowSpan="2" 
-            Items="{Binding Path=NavigationItems, Mode=OneTime}"
-            NavigationItemSelected="NavigationItemSelectedHandler" 
-            Style="{StaticResource MaterialDesignNavigationRailPrimary}"/>-->
 
-        <!--<GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Stretch"/>-->
+        <Menu Grid.Row="0" Grid.ColumnSpan="3" IsMainMenu="True">
+            <MenuItem Header="File" />
+            <MenuItem Header="Edit" />
+            <MenuItem Header="View" >
+                <MenuItem Header="Refresh" Icon="{md:PackIcon Kind=Refresh}" Command="{Binding ApplicationCommand.RefreshCommand}" InputGestureText="F5"/>
+                <Separator />
+                <MenuItem Header="Show Notices" IsCheckable="True" IsChecked="{Binding ShowNotices}"/>
+                <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>                
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About" />
+            </MenuItem>
+        </Menu>
 
-        <ContentControl Grid.Column="2" prism:RegionManager.RegionName="{x:Static const:RegionNames.ContentRegion}" />
+        <ContentControl Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" prism:RegionManager.RegionName="{x:Static const:RegionNames.SideNavRegion}" />
+        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" Width="8" ResizeBehavior="PreviousAndNext" />
 
-        <md:Snackbar Grid.Row="1" Grid.ColumnSpan="3" MessageQueue="{Binding MessageQueue}" />
+        <ContentControl Grid.Row="1" Grid.Column="2" prism:RegionManager.RegionName="{x:Static const:RegionNames.ContentRegion}" />
+
+        <md:Snackbar Grid.Row="2" Grid.Column="2" MessageQueue="{Binding MessageQueue}" />
     </Grid>
 </mde:MaterialWindow>

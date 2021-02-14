@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
-    public class NewsAndAlertPageViewModel : PaginationBase, INavigationAware
+    public class NepseNoticePageViewModel : PaginationBase
     {
         private readonly ServiceClient _service;
 
@@ -22,26 +22,12 @@ namespace NepseClient.Modules.Stocks.ViewModels
             set { SetProperty(ref _items, value); }
         }
 
-        public NewsAndAlertPageViewModel(ServiceClient service, IApplicationCommand applicationCommand)
+        public NepseNoticePageViewModel(ServiceClient service, IApplicationCommand applicationCommand)
             : base(applicationCommand)
         {
             _service = service;
+            RefreshCommand.Execute();
         }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            //RefreshCommand.Execute();
-        }
-
-        public bool IsNavigationTarget(NavigationContext navigationContext)
-        {
-            return true;
-        }
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-
-        }        
 
         protected override void Navigate(int page)
         {

@@ -3,11 +3,11 @@
 namespace NepseClient.Modules.Stocks.Views
 {
     /// <summary>
-    /// Interaction logic for DashboardPage
+    /// Interaction logic for NepseNoticePage
     /// </summary>
-    public partial class DashboardPage : UserControl
+    public partial class NepseNoticePage : UserControl
     {
-        public DashboardPage()
+        public NepseNoticePage()
         {
             InitializeComponent();
         }

@@ -10,6 +10,7 @@ using NepseClient.Libraries.MeroShare;
 using NepseClient.Libraries.MeroShare.Models.Requests;
 using NepseClient.Libraries.TradeManagementSystem;
 using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
+using NepseClient.Modules.Commons.Events;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.MeroShare.Extensions;
 using NepseClient.Modules.MeroShare.Views;
@@ -18,6 +19,7 @@ using NepseClient.Modules.TradeManagementSystem.Views;
 using Newtonsoft.Json;
 
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -39,6 +41,9 @@ namespace NepseApp.ViewModels
         private readonly IRegionManager _regionManager;
 
         public IApplicationCommand ApplicationCommand { get; }
+
+        private UpdateUIEvent _updateUIEvent;
+
         public ISnackbarMessageQueue MessageQueue => ApplicationCommand.MessageQueue;
 
         private string _title = "Nepse App";
@@ -55,6 +60,26 @@ namespace NepseApp.ViewModels
             set { SetProperty(ref _message, value); }
         }
 
+        public bool ShowNotices
+        {
+            get => _config.ShowNepseNotice;
+            set
+            {
+                _config.ShowNepseNotice = value;
+                _updateUIEvent.Publish(nameof(RegionNames.SideNavRegion));
+            }
+        }
+
+        public bool ShowFloorsheets
+        {
+            get => _config.ShowFloorsheet;
+            set
+            {
+                _config.ShowFloorsheet = value;
+                _updateUIEvent.Publish(nameof(RegionNames.SideNavRegion));
+            }
+        }
+
         public IEnumerable<INavigationItem> NavigationItems => GetNavigationItem().ToArray();
 
         private object UpdateNavigationSelection(string source)
@@ -66,7 +91,8 @@ namespace NepseApp.ViewModels
         }
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
-            TmsClient nepse, IDialogService dialog, MeroshareClient meroshareClient, IConfiguration config)
+            TmsClient nepse, IDialogService dialog, IEventAggregator events,
+            MeroshareClient meroshareClient, IConfiguration config)
         {
             _regionManager = regionManager;
             _client = nepse;
@@ -74,6 +100,8 @@ namespace NepseApp.ViewModels
             _meroshareClient = meroshareClient;
             _config = config;
             ApplicationCommand = applicationCommand;
+
+            _updateUIEvent = events.GetEvent<UpdateUIEvent>();
 
             applicationCommand.ShowMessage = ShowMessage;
             _client.PromptCredentials = GetTmsCredentials;

@@ -68,6 +68,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
         public FloorsheetPageViewModel(IApplicationCommand appCommand, ServiceClient client) : base(appCommand)
         {
             _client = client;
+            RefreshCommand.Execute();
         }
 
         protected override void Navigate(int page)

@@ -14,18 +14,18 @@ namespace NepseClient.Modules.Stocks
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var regionManager = containerProvider.Resolve<IRegionManager>();
-
-            regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(DashboardPage));
+            regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(SideNavPage));
+            regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(NepseNoticePage));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<ServiceClient>();
 
-            containerRegistry.RegisterForNavigation<DashboardPage, DashboardPageViewModel>();
-            containerRegistry.RegisterForNavigation<NewsAndAlertPage, NewsAndAlertPageViewModel>();
-            containerRegistry.RegisterForNavigation<StockContentPage, StockContentPageViewModel>();
+            containerRegistry.RegisterForNavigation<SideNavPage, SideNavPageViewModel>();
+            containerRegistry.RegisterForNavigation<NepseNoticePage, NepseNoticePageViewModel>();
             containerRegistry.RegisterForNavigation<FloorsheetPage, FloorsheetPageViewModel>();
+            containerRegistry.RegisterForNavigation<StockContentPage, StockContentPageViewModel>();
         }
     }
 }

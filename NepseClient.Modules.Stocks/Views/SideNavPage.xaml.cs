@@ -3,11 +3,11 @@
 namespace NepseClient.Modules.Stocks.Views
 {
     /// <summary>
-    /// Interaction logic for NewsAndAlertPage
+    /// Interaction logic for SideNavPage
     /// </summary>
-    public partial class NewsAndAlertPage : UserControl
+    public partial class SideNavPage : UserControl
     {
-        public NewsAndAlertPage()
+        public SideNavPage()
         {
             InitializeComponent();
         }
