@@ -7,140 +7,139 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" MinHeight="256"/>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Margin="8 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Security.Security.Symbol}" av:Text="NIB" FontWeight="Bold" FontSize="20"/>
-            <TextBlock Grid.Column="1" Text="{Binding Security.Security.SecurityName}" av:Text="Nepal Investment Bank Limited" VerticalAlignment="Bottom"
+        <StackPanel>
+            <Grid Margin="8 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Security.Security.Symbol}" av:Text="NIB" FontWeight="Bold" FontSize="20"/>
+                <TextBlock Grid.Column="1" Text="{Binding Security.Security.SecurityName}" av:Text="Nepal Investment Bank Limited" VerticalAlignment="Bottom"
                        Margin="4 0"/>
 
-            <TextBlock Grid.Column="3" 
+                <TextBlock Grid.Column="3" 
                        Text="{Binding Security.SecurityDailyTradeDto.LastTradedPrice, StringFormat='N2'}" 
                        av:Text="465.00" FontSize="20"/>
-            <TextBlock Grid.Column="4" 
-                       Text="{Binding Security.SecurityDailyTradeDto.PointChange, StringFormat='+#.00;-#.00;0.00'}" 
+                <TextBlock Grid.Column="4" 
+                       Text="{Binding Security.SecurityDailyTradeDto.PointChange, StringFormat='+0.00;-0.00;0.00'}" 
                        av:Text="5.00" Margin="4 0"
                        VerticalAlignment="Bottom"
                        Foreground="{Binding Security.SecurityDailyTradeDto.PointChange, Converter={StaticResource PolarBrushConverter}}"/>
-        </Grid>
-        
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <StackPanel.Resources>
-                <Style TargetType="RadioButton" BasedOn="{StaticResource MaterialDesignChoiceChipRadioButton}" />
-            </StackPanel.Resources>
-            <RadioButton Content="1D" Command="{Binding FilterGraphCommand}" CommandParameter="1D" Visibility="Hidden"/>
-            <RadioButton Content="1W" IsChecked="True"  Command="{Binding FilterGraphCommand}" CommandParameter="1W"/>
-            <RadioButton Content="1M"  Command="{Binding FilterGraphCommand}" CommandParameter="1M"/>
-            <RadioButton Content="3M"  Command="{Binding FilterGraphCommand}" CommandParameter="3M"/>
-            <RadioButton Content="6M"  Command="{Binding FilterGraphCommand}" CommandParameter="6M"/>
-            <RadioButton Content="1Y"  Command="{Binding FilterGraphCommand}" CommandParameter="1Y"/>
-            <RadioButton Content="2Y"  Command="{Binding FilterGraphCommand}" CommandParameter="2Y"/>
-            <RadioButton Content="5Y"  Command="{Binding FilterGraphCommand}" CommandParameter="5Y"/>
-            <RadioButton Content="10Y" Command="{Binding FilterGraphCommand}" CommandParameter="10Y"/>
-            <RadioButton Content="All" Command="{Binding FilterGraphCommand}" CommandParameter="All"/>
-        </StackPanel>
+            </Grid>
 
-        <lvc:CartesianChart Grid.Row="2">
-            <lvc:CartesianChart.Series>
-                <lvc:LineSeries Title="Close Price"
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="RadioButton" BasedOn="{StaticResource MaterialDesignChoiceChipRadioButton}" />
+                </StackPanel.Resources>
+                <RadioButton Content="1D" Command="{Binding FilterGraphCommand}" CommandParameter="1D" Visibility="Hidden"/>
+                <RadioButton Content="1W" IsChecked="True"  Command="{Binding FilterGraphCommand}" CommandParameter="1W"/>
+                <RadioButton Content="1M"  Command="{Binding FilterGraphCommand}" CommandParameter="1M"/>
+                <RadioButton Content="3M"  Command="{Binding FilterGraphCommand}" CommandParameter="3M"/>
+                <RadioButton Content="6M"  Command="{Binding FilterGraphCommand}" CommandParameter="6M"/>
+                <RadioButton Content="1Y"  Command="{Binding FilterGraphCommand}" CommandParameter="1Y"/>
+                <RadioButton Content="2Y"  Command="{Binding FilterGraphCommand}" CommandParameter="2Y"/>
+                <RadioButton Content="5Y"  Command="{Binding FilterGraphCommand}" CommandParameter="5Y"/>
+                <RadioButton Content="10Y" Command="{Binding FilterGraphCommand}" CommandParameter="10Y"/>
+                <RadioButton Content="All" Command="{Binding FilterGraphCommand}" CommandParameter="All"/>
+            </StackPanel>
+
+            <lvc:CartesianChart MinHeight="256">
+                <lvc:CartesianChart.Series>
+                    <lvc:LineSeries Title="Close Price"
                                 Values="{Binding ClosePriceValues}" 
                                 Configuration="{Binding ClosePriceConfiguration}" />
-                <lvc:OhlcSeries Title="OHLC"
+                    <lvc:OhlcSeries Title="OHLC"
                                 Values="{Binding ClosePriceValues}" 
                                 Configuration="{Binding OhlcConfiguration}"
                                 Visibility="{Binding IsOhlcVisible, Converter={StaticResource boolToVisibilityConverter}}"/>
-            </lvc:CartesianChart.Series>
-            <lvc:CartesianChart.AxisX>
-                <lvc:Axis LabelFormatter="{Binding Formatter}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
-            </lvc:CartesianChart.AxisX>
-            <lvc:CartesianChart.AxisY>
-                <lvc:Axis Name="Axis">
-                    <lvc:Axis.Sections>
-                        <lvc:AxisSection Value="{Binding LastPrice}" StrokeThickness="3" Stroke="#F9D648">
-                            <lvc:AxisSection.Fill>
-                                <SolidColorBrush Color="#A3A3FF" Opacity=".4"></SolidColorBrush>
-                            </lvc:AxisSection.Fill>
-                        </lvc:AxisSection>
-                    </lvc:Axis.Sections>
-                </lvc:Axis>
-            </lvc:CartesianChart.AxisY>
-        </lvc:CartesianChart>
+                </lvc:CartesianChart.Series>
+                <lvc:CartesianChart.AxisX>
+                    <lvc:Axis LabelFormatter="{Binding Formatter}" Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
+                </lvc:CartesianChart.AxisX>
+                <lvc:CartesianChart.AxisY>
+                    <lvc:Axis Name="Axis">
+                        <lvc:Axis.Sections>
+                            <lvc:AxisSection Value="{Binding LastPrice}" StrokeThickness="3" Stroke="#F9D648">
+                                <lvc:AxisSection.Fill>
+                                    <SolidColorBrush Color="#A3A3FF" Opacity=".4"></SolidColorBrush>
+                                </lvc:AxisSection.Fill>
+                            </lvc:AxisSection>
+                        </lvc:Axis.Sections>
+                    </lvc:Axis>
+                </lvc:CartesianChart.AxisY>
+            </lvc:CartesianChart>
 
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Open" Margin="8 0"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.OpenPrice, StringFormat=N2}" av:Text="137.35" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Open" Margin="8 0"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.OpenPrice, StringFormat=N2}" av:Text="137.35" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="3" Text="Volume" Margin="8 0" />
-            <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding Security.SecurityDailyTradeDto.TotalTradeQuantity, StringFormat=N0}" av:Text="72.32M" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="Volume" Margin="8 0" />
+                <TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding Security.SecurityDailyTradeDto.TotalTradeQuantity, StringFormat=N0}" av:Text="72.32M" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="6" Text="52W H" Margin="8 0" />
-            <TextBlock Grid.Row="0" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.FiftyTwoWeekHigh, StringFormat=N2}" av:Text="145.09" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="0" Grid.Column="6" Text="52W H" Margin="8 0" />
+                <TextBlock Grid.Row="0" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.FiftyTwoWeekHigh, StringFormat=N2}" av:Text="145.09" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="9" Text="Yield" Margin="8 0" />
-            <TextBlock Grid.Row="0" Grid.Column="10" Text="{Binding Text}" av:Text="0.60%" FontWeight="Bold" TextAlignment="Right"/>
-
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="High" Margin="8 0"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.HighPrice, StringFormat=N2}" av:Text="137.41" FontWeight="Bold" TextAlignment="Right"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="3" Text="P/E" Margin="8 0" />
-            <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Text}" av:Text="37.09" FontWeight="Bold" TextAlignment="Right"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="6" Text="52W L" Margin="8 0" />
-            <TextBlock Grid.Row="1" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.FiftyTwoWeekLow, StringFormat=N2}" av:Text="53.15" FontWeight="Bold" TextAlignment="Right"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="9" Text="Beta" Margin="8 0" />
-            <TextBlock Grid.Row="1" Grid.Column="10" Text="{Binding Text}" av:Text="1.27" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="0" Grid.Column="9" Text="Yield" Margin="8 0" />
+                <TextBlock Grid.Row="0" Grid.Column="10" Text="{Binding Text}" av:Text="0.60%" FontWeight="Bold" TextAlignment="Right"/>
 
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Low" Margin="8 0"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.LowPrice, StringFormat=F2}" av:Text="135.86" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="High" Margin="8 0"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.HighPrice, StringFormat=N2}" av:Text="137.41" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="3" Text="Mkt Cap" Margin="8 0" />
-            <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding Security.MarketCapitalization, Converter={StaticResource LargeNumberConverter}}" av:Text="2.296T" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="P/E" Margin="8 0" />
+                <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding Text}" av:Text="37.09" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="6" Text="Avg Vol" Margin="8 0" />
-            <TextBlock Grid.Row="2" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.AverageVolume, Converter={StaticResource LargeNumberConverter}}" av:Text="106.9M" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="1" Grid.Column="6" Text="52W L" Margin="8 0" />
+                <TextBlock Grid.Row="1" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.FiftyTwoWeekLow, StringFormat=N2}" av:Text="53.15" FontWeight="Bold" TextAlignment="Right"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="9" Text="EPS" Margin="8 0" />
-            <TextBlock Grid.Row="2" Grid.Column="10" Text="{Binding Text}" av:Text="3.69" FontWeight="Bold" TextAlignment="Right"/>
+                <TextBlock Grid.Row="1" Grid.Column="9" Text="Beta" Margin="8 0" />
+                <TextBlock Grid.Row="1" Grid.Column="10" Text="{Binding Text}" av:Text="1.27" FontWeight="Bold" TextAlignment="Right"/>
 
-            <Separator Grid.Column="2" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
-            <Separator Grid.Column="5" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
-            <Separator Grid.Column="8" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
-        </Grid>
 
-        <DataGrid Grid.Row="4" IsReadOnly="True" ItemsSource="{Binding CorporteActions}"
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Low" Margin="8 0"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Security.SecurityDailyTradeDto.LowPrice, StringFormat=F2}" av:Text="135.86" FontWeight="Bold" TextAlignment="Right"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="Mkt Cap" Margin="8 0" />
+                <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding Security.MarketCapitalization, Converter={StaticResource LargeNumberConverter}}" av:Text="2.296T" FontWeight="Bold" TextAlignment="Right"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="6" Text="Avg Vol" Margin="8 0" />
+                <TextBlock Grid.Row="2" Grid.Column="7" Text="{Binding Security.SecurityDailyTradeDto.AverageVolume, Converter={StaticResource LargeNumberConverter}}" av:Text="106.9M" FontWeight="Bold" TextAlignment="Right"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="9" Text="EPS" Margin="8 0" />
+                <TextBlock Grid.Row="2" Grid.Column="10" Text="{Binding Text}" av:Text="3.69" FontWeight="Bold" TextAlignment="Right"/>
+
+                <Separator Grid.Column="2" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+                <Separator Grid.Column="5" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+                <Separator Grid.Column="8" Grid.RowSpan="3" Style="{StaticResource VerticalSeparatorStyle}"/>
+            </Grid>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" IsReadOnly="True" ItemsSource="{Binding CorporteActions}"
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Fiscal Year" Binding="{Binding FiscalYear}"/>

@@ -8,6 +8,8 @@ using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Views;
 
+using Ookii.Dialogs.Wpf;
+
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
@@ -46,10 +48,28 @@ namespace NepseApp
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Log.Fatal(e.Exception, "Unknown error occured");
-            var result = MessageBox.Show("An unknown error has occured. Do you wish to continue? \n" + e.Exception.Message,
-                "Unknown Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            if (!TaskDialog.OSSupportsTaskDialogs)
+            {
+                var result = MessageBox.Show("Do you want to ignore this unknown error?\n\r" + e.Exception.Message,
+                    "Unknown error occured", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                e.Handled = result == MessageBoxResult.Yes;
+                return;
+            }
+            using (var dialog = new TaskDialog())
+            {
+                dialog.WindowTitle = "Unknown error occured";
+                dialog.MainInstruction = "An unknown error has occurred. Do you wish to ignore and continue?";
+                dialog.Content = e.Exception.Message;
+                dialog.ExpandedInformation = e.Exception.StackTrace;
+                dialog.MainIcon = TaskDialogIcon.Error;
+                TaskDialogButton okButton = new TaskDialogButton("Ignore");
+                TaskDialogButton cancelButton = new TaskDialogButton("Exit");
+                dialog.Buttons.Add(okButton);
+                dialog.Buttons.Add(cancelButton);
+                TaskDialogButton button = dialog.ShowDialog(Current.MainWindow);
 
-            e.Handled = result == MessageBoxResult.Yes;
+                e.Handled = button == okButton;
+            };
         }
 
         protected override Window CreateShell()
@@ -69,10 +89,10 @@ namespace NepseApp
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 
-            
+
             containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
             containerRegistry.RegisterForNavigation<TmsLiveMarketPage, TmsLiveMarketPageViewModel>();
-            
+
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
