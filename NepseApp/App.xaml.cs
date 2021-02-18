@@ -4,7 +4,6 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
-using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Views;
 
@@ -83,9 +82,9 @@ namespace NepseApp
 
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
             containerRegistry.RegisterSingleton<IConfiguration, Configuration>();
-            //containerRegistry.RegisterSingleton<MeroshareClient>();
-            //containerRegistry.RegisterSingleton<TmsClient>();
-            containerRegistry.RegisterSingleton<DatabaseContext, SQLiteDatabaseContext>();
+            containerRegistry.RegisterSingleton<NepseClient.Libraries.MeroShare.MeroshareClient>();
+            containerRegistry.RegisterSingleton<NepseClient.Libraries.TradeManagementSystem.TmsClient>();
+            containerRegistry.RegisterSingleton<NepseClient.Libraries.NepalStockExchange.Contexts.DatabaseContext, SQLiteDatabaseContext>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
 
@@ -100,15 +99,14 @@ namespace NepseApp
             base.ConfigureModuleCatalog(moduleCatalog);
 
             moduleCatalog.AddModule<NepseClient.Modules.Stocks.StocksModule>();
-
             moduleCatalog.AddModule<NepseClient.Modules.MeroShare.MeroShareModule>();
-            //moduleCatalog.AddModule<TradeManagementSystemModule>();
+            moduleCatalog.AddModule<NepseClient.Modules.TradeManagementSystem.TradeManagementSystemModule>();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            //Container.Resolve<TmsClient>().Dispose();
-            //Container.Resolve<MeroshareClient>().Dispose();
+            Container.Resolve<NepseClient.Libraries.TradeManagementSystem.TmsClient>().SignOut();
+            Container.Resolve<NepseClient.Libraries.MeroShare.MeroshareClient>().SignOut();
             Log.CloseAndFlush();
             base.OnExit(e);
         }

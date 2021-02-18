@@ -22,6 +22,8 @@ namespace NepseClient.Modules.MeroShare
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterForNavigation<SideNavPage, SideNavPageViewModel>("MeroShareNavPage");
+
             containerRegistry.RegisterDialog<MyAsbaApplicationFormDialog, MyAsbaApplicationFormDialogViewModel>();
             containerRegistry.RegisterDialog<MyAsbaApplicationReportDialog, MyAsbaApplicationReportDialogViewModel>();
             containerRegistry.RegisterDialog<UpdateClientDialog, UpdateClientDialogViewModel>();

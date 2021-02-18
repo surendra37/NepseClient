@@ -6,6 +6,7 @@ using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
 using NepseClient.Libraries.MeroShare;
 using NepseClient.Libraries.MeroShare.Models.Requests;
+using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Libraries.TradeManagementSystem;
 using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
 using NepseClient.Modules.Commons.Events;
@@ -35,6 +36,7 @@ namespace NepseApp.ViewModels
     {
         private readonly TmsClient _client;
         private readonly IDialogService _dialog;
+        private readonly DatabaseContext _database;
         private readonly MeroshareClient _meroshareClient;
         private readonly IConfiguration _config;
         private readonly IRegionManager _regionManager;
@@ -79,12 +81,13 @@ namespace NepseApp.ViewModels
         }
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
-            TmsClient nepse, IDialogService dialog, IEventAggregator events,
+            TmsClient nepse, IDialogService dialog, IEventAggregator events, DatabaseContext database,
             MeroshareClient meroshareClient, IConfiguration config)
         {
             _regionManager = regionManager;
             _client = nepse;
             _dialog = dialog;
+            _database = database;
             _meroshareClient = meroshareClient;
             _config = config;
             ApplicationCommand = applicationCommand;
@@ -103,46 +106,6 @@ namespace NepseApp.ViewModels
         void ExecuteShowMessageCommand(object parameter)
         {
             MessageQueue.Enqueue(parameter);
-        }
-
-        private bool _isImporting;
-        public bool IsImporting
-        {
-            get { return _isImporting; }
-            set
-            {
-                if (SetProperty(ref _isImporting, value))
-                {
-                    ImportPortfolioCommand.RaiseCanExecuteChanged();
-                }
-            }
-        }
-
-        private DelegateCommand _importPortfolioCommand;
-        public DelegateCommand ImportPortfolioCommand =>
-            _importPortfolioCommand ?? (_importPortfolioCommand = new DelegateCommand(ExecuteImportPortfolioCommand, () => !IsImporting));
-
-        void ExecuteImportPortfolioCommand()
-        {
-            try
-            {
-                IsImporting = true;
-                MessageQueue.Enqueue("Importing wacc from meroshare");
-
-                var myShares = _meroshareClient.GetMyShares();
-                var waccs = _meroshareClient.GetWaccs(myShares).ToArray();
-
-                var path = Path.Combine(PathConstants.AppDataPath.Value, "wacc.json");
-                File.WriteAllText(path, JsonConvert.SerializeObject(waccs));
-                MessageQueue.Enqueue("Wacc imported.");
-                IsImporting = false;
-            }
-            catch (System.Exception ex)
-            {
-                IsImporting = false;
-                MessageQueue.Enqueue("Failed to load portfolio. Error: " + ex.Message);
-                Log.Error(ex, "Failed to import portfolio");
-            }
         }
 
         private void ShowMessage(string message)
@@ -273,6 +236,7 @@ namespace NepseApp.ViewModels
                         _client.SignIn(url, username, password);
                         IsTmsLoggedIn = true;
                         dialog.ConfirmCredentials(true);
+                        _regionManager.RequestNavigate(RegionNames.SideNavRegion, "TmsNavPage");
                     }
                 }
             }
@@ -293,7 +257,7 @@ namespace NepseApp.ViewModels
             {
                 _client.SignOut();
                 var url = _config.Tms.BaseUrl;
-                CredentialDialog.DeleteCredential(url);
+                //CredentialDialog.DeleteCredential(url);
                 IsTmsLoggedIn = false;
 
             }
@@ -338,7 +302,6 @@ namespace NepseApp.ViewModels
                     Content = "Enter your username and password provided by your broker",
                     WindowTitle = "Input MeroShare Credentials",
                     Target = "https://backend.cdsc.com.np",
-                    UseApplicationInstanceCredentialCache = false,
                     ShowSaveCheckBox = true,
                     ShowUIForSavedCredentials = true,
                 };
@@ -351,6 +314,8 @@ namespace NepseApp.ViewModels
                         _meroshareClient.SignIn(clientId, username, password); //176//150394//vVy.$3pz7wx#y9S
                         IsMeroShareLoggedIn = true;
                         dialog.ConfirmCredentials(true);
+
+                        _regionManager.RequestNavigate(RegionNames.SideNavRegion, "MeroShareNavPage");
                     }
                 }
             }
@@ -378,6 +343,27 @@ namespace NepseApp.ViewModels
             {
                 Log.Error(ex, "Failed to log out to mero share");
                 MessageBoxManager.ShowErrorMessage(ex, "Log out Failed");
+            }
+        }
+
+        private DelegateCommand _importPortfolioCommand;
+        public DelegateCommand ImportPortfolioCommand =>
+            _importPortfolioCommand ?? (_importPortfolioCommand = new DelegateCommand(ExecuteImportPortfolioCommand));
+
+        async void ExecuteImportPortfolioCommand()
+        {
+            try
+            {
+                var portfolio = await _meroshareClient.GetMySharesAsync();
+                foreach (var item in portfolio)
+                {
+                    _database.Watchlist.Update(item, true);
+                }
+                ApplicationCommand.RefreshCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to import portfolio");
             }
         }
         #endregion

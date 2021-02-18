@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="NepseClient.Modules.TradeManagementSystem.Views.SideNavPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
+    <mde:SideNavigation Items="{Binding Path=NavigationItems, Mode=OneTime}" 
+                        NavigationItemSelectedCommand="{Binding OnNavigated}"/>
+</UserControl>

@@ -1,92 +1,33 @@
-﻿using NepseClient.Commons.Constants;
-using NepseClient.Commons.Contracts;
+﻿using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
 using NepseClient.Commons.Utils;
 using NepseClient.Libraries.TradeManagementSystem.Models;
 using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
 using NepseClient.Libraries.TradeManagementSystem.Models.Responses;
-
-using Newtonsoft.Json;
+using NepseClient.Libraries.TradeManagementSystem.Responses;
 
 using RestSharp;
 using RestSharp.Authenticators;
 
 using Serilog;
 
-using System;
-using System.IO;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace NepseClient.Libraries.TradeManagementSystem
 {
     public class TmsClient : IAuthorizable
     {
-        private readonly string _cookiPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-cookies.dat");
-        private readonly string _dataPath = Path.Combine(PathConstants.AppDataPath.Value, "tms-data.dat");
-
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
-        private ITmsConfiguration _config;
 
         public IRestClient Client { get; private set; }
-        public Func<TmsAuthenticationRequest> PromptCredentials { get; set; }
-
-        public TmsClient(IConfiguration config)
-        {
-            _config = config.Tms;
-
-            ValidateBaseUrl();
-            Client = RestClientUtils.CreateNewClient(_config.BaseUrl);
-            Client.Authenticator = new TmsAuthenticator();
-
-            RestoreSession();
-        }
-
-        private void ValidateBaseUrl()
-        {
-            if (string.IsNullOrEmpty(_config.BaseUrl))
-            {
-                Log.Error("Tms Base url is empty. Settings 'https://tms49.nepsetms.com.np' as default. Update the base url in settings and restart the application");
-                _config.BaseUrl = "https://tms49.nepsetms.com.np";
-            }
-        }
-        private void RestoreSession()
-        {
-            Log.Debug("Restoring session");
-
-            Client.CookieContainer = CookieUtils.ReadCookiesFromDisk(_cookiPath);
-            AuthData = AuthenticationDataResponse.NewInstance(_dataPath);
-            IsAuthenticated = AuthData is not null;
-
-            Client.Authenticator = GetAuthenticator(AuthData);
-        }
-        private void SaveSession()
-        {
-            Log.Debug("Saving session");
-            if (Client is not null)
-                CookieUtils.WriteCookiesToDisk(_cookiPath, Client.CookieContainer);
-            if (AuthData is not null)
-            {
-                var json = JsonConvert.SerializeObject(AuthData);
-                File.WriteAllText(_dataPath, json);
-
-            }
-            Client.Authenticator = GetAuthenticator(AuthData);
-        }
 
         private static IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
         {
             if (authData is null || authData.IsCookieEnabled) return new TmsAuthenticator();
 
             return new BearerAuthenticator(authData.JsonWebToken);
-        }
-
-        private void ClearSession()
-        {
-            Log.Debug("Clearing session");
-            Client.CookieContainer = new System.Net.CookieContainer();
-            AuthData = null;
-            IsAuthenticated = false;
         }
 
         #region UnAuthorized Access
@@ -104,6 +45,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
         {
 
         }
+
         public void SignIn(string url, string username, string password)
         {
             Log.Debug("Signing in");
@@ -116,11 +58,12 @@ namespace NepseClient.Libraries.TradeManagementSystem
             var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
             if (!response.IsSuccessful)
             {
-                Log.Error(response.Content);
+                Log.Warning(response.Content);
                 throw new AuthenticationException(response.Data.Message);
             }
             AuthData = response.Data.Data;
             IsAuthenticated = true;
+            Client.Authenticator = GetAuthenticator(AuthData);
             Log.Debug("Signed In");
         }
         public void SignOut()
@@ -133,19 +76,9 @@ namespace NepseClient.Libraries.TradeManagementSystem
                 var response = Client.Post<ResponseBase>(request);
                 Log.Information(response.Data.Message);
             }
-            ClearSession();
-            SaveSession();
             Log.Debug("Signed out from Tms");
         }
         #endregion
-        public void Dispose()
-        {
-#if DEBUG
-            //SignOut();
-#else
-            SignOut();
-#endif
-        }
 
         public WebSocketResponse<WsSecurityResponse> GetSecurities()
         {
@@ -204,6 +137,15 @@ namespace NepseClient.Libraries.TradeManagementSystem
 
             var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
             return response.Data;
+        }
+        #endregion
+
+        #region Broker Back Office
+        public Task<PortfolioResponse[]> GetPortfolioAsync()
+        {
+            var id = AuthData.User.Id;
+            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{1979933}/CLI");
+            return Client.GetAsync<PortfolioResponse[]>(request);
         }
         #endregion
     }

@@ -10,5 +10,9 @@
   <ItemGroup>
     <ProjectReference Include="..\NepseClient.Commons\NepseClient.Commons.csproj" />
     <ProjectReference Include="..\NepseClient.Libraries.TradeManagementSystem\NepseClient.Libraries.TradeManagementSystem.csproj" />
+    <ProjectReference Include="..\NepseClient.Modules.Commons\NepseClient.Modules.Commons.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 </Project>

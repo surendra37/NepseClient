@@ -1,0 +1,8 @@
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.MeroShare.Views.SideNavPage"             
+             prism:ViewModelLocator.AutoWireViewModel="True" av:DesignWidth="1.797" av:DesignHeight="0.234"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
+    <mde:SideNavigation Items="{Binding Path=NavigationItems, Mode=OneTime}" />
+</UserControl>

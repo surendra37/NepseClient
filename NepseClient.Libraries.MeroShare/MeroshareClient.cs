@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
@@ -148,12 +149,11 @@ namespace NepseClient.Libraries.MeroShare
             return response.Data;
         }
 
-        public string[] GetMyShares()
+        public Task<string[]> GetMySharesAsync()
         {
             Log.Debug("Getting my shares");
             var request = new RestRequest("/api/myPurchase/myShare/");
-            var response = this.AuthorizedGet<string[]>(request);
-            return response.Data;
+            return Client.GetAsync<string[]>(request);
         }
 
         public MeroshareViewMyPurchaseResponse ViewMyPurchase(MeroshareViewMyPurchaseRequest body)
@@ -233,7 +233,7 @@ namespace NepseClient.Libraries.MeroShare
             var path = Path.Combine(PathConstants.AppDataPath.Value, "wacc.json");
             if (!File.Exists(path))
             {
-                var output = GetWaccs(GetMyShares()).ToArray();
+                var output = GetWaccs(GetMySharesAsync().GetAwaiter().GetResult()).ToArray();
                 File.WriteAllText(path, JsonConvert.SerializeObject(output));
                 return output;
             }

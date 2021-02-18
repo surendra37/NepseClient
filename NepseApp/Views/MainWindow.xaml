@@ -77,6 +77,11 @@
                 <MenuItem Header="Log Out" Command="{Binding MeroShareLogOutCommand}" 
                           Icon="{md:PackIcon Kind=Logout}"
                           Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <MenuItem Header="Import my portfolio as watchlist" 
+                          Icon="{md:PackIcon Kind=Import}"
+                          Command="{Binding ImportPortfolioCommand}"
+                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Separator />
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About" />

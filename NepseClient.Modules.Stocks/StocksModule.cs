@@ -13,9 +13,6 @@ namespace NepseClient.Modules.Stocks
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var regionManager = containerProvider.Resolve<IRegionManager>();
-            regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(SideNavPage));
-            regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(NepseNoticePage));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
