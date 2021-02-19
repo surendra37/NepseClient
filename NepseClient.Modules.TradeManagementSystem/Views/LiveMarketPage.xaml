@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="NepseClient.Modules.TradeManagementSystem.Views.LiveMarketPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
+            <DataGridTextColumn Header="Ltp" Binding="{Binding Ltp, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}"/>
+            <DataGridTextColumn Header="LTV" Binding="{Binding LastTradedVolume, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="Point Change" Binding="{Binding Change, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="% Change" Binding="{Binding PercentChange, StringFormat=N2}" CellStyle="{StaticResource RightCellStyle}"/>
+            <DataGridTextColumn Header="Open" Binding="{Binding Open, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="High" Binding="{Binding High, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="Low" Binding="{Binding Low, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="Volume" Binding="{Binding Volume, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+            <DataGridTextColumn Header="P. Closing" Binding="{Binding PreviousClose, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+        </DataGrid.Columns>
+        <DataGrid.RowStyle>
+            <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                <Setter Property="Foreground" Value="{Binding Change, Converter={StaticResource PolarBrushConverter}}" />
+            </Style>
+        </DataGrid.RowStyle>
+    </DataGrid>
+</UserControl>

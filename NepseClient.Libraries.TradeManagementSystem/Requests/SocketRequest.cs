@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace NepseClient.Libraries.TradeManagementSystem.Models.Requests
+namespace NepseClient.Libraries.TradeManagementSystem.Requests
 {
     public class SocketRequest
     {

@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace NepseClient.Libraries.TradeManagementSystem.Models.Responses
+namespace NepseClient.Libraries.TradeManagementSystem.Responses
 {
     public class AuthenticationDataResponse
     {

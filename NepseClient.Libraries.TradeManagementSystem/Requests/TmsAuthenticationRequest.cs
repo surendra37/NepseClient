@@ -4,7 +4,7 @@ using NepseClient.Commons;
 
 using Newtonsoft.Json;
 
-namespace NepseClient.Libraries.TradeManagementSystem.Models.Requests
+namespace NepseClient.Libraries.TradeManagementSystem.Requests
 {
     public class TmsAuthenticationRequest
     {

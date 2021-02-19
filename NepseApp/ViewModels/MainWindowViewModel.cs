@@ -8,13 +8,11 @@ using NepseClient.Libraries.MeroShare;
 using NepseClient.Libraries.MeroShare.Models.Requests;
 using NepseClient.Libraries.NepalStockExchange.Contexts;
 using NepseClient.Libraries.TradeManagementSystem;
-using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
+using NepseClient.Libraries.TradeManagementSystem.Requests;
 using NepseClient.Modules.Commons.Events;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Extensions;
-
-using Newtonsoft.Json;
 
 using Ookii.Dialogs.Wpf;
 
@@ -27,8 +25,6 @@ using Prism.Services.Dialogs;
 using Serilog;
 
 using System;
-using System.IO;
-using System.Linq;
 
 namespace NepseApp.ViewModels
 {
@@ -95,7 +91,6 @@ namespace NepseApp.ViewModels
             _updateUIEvent = events.GetEvent<UpdateUIEvent>();
 
             applicationCommand.ShowMessage = ShowMessage;
-            _client.PromptCredentials = GetTmsCredentials;
             _meroshareClient.PromptCredential = GetMeroShareCredentials;
         }
 

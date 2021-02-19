@@ -1,9 +1,6 @@
-﻿using NepseClient.Commons.Contracts;
-using NepseClient.Commons.Extensions;
-using NepseClient.Commons.Utils;
+﻿using NepseClient.Commons.Utils;
 using NepseClient.Libraries.TradeManagementSystem.Models;
-using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
-using NepseClient.Libraries.TradeManagementSystem.Models.Responses;
+using NepseClient.Libraries.TradeManagementSystem.Requests;
 using NepseClient.Libraries.TradeManagementSystem.Responses;
 
 using RestSharp;
@@ -16,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace NepseClient.Libraries.TradeManagementSystem
 {
-    public class TmsClient : IAuthorizable
+    public class TmsClient
     {
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
@@ -41,13 +38,16 @@ namespace NepseClient.Libraries.TradeManagementSystem
         #endregion
 
         #region Authentication
-        public virtual void Authorize()
-        {
-
-        }
 
         public void SignIn(string url, string username, string password)
         {
+            // Use cached
+            Client = RestClientUtils.CreateNewClient(url);
+            IsAuthenticated = true;
+            Client.Authenticator = new CachedTmsAuthenticator();
+            return;
+
+            SignOut();
             Log.Debug("Signing in");
 
             var request = new RestRequest("/tmsapi/authenticate");
@@ -68,6 +68,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
         }
         public void SignOut()
         {
+            return;
             Log.Debug("Signing out from Tms");
             if (IsAuthenticated)
             {
@@ -80,72 +81,29 @@ namespace NepseClient.Libraries.TradeManagementSystem
         }
         #endregion
 
-        public WebSocketResponse<WsSecurityResponse> GetSecurities()
-        {
-            Log.Debug("Getting securities");
-            var request = new RestRequest("/tmsapi/ws/top25securities");
-            var response = this.AuthorizedGet<WebSocketResponse<WsSecurityResponse>>(request);
-            return response.Data;
-        }
-
-        #region Graph 
-        public GraphDataResponse[] GetGraphData(params string[] isins)
-        {
-            var request = new RestRequest("/tmsapi/graph-data/fetch/1"); // NPE019A00007 
-            foreach (var isin in isins)
-            {
-                request.AddParameter("ISIN", isin);
-            }
-            var data = this.AuthorizedGet<GraphDataResponse[]>(request);
-            return data.Data;
-        }
-        #endregion
-
-        #region Top
-        public TopGainerResponse[] GetTopGainers(int count = 10)
-        {
-            var api = new RestRequest($"/tmsapi/stock/top/gainer/{count}");
-
-            var response= this.AuthorizedGet<TopGainerResponse[]>(api);
-            return response.Data;
-        }
-        public TopGainerResponse[] GetTopLosers(int count = 8)
-        {
-            var api = new RestRequest($"/tmsapi/stock/top/loser/{count}");
-
-            var response= this.AuthorizedGet<TopGainerResponse[]>(api);
-            return response.Data;
-        }
-
-        public TopTurnoverResponse[] GetTopTurnover(int count = 9)
-        {
-            var api = new RestRequest($"/tmsapi/stock/top-securities/turnover/{count}");
-
-            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
-            return response.Data;
-        }
-        public TopTurnoverResponse[] GetTopTransaction(int count = 9)
-        {
-            var api = new RestRequest($"/tmsapi/stock/top-securities/transaction/{count}");
-
-            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
-            return response.Data;
-        }
-        public TopTurnoverResponse[] GetTopVolume(int count = 9)
-        {
-            var api = new RestRequest($"/tmsapi/stock/top-securities/volume/{count}");
-
-            var response= this.AuthorizedGet<TopTurnoverResponse[]>(api);
-            return response.Data;
-        }
-        #endregion
-
         #region Broker Back Office
         public Task<PortfolioResponse[]> GetPortfolioAsync()
         {
-            var id = AuthData.User.Id;
-            var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{1979933}/CLI");
+            //var id = AuthData.User.Id;
+            //var request = new RestRequest($"/tmsapi/dp-holding/client/freebalance/{id}/CLI");
+            var request = new RestRequest("/tmsapi/dp-holding/client/freebalance/1979933/CLI");
+
+            //var res = Client.Get(request);
+            //var client = RestClientUtils.CreateNewClient("https://tms49.nepsetms.com.np/");
+            //client.Authenticator = new CachedTmsAuthenticator();
+
+            //var response = client.Get(request);
+
+
             return Client.GetAsync<PortfolioResponse[]>(request);
+        }
+        #endregion
+
+        #region Market
+        public Task<WebSocketResponse<WsSecurityResponse>> GetLiveMarketAsync()
+        {
+            var request = new RestRequest("/tmsapi/rtApi/ws/top25securities");
+            return Client.GetAsync<WebSocketResponse<WsSecurityResponse>>(request);
         }
         #endregion
     }

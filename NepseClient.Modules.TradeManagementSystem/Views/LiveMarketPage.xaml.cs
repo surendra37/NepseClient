@@ -3,11 +3,11 @@
 namespace NepseClient.Modules.TradeManagementSystem.Views
 {
     /// <summary>
-    /// Interaction logic for TopGainerPage
+    /// Interaction logic for LiveMarketPage
     /// </summary>
-    public partial class TopGainerPage : UserControl
+    public partial class LiveMarketPage : UserControl
     {
-        public TopGainerPage()
+        public LiveMarketPage()
         {
             InitializeComponent();
         }

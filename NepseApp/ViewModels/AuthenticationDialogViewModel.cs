@@ -1,5 +1,5 @@
 ﻿using NepseClient.Commons.Extensions;
-using NepseClient.Libraries.TradeManagementSystem.Models.Requests;
+using NepseClient.Libraries.TradeManagementSystem.Requests;
 using NepseClient.Modules.MeroShare.Extensions;
 
 using Prism.Commands;

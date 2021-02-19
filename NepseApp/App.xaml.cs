@@ -87,11 +87,6 @@ namespace NepseApp
             containerRegistry.RegisterSingleton<NepseClient.Libraries.NepalStockExchange.Contexts.DatabaseContext, SQLiteDatabaseContext>();
 
             containerRegistry.RegisterDialog<AuthenticationDialog, AuthenticationDialogViewModel>();
-
-
-            containerRegistry.RegisterForNavigation<SettingsPage, SettingsPageViewModel>();
-            containerRegistry.RegisterForNavigation<TmsLiveMarketPage, TmsLiveMarketPageViewModel>();
-
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
