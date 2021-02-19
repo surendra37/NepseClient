@@ -4,10 +4,25 @@ using System.Net;
 using RestSharp;
 using RestSharp.Authenticators;
 
+using Serilog;
+
 namespace NepseClient.Libraries.TradeManagementSystem.Models
 {
     public class TmsAuthenticator : IAuthenticator
     {
+        public TmsAuthenticator(IRestClient client)
+        {
+            // Trim cookies
+            var cookies = client.CookieContainer.GetCookies(client.BaseUrl);
+            client.CookieContainer = new CookieContainer();
+            var newColl = new CookieCollection();
+            foreach (Cookie cookie in cookies)
+            {
+                Log.Verbose("Name: {0}, Value:{1}", cookie.Name, cookie.Value);
+                newColl.Add(new Cookie(cookie.Name, cookie.Value));
+            }
+            client.CookieContainer.Add(client.BaseUrl, newColl);
+        }
         public void Authenticate(IRestClient client, IRestRequest request)
         {
             var cookies = client.CookieContainer.GetCookies(client.BaseUrl);

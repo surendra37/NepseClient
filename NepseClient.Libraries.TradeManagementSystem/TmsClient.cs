@@ -1,4 +1,5 @@
-﻿using NepseClient.Commons.Utils;
+﻿using NepseClient.Commons.Contracts;
+using NepseClient.Commons.Utils;
 using NepseClient.Libraries.TradeManagementSystem.Models;
 using NepseClient.Libraries.TradeManagementSystem.Requests;
 using NepseClient.Libraries.TradeManagementSystem.Responses;
@@ -18,14 +19,30 @@ namespace NepseClient.Libraries.TradeManagementSystem
     {
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
-
         public IRestClient Client { get; private set; }
 
-        private static IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
+        public TmsClient(IConfiguration config)
         {
-            if (authData is null || authData.IsCookieEnabled) return new TmsAuthenticator();
+            Client = RestClientUtils.CreateNewClient(config.Tms.BaseUrl);
+        }
+
+        private void Authorize()
+        {
+            IsAuthenticated = false;
+
+        }
+
+        private IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
+        {
+            if (authData is null || authData.IsCookieEnabled) return new TmsAuthenticator(Client);
 
             return new BearerAuthenticator(authData.JsonWebToken);
+        }
+
+        public void UpdateBaseUrl(string baseUrl)
+        {
+            IsAuthenticated = false;
+            Client = RestClientUtils.CreateNewClient(baseUrl);
         }
 
         #region UnAuthorized Access
@@ -47,14 +64,32 @@ namespace NepseClient.Libraries.TradeManagementSystem
 
         #region Authentication
 
-        public void SignIn(string url, string username, string password)
+        public async Task SignInAsync()
         {
-            // Use cached
-            Client = RestClientUtils.CreateNewClient(url);
-            IsAuthenticated = true;
-            Client.Authenticator = new CachedTmsAuthenticator();
-            return;
-
+            var url = Client.BaseUrl.ToString();
+            var dialog = new Ookii.Dialogs.Wpf.CredentialDialog
+            {
+                MainInstruction = $"Please provide tms credentials for {url}",
+                Content = "Enter your username and password provided by your broker",
+                WindowTitle = "Input TMS Credentials",
+                Target = url,
+                UseApplicationInstanceCredentialCache = false,
+                ShowSaveCheckBox = true,
+                ShowUIForSavedCredentials = true,
+            };
+            using (dialog)
+            {
+                if (dialog.ShowDialog())
+                {
+                    var username = dialog.UserName;
+                    var password = dialog.Password;
+                    await SignInAsync(url, username, password);
+                    dialog.ConfirmCredentials(true);
+                }
+            }
+        }
+        private async Task SignInAsync(string url, string username, string password)
+        {
             SignOut();
             Log.Debug("Signing in");
 
@@ -63,7 +98,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
             request.AddJsonBody(json);
 
             Client = RestClientUtils.CreateNewClient(url);
-            var response = Client.Post<ResponseBase<AuthenticationDataResponse>>(request);
+            var response = await Client.ExecutePostAsync<ResponseBase<AuthenticationDataResponse>>(request);
             if (!response.IsSuccessful)
             {
                 Log.Warning(response.Content);
@@ -74,9 +109,9 @@ namespace NepseClient.Libraries.TradeManagementSystem
             Client.Authenticator = GetAuthenticator(AuthData);
             Log.Debug("Signed In");
         }
+
         public void SignOut()
         {
-            return;
             Log.Debug("Signing out from Tms");
             if (IsAuthenticated)
             {
@@ -111,7 +146,23 @@ namespace NepseClient.Libraries.TradeManagementSystem
         public Task<WebSocketResponse<WsSecurityResponse>> GetLiveMarketAsync()
         {
             var request = new RestRequest("/tmsapi/rtApi/ws/top25securities");
-            return Client.GetAsync<WebSocketResponse<WsSecurityResponse>>(request);
+            return AuthorizeGet<WebSocketResponse<WsSecurityResponse>>(request);
+        }
+
+        private async Task<T> AuthorizeGet<T>(IRestRequest request)
+        {
+            var response = await Client.ExecuteGetAsync<T>(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                Authorize();
+                response = await Client.ExecuteGetAsync<T>(request);
+            }
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.Content, response.ErrorException);
+            }
+
+            return response.Data;
         }
         #endregion
     }

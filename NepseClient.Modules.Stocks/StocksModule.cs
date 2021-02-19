@@ -19,7 +19,7 @@ namespace NepseClient.Modules.Stocks
         {
             containerRegistry.RegisterSingleton<ServiceClient>();
 
-            containerRegistry.RegisterForNavigation<SideNavPage, SideNavPageViewModel>();
+            containerRegistry.RegisterForNavigation<SideNavPage, SideNavPageViewModel>("StocksNavPage");
             containerRegistry.RegisterForNavigation<NepseNoticePage, NepseNoticePageViewModel>();
             containerRegistry.RegisterForNavigation<FloorsheetPage, FloorsheetPageViewModel>();
             containerRegistry.RegisterForNavigation<StockContentPage, StockContentPageViewModel>();

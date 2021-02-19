@@ -206,40 +206,19 @@ namespace NepseApp.ViewModels
         public DelegateCommand TmsLogInCommand =>
             _tmsLogInCommand ?? (_tmsLogInCommand = new DelegateCommand(ExecuteTmsLogInCommand));
 
-        void ExecuteTmsLogInCommand()
+        async void ExecuteTmsLogInCommand()
         {
             try
             {
-                IsTmsLoggedIn = false;
-                var url = _config.Tms.BaseUrl;
-                var dialog = new Ookii.Dialogs.Wpf.CredentialDialog
-                {
-                    MainInstruction = $"Please provide tms credentials for {url}",
-                    Content = "Enter your username and password provided by your broker",
-                    WindowTitle = "Input TMS Credentials",
-                    Target = url,
-                    UseApplicationInstanceCredentialCache = true,
-                    ShowSaveCheckBox = true,
-                    ShowUIForSavedCredentials = true,
-                };
-                using (dialog)
-                {
-                    if (dialog.ShowDialog())
-                    {
-                        var username = dialog.UserName;
-                        var password = dialog.Password;
-                        _client.SignIn(url, username, password);
-                        IsTmsLoggedIn = true;
-                        dialog.ConfirmCredentials(true);
-                        _regionManager.RequestNavigate(RegionNames.SideNavRegion, "TmsNavPage");
-                    }
-                }
+                await _client.SignInAsync();
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to log in to tms");
                 MessageBoxManager.ShowErrorMessage(ex, "Login Failed");
             }
+
+            IsTmsLoggedIn = _client.IsAuthenticated;
         }
 
         private DelegateCommand _tmsLogoutCommand;
@@ -261,6 +240,8 @@ namespace NepseApp.ViewModels
                 Log.Error(ex, "Failed to log out to tms");
                 MessageBoxManager.ShowErrorMessage(ex, "Log out Failed");
             }
+
+            IsTmsLoggedIn = _client.IsAuthenticated;
         }
         #endregion
 
@@ -360,6 +341,17 @@ namespace NepseApp.ViewModels
             {
                 Log.Error(ex, "Failed to import portfolio");
             }
+        }
+        #endregion
+
+        #region Views
+        private DelegateCommand<string> _updateSideNavViewCommand;
+        public DelegateCommand<string> UpdateSideNavViewCommand =>
+            _updateSideNavViewCommand ?? (_updateSideNavViewCommand = new DelegateCommand<string>(ExecuteUpdateSideNavViewCommand));
+
+        void ExecuteUpdateSideNavViewCommand(string arg)
+        {
+            _regionManager.RequestNavigate(RegionNames.SideNavRegion, arg);
         }
         #endregion
     }

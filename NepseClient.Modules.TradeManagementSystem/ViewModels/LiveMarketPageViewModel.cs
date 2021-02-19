@@ -40,6 +40,7 @@ namespace NepseClient.Modules.TradeManagementSystem.ViewModels
         {
             try
             {
+                if (IsBusy) return;
                 IsBusy = true;
                 AppCommand.ShowMessage("Fetching data...");
                 var items = await _client.GetLiveMarketAsync();

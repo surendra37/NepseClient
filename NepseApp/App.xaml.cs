@@ -31,9 +31,11 @@ namespace NepseApp
         {
             var logPath = Path.Combine(PathConstants.AppDataPath.Value, "Logs", "log-.jl");
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
 #if DEBUG
+                .MinimumLevel.Verbose()
                 .WriteTo.Console()
+                #else
+                .MinimumLevel.Debug()
 #endif
                 .WriteTo.File(new CompactJsonFormatter(), logPath, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
@@ -42,6 +44,10 @@ namespace NepseApp
 
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
+
+            var regionManager = Container.Resolve<IRegionManager>();
+            //regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(NepseClient.Modules.Stocks.Views.SideNavPage));
+            regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(NepseClient.Modules.TradeManagementSystem.Views.SideNavPage));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

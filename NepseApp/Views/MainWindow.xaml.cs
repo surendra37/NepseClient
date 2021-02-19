@@ -18,5 +18,27 @@ namespace NepseApp.Views
             // do navigation according to the selected item in args.NavigationItem
             args.NavigationItem.NavigationItemSelectedCallback?.Invoke(args.NavigationItem);
         }
+
+        private void MenuItem_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (sender == StockMenu)
+            {
+                //StockMenu.IsChecked = false;
+                TmsMenu.IsChecked = false;
+                MeroShareMenu.IsChecked = false;
+            }
+            else if (sender == TmsMenu)
+            {
+                StockMenu.IsChecked = false;
+                //TmsMenu.IsChecked = false;
+                MeroShareMenu.IsChecked = false;
+            }
+            else if (sender == MeroShareMenu)
+            {
+                StockMenu.IsChecked = false;
+                TmsMenu.IsChecked = false;
+                //MeroShareMenu.IsChecked = false;
+            }
+        }
     }
 }

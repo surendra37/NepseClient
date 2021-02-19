@@ -59,6 +59,17 @@
                 <Separator />
                 <MenuItem Header="Show Notices" IsCheckable="True" IsChecked="{Binding ShowNotices}"/>
                 <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>
+                <Separator/>
+                <MenuItem x:Name="StockMenu" Header="Stocks" IsCheckable="True" Checked="MenuItem_Checked" 
+                          Command="{Binding UpdateSideNavViewCommand}" 
+                          CommandParameter="StocksNavPage"/>
+                <MenuItem x:Name="TmsMenu" Header="TMS" IsCheckable="True" Checked="MenuItem_Checked" 
+                          Command="{Binding UpdateSideNavViewCommand}" 
+                          CommandParameter="TmsNavPage"/>
+                <MenuItem x:Name="MeroShareMenu" Header="MeroShare" IsCheckable="True" Checked="MenuItem_Checked" 
+                          Command="{Binding UpdateSideNavViewCommand}" 
+                          CommandParameter="MeroShareNavPage"/>
+
             </MenuItem>
             <MenuItem Header="TMS">
                 <MenuItem Header="Update Base URL" Command="{Binding UpdateTmsBaseUrl}" Icon="{md:PackIcon Kind=Web}" />
