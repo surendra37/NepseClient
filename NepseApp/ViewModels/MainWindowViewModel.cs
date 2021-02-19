@@ -266,40 +266,18 @@ namespace NepseApp.ViewModels
         public DelegateCommand MeroShareLogInCommand =>
             _meroShareLogInCommand ?? (_meroShareLogInCommand = new DelegateCommand(ExecuteMeroShareLoginCommand));
 
-        void ExecuteMeroShareLoginCommand()
+        async void ExecuteMeroShareLoginCommand()
         {
             try
             {
-                IsMeroShareLoggedIn = false;
-                var clientId = _config.Meroshare.ClientId;
-                var dialog = new CredentialDialog
-                {
-                    MainInstruction = $"Please provide mero share credentials",
-                    Content = "Enter your username and password provided by your broker",
-                    WindowTitle = "Input MeroShare Credentials",
-                    Target = "https://backend.cdsc.com.np",
-                    ShowSaveCheckBox = true,
-                    ShowUIForSavedCredentials = true,
-                };
-                using (dialog)
-                {
-                    if (dialog.ShowDialog())
-                    {
-                        var username = dialog.UserName;
-                        var password = dialog.Password;
-                        _meroshareClient.SignIn(clientId, username, password); //176//150394//vVy.$3pz7wx#y9S
-                        IsMeroShareLoggedIn = true;
-                        dialog.ConfirmCredentials(true);
-
-                        _regionManager.RequestNavigate(RegionNames.SideNavRegion, "MeroShareNavPage");
-                    }
-                }
+                await _meroshareClient.SignInAsync();
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to log in to tms");
                 MessageBoxManager.ShowErrorMessage(ex, "Login Failed");
             }
+            IsMeroShareLoggedIn = _meroshareClient.IsAuthenticated;
         }
 
         private DelegateCommand _meroShareLogoutCommand;

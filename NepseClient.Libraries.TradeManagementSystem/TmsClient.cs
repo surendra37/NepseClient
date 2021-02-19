@@ -17,12 +17,14 @@ namespace NepseClient.Libraries.TradeManagementSystem
 {
     public class TmsClient
     {
+        private readonly ITmsConfiguration _configuration;
         public AuthenticationDataResponse AuthData { get; private set; }
         public bool IsAuthenticated { get; set; }
         public IRestClient Client { get; private set; }
 
         public TmsClient(IConfiguration config)
         {
+            _configuration = config.Tms;
             Client = RestClientUtils.CreateNewClient(config.Tms.BaseUrl);
         }
 
@@ -39,10 +41,10 @@ namespace NepseClient.Libraries.TradeManagementSystem
             return new BearerAuthenticator(authData.JsonWebToken);
         }
 
-        public void UpdateBaseUrl(string baseUrl)
+        public void UpdateBaseUrl()
         {
             IsAuthenticated = false;
-            Client = RestClientUtils.CreateNewClient(baseUrl);
+            Client = RestClientUtils.CreateNewClient(_configuration.BaseUrl);
         }
 
         #region UnAuthorized Access
@@ -66,7 +68,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
 
         public async Task SignInAsync()
         {
-            var url = Client.BaseUrl.ToString();
+            var url = _configuration.BaseUrl;
             var dialog = new Ookii.Dialogs.Wpf.CredentialDialog
             {
                 MainInstruction = $"Please provide tms credentials for {url}",
