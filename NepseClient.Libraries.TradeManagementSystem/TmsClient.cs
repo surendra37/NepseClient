@@ -8,6 +8,7 @@ using RestSharp.Authenticators;
 
 using Serilog;
 
+using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
@@ -34,6 +35,13 @@ namespace NepseClient.Libraries.TradeManagementSystem
             var request = new RestRequest("/tmsapi/dashboard/businessDate");
             var response = Client.Get<string>(request);
             return response.Data;
+        }
+
+        public DateTime GetLastUpdatedDate()
+        {
+            var request = new RestRequest("/tmsapi/orderApi/stock/last-updated-time");
+            var response = Client.Get<LastUpdatedDateResponse>(request);
+            return response.Data.Date;
         }
         #endregion
 
