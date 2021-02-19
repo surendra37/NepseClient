@@ -14,6 +14,8 @@ using NepseClient.Libraries.MeroShare.Models.Responses;
 
 using Newtonsoft.Json;
 
+using Ookii.Dialogs.Wpf;
+
 using RestSharp;
 
 using Serilog;
@@ -62,32 +64,42 @@ namespace NepseClient.Libraries.MeroShare
         {
             _configuration = configuration.Meroshare;
             Client = RestClientUtils.CreateNewClient("https://backend.cdsc.com.np");
-            RestoreSession();
-        }
-
-        private void RestoreSession()
-        {
-            if (!string.IsNullOrEmpty(_configuration.AuthHeader))
-            {
-                IsAuthenticated = true;
-                Client.Authenticator = new MeroshareAuthenticator(_configuration.AuthHeader);
-            }
-        }
-
-        private void ClearSession()
-        {
-            IsAuthenticated = false;
-            Client.CookieContainer = new System.Net.CookieContainer();
-            Client.Authenticator = null;
-            _banks = null;
-            _me = null;
         }
 
         #region Authentication
         public virtual void Authorize()
         {
+            SignInAsync().GetAwaiter().GetResult();
         }
-        public void SignIn(string clientId, string username, string password)
+
+        public async Task SignInAsync()
+        {
+            SignOut();
+
+            var clientId = _configuration.ClientId;
+            var dialog = new CredentialDialog
+            {
+                MainInstruction = $"Please provide mero share credentials",
+                Content = "Enter your username and password provided by your broker",
+                WindowTitle = "Input MeroShare Credentials",
+                Target = "https://backend.cdsc.com.np",
+                ShowSaveCheckBox = true,
+                ShowUIForSavedCredentials = true,
+            };
+            using (dialog)
+            {
+                if (dialog.ShowDialog())
+                {
+                    var username = dialog.UserName;
+                    var password = dialog.Password;
+                    await SignInAsync(clientId, username, password); //176//150394//vVy.$3pz7wx#y9S
+                    dialog.ConfirmCredentials(true);
+                    IsAuthenticated = true;
+                }
+            }
+        }
+
+        private async Task SignInAsync(string clientId, string username, string password)
         {
             Log.Debug("Signing in...");
 
@@ -95,7 +107,7 @@ namespace NepseClient.Libraries.MeroShare
             var json = new MeroshareAuthRequest(clientId, username, password);
             request.AddJsonBody(json);
 
-            var response = Client.Post(request);
+            var response = await Client.ExecutePostAsync(request);
             if (!response.IsSuccessful)
             {
                 Log.Warning(response.Content);
@@ -107,12 +119,6 @@ namespace NepseClient.Libraries.MeroShare
             if (string.IsNullOrEmpty(authHeader))
                 throw new AuthenticationException("Authorization header not found");
             Client.Authenticator = new MeroshareAuthenticator(authHeader);
-
-            // Store session
-            _configuration.AuthHeader = authHeader;
-            _configuration.Save();
-
-            IsAuthenticated = true;
             Log.Debug("Signed In");
         }
         public void SignOut()
@@ -123,9 +129,6 @@ namespace NepseClient.Libraries.MeroShare
             Log.Debug(response.Content);
 
             // Remove all stored values
-            ClearSession();
-            _configuration.AuthHeader = string.Empty;
-            _configuration.Save();
             Log.Debug("Signed out from MeroShare");
         }
         #endregion
