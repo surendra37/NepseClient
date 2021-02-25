@@ -3,9 +3,11 @@
 using MaterialDesignThemes.Wpf;
 
 using NepseClient.Commons.Constants;
+using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Views;
 
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 
@@ -21,27 +23,30 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         {
             get
             {
-                return new List<INavigationItem>
+                return new INavigationItem[]
                 {
                     //new SubheaderNavigationItem() { Subheader = "Documents" },
-                    new PrismSideNavItem("My Portfolio", PackIconKind.Marketplace, nameof(PortfolioPage), true) { NavigationItemSelectedCallback=OnSelected},
+                    new PrismSideNavItem("My Portfolio", PackIconKind.ClipboardPerson, "MeroSharePortfolioPage", true),
                 };
             }
-        }
-
-        private object OnSelected(INavigationItem navigationItem)
-        {
-            if (navigationItem is PrismSideNavItem item)
-            {
-                _regionManager.RequestNavigate(RegionNames.ContentRegion, item.Target);
-            }
-
-            return navigationItem;
         }
 
         public SideNavPageViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
+        }
+
+        private DelegateCommand<INavigationItem> _onNavigated;
+        public DelegateCommand<INavigationItem> OnNavigated =>
+            _onNavigated ?? (_onNavigated = new DelegateCommand<INavigationItem>(ExecuteOnNavigated));
+
+        void ExecuteOnNavigated(INavigationItem arg)
+        {
+            if (arg is null) return;
+            if (arg is IViewNavigationItem item)
+            {
+                _regionManager.RequestNavigate(RegionNames.ContentRegion, item.Target);
+            }
         }
     }
 }

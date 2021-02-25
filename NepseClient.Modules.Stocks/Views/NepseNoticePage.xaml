@@ -3,7 +3,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.Stocks.Views.NepseNoticePage"             
              prism:ViewModelLocator.AutoWireViewModel="True" av:DesignWidth="1.922" av:DesignHeight="1"
-             xmlns:local="clr-namespace:NepseClient.Modules.Stocks.Views">
+             xmlns:local="clr-namespace:NepseClient.Modules.Commons.Views;assembly=NepseClient.Modules.Commons">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

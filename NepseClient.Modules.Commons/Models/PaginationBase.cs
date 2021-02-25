@@ -5,7 +5,7 @@ using Prism.Commands;
 
 using System;
 
-namespace NepseClient.Modules.Stocks.Models
+namespace NepseClient.Modules.Commons.Models
 {
     public abstract class PaginationBase : ActiveAwareBindableBase
     {

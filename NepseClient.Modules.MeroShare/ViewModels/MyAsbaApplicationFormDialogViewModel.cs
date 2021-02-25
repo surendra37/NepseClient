@@ -46,7 +46,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             set { SetProperty(ref _boid, value); }
         }
 
-        public MeroshareCapitalResponse[] Banks => _client.Banks;
+        public MeroshareCapitalResponse[] Banks => _client.GetCapitalsAsync().GetAwaiter().GetResult();
 
         private MeroshareCapitalResponse _selectedBank;
         public MeroshareCapitalResponse SelectedBank
@@ -136,7 +136,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 Title = $"{Issue.CompanyName} ({Issue.Action})";
                 SelectedBank = Banks?.FirstOrDefault();
 
-                Boid = _client.Me.Demat;
+                Boid = _client.GetOwnDetailsAsync().GetAwaiter().GetResult().Demat;
                 Branch = BankDetails.BranchName;
                 AccountNumber = BankDetails.AccountNumber;
                 var disclaimer = _client.GetPurchaseDisclaimer();

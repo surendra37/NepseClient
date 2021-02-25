@@ -268,6 +268,7 @@ namespace NepseApp.ViewModels
             try
             {
                 await _meroshareClient.SignInAsync();
+                _regionManager.RequestNavigate(RegionNames.SideNavRegion, "MeroShareNavPage");
             }
             catch (Exception ex)
             {

@@ -1,6 +1,5 @@
-﻿using NepseClient.Commons.Contracts;
-using NepseClient.Libraries.MeroShare;
-using NepseClient.Libraries.MeroShare.Adapters;
+﻿using NepseClient.Libraries.MeroShare;
+using NepseClient.Libraries.MeroShare.Models.Responses;
 using NepseClient.Modules.Commons.Extensions;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
@@ -8,26 +7,25 @@ using NepseClient.Modules.Commons.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace NepseClient.Modules.MeroShare.ViewModels
 {
-    public class PortfolioPageViewModel : ActiveAwareBindableBase
+    public class PortfolioPageViewModel : PaginationBase
     {
+        private readonly int _size = 200;
         private readonly MeroshareClient _client;
 
-        private IEnumerable<IScripResponse> _items;
-        public IEnumerable<IScripResponse> Items
+        private IEnumerable<MeroShareMyPortfolio> _items;
+        public IEnumerable<MeroShareMyPortfolio> Items
         {
             get { return _items; }
             set { SetProperty(ref _items, value); }
         }
-        public int? TotalScrips => Items?.Count();
-        public double? TotalPrevious => Items?.Sum(x => x.PreviousTotal);
-        public double? TotalLTP => Items?.Sum(x => x.LTPTotal);
-        public double? TotalWacc => Items?.Sum(x => x.TotalCost);
-        public double? DailyGain => Items?.Sum(x => x.DailyGain);
-        public double? TotalGain => Items?.Sum(x => x.TotalGain);
+
+        public int? TotalItems => Items?.Count();
+        public double? TotalLtpValue => Items?.Sum(x => x.ValueOfLastTransPrice);
+        public double? TotalPreviousValue => Items?.Sum(x => x.ValueOfPrevClosingPrice);
+        public double? DailyProfit => TotalLtpValue - TotalPreviousValue;
 
         public PortfolioPageViewModel(MeroshareClient client, IApplicationCommand applicationCommand) :
             base(applicationCommand)
@@ -35,26 +33,23 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             _client = client;
         }
 
-        public override async void ExecuteRefreshCommand()
+        protected override async void Navigate(int page)
         {
             try
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Loading portfolio...");
-                var portfolios = await Task.Run(() => _client.GetMyPortfolios());
-                var waccDict = await Task.Run(() =>_client.ReadWaccFromFile().ToDictionary(x => x.ScripName));
-                var newItems = portfolios.MeroShareMyPortfolio
-                    .Select(x => new MeroSharePortfolioAdapter(x, waccDict))
-                    .ToArray();
+                var portfolios = await _client.GetMyPortfoliosAsync(page, _size);
+                if (portfolios is not null)
+                {
+                    Items = portfolios?.MeroShareMyPortfolio;
+                    CurrentPage = page;
+                    double total = portfolios.TotalItems;
+                    double count = Math.Ceiling(total / _size);
+                    TotalPage = (int)count;
+                }
 
-                Items = newItems;
                 IsBusy = false;
-                RaisePropertyChanged(nameof(TotalScrips));
-                RaisePropertyChanged(nameof(TotalPrevious));
-                RaisePropertyChanged(nameof(TotalLTP));
-                RaisePropertyChanged(nameof(DailyGain));
-                RaisePropertyChanged(nameof(TotalWacc));
-                RaisePropertyChanged(nameof(TotalGain));
             }
             catch (Exception ex)
             {
@@ -62,6 +57,12 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 LogDebugAndEnqueMessage(ex.Message);
             }
             AppCommand.HideMessage();
+            base.Navigate(page);
+
+            RaisePropertyChanged(nameof(TotalItems));
+            RaisePropertyChanged(nameof(TotalLtpValue));
+            RaisePropertyChanged(nameof(TotalPreviousValue));
+            RaisePropertyChanged(nameof(DailyProfit));
         }
     }
 }

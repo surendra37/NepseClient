@@ -1,117 +1,78 @@
-﻿<UserControl x:Class="NepseClient.Modules.MeroShare.Views.PortfolioPage"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:dataGrid2D="http://gu.se/DataGrid2D"
              xmlns:behaviors="clr-namespace:NepseClient.Modules.Commons.Behaviors;assembly=NepseClient.Modules.Commons"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.MeroShare.Views.PortfolioPage"
+             prism:ViewModelLocator.AutoWireViewModel="True" av:DesignHeight="166.128"
+             xmlns:views="clr-namespace:NepseClient.Modules.Commons.Views;assembly=NepseClient.Modules.Commons"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" av:DesignWidth="506.937">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid Grid.Row="0" ItemsSource="{Binding Items}" 
-                  AutoGenerateColumns="False" IsReadOnly="True"
-                  behaviors:DataGridBehavior.DisplayRowNumber="True" 
+        <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True"
+                  behaviors:DataGridBehavior.DisplayRowNumber="True"
                   HeadersVisibility="All">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Symbol" Binding="{Binding Scrip}"/>
-                <DataGridTextColumn Header="Balance" Binding="{Binding CurrentBalance, StringFormat=N0}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="WACC" Binding="{Binding WaccValue, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="LTP" Binding="{Binding LastTransactionPrice, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Previous" Binding="{Binding PreviousClosePrice, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Cost Total" Binding="{Binding TotalCost, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="LTP Total" Binding="{Binding LTPTotal, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Previous Total" Binding="{Binding PreviousTotal, StringFormat=N2}" >
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Daily Gain" Binding="{Binding DailyGain, StringFormat=N2}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DailyGain, Converter={StaticResource PolarConverter}}" Value="-1">
-                                    <Setter Property="Foreground" Value="#f44336"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding DailyGain, Converter={StaticResource PolarConverter}}" Value="1">
-                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Total Gain" Binding="{Binding TotalGain, StringFormat=N2}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="HorizontalAlignment" Value="Right" />
-
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding TotalGain, Converter={StaticResource PolarConverter}}" Value="-1">
-                                    <Setter Property="Foreground" Value="#f44336"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding TotalGain, Converter={StaticResource PolarConverter}}" Value="1">
-                                    <Setter Property="Foreground" Value="#4caf50"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Scrip">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Script}" ToolTip="{Binding ScriptDesc}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Quantity" Binding="{Binding CurrentBalance, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+                <DataGridTemplateColumn Header="LTP" CellStyle="{StaticResource RightCellStyle}"
+                                        CanUserSort="True" SortMemberPath="LastTransactionPrice">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock ToolTip="{Binding Change, StringFormat=N2, Mode=OneWay}" 
+                                       Foreground="{Binding Change, Converter={StaticResource PolarBrushConverter}}">
+                                    <Run Text="{Binding LastTransactionPrice, StringFormat=N0, Mode=OneWay}" />
+                                   <md:PackIcon Kind="{Binding Change, Converter={StaticResource PolarPackIconKindConverter}}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Total" CellStyle="{StaticResource RightCellStyle}"
+                                        CanUserSort="True" SortMemberPath="ValueOfLastTransPrice">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ValueOfLastTransPrice, StringFormat=N0}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Daily Gain" 
+                                    Binding="{Binding TotalChange, StringFormat=N0}" 
+                                    CellStyle="{StaticResource RightCellStyle}" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <StatusBar Grid.Row="1" FontSize="14">
-            <StatusBarItem  Content="{Binding TotalScrips}" ContentStringFormat="Total Scrips: {0:N0}"/>
-            <Separator />
-            <StatusBarItem  Content="{Binding TotalWacc}" ContentStringFormat="WACC: {0:N2}" />
-            <Separator />
-            <StatusBarItem  Content="{Binding TotalPrevious}" ContentStringFormat="Previous: {0:N2}" />
-            <Separator />
-            <StatusBarItem  Content="{Binding TotalLTP}" ContentStringFormat="LTP: {0:N2}" />
-            <Separator />
-            <StatusBarItem  Content="{Binding DailyGain}" ContentStringFormat="D. Gain: {0:N2}" Foreground="{Binding DailyGain, Converter={StaticResource PolarBrushConverter}}"/>
-            <Separator />
-            <StatusBarItem  Content="{Binding TotalGain}" ContentStringFormat="Total Gain: {0:N2}" Foreground="{Binding TotalGain, Converter={StaticResource PolarBrushConverter}}"/>
-        </StatusBar>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock FontSize="18">
+                <Run Text="Total #:" FontWeight="Bold"/>
+                <Run Text="{Binding TotalItems, StringFormat=N0, Mode=OneWay}" av:Text="99"/>
+            </TextBlock>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <TextBlock FontSize="18">
+                <Run Text="Total LTP:"  FontWeight="Bold"/>
+                <Run Text="{Binding TotalLtpValue, StringFormat=N0, Mode=OneWay}" 
+                     av:Text="990"/>
+            </TextBlock>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <TextBlock FontSize="18" 
+                       Foreground="{Binding DailyProfit, Converter={StaticResource PolarBrushConverter}}">
+                <Run Text="Daily Gain:"  FontWeight="Bold"/>
+                <Run Text="{Binding DailyProfit, StringFormat=N0, Mode=OneWay}" 
+                     av:Text="990"/>
+                <md:PackIcon 
+                    Kind="{Binding DailyProfit, Converter={StaticResource PolarPackIconKindConverter}, Mode=OneWay}"/>
+            </TextBlock>
+        </StackPanel>
+        <views:PaginationNavigationUC Grid.Row="2" />
     </Grid>
 
 </UserControl>

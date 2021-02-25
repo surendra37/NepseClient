@@ -5,7 +5,7 @@
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" av:DesignWidth="700.076" av:DesignHeight="256"
-             xmlns:local="clr-namespace:NepseClient.Modules.Stocks.Views">
+             xmlns:local="clr-namespace:NepseClient.Modules.Commons.Views;assembly=NepseClient.Modules.Commons">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

@@ -1,8 +1,7 @@
-﻿using NepseClient.Commons.Contracts;
-using NepseClient.Libraries.NepalStockExchange;
+﻿using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Responses;
 using NepseClient.Modules.Commons.Interfaces;
-using NepseClient.Modules.Stocks.Models;
+using NepseClient.Modules.Commons.Models;
 
 using Prism.Commands;
 

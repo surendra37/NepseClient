@@ -116,19 +116,17 @@ namespace NepseClient.Libraries.MeroShare
         /// <summary>
         /// Get Depository Participants (Capitals)
         /// </summary>
-        public async Task<MeroshareCapitalResponse[]> GetCapitalsAsync(CancellationToken ct = default)
+        public Task<MeroshareCapitalResponse[]> GetCapitalsAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting capitals");
             var request = new RestRequest("/api/meroShare/capital");
-            var response = await Client.ExecuteGetAsync<MeroshareCapitalResponse[]>(request, ct);
-            return response.Data;
+            return this.AuthorizeGetAsync<MeroshareCapitalResponse[]>(request, ct);
         }
-        public async Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(CancellationToken ct = default)
+        public Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting own details");
             var request = new RestRequest("/api/meroShare/ownDetail/");
-            var response = await Client.ExecuteGetAsync<MeroshareOwnDetailResponse>(request, ct);
-            return response.Data;
+            return this.AuthorizeGetAsync<MeroshareOwnDetailResponse>(request, ct);
         }
 
         public Task<string[]> GetMySharesAsync(CancellationToken ct = default)
@@ -154,10 +152,11 @@ namespace NepseClient.Libraries.MeroShare
             var response = this.AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
             return response.Data;
         }
-        public async Task<MerosharePortfolioResponse> GetMyPortfoliosAsync(int page = 1, CancellationToken ct = default)
+        public async Task<MerosharePortfolioResponse> GetMyPortfoliosAsync(int page = 1, int size = 200, CancellationToken ct = default)
         {
             var me = await Cache.GetOrCreateAsync(CacheKeys.OwnDetail, entry =>
             {
+                entry.Size = 1;
                 return GetOwnDetailsAsync(ct);
             });
             var body = new GetMyPortfolioRequest
@@ -165,14 +164,14 @@ namespace NepseClient.Libraries.MeroShare
                 ClientCode = me.ClientCode,
                 Demat = new string[] { me.Demat },
                 Page = page,
-                Size = 200,
+                Size = size,
                 SortAsc = true,
                 SortBy = "scrip"
             };
             var request = new RestRequest("/api/meroShareView/myPortfolio");
             request.AddJsonBody(body);
 
-            return await this.AuthorizeGetAsync<MerosharePortfolioResponse>(request, ct);
+            return await this.AuthorizePostAsync<MerosharePortfolioResponse>(request, ct);
         }
 
         #region ASBA

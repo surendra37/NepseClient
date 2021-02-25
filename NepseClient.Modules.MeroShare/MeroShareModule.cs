@@ -29,7 +29,7 @@ namespace NepseClient.Modules.MeroShare
             containerRegistry.RegisterDialog<UpdateClientDialog, UpdateClientDialogViewModel>();
 
             containerRegistry.RegisterForNavigation<LoginPage, LoginPageViewModel>();
-            containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
+            containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>("MeroSharePortfolioPage");
             containerRegistry.RegisterForNavigation<AsbaPage, AsbaPageViewModel>();
         }
     }

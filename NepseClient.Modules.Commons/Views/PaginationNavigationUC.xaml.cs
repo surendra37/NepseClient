@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NepseClient.Modules.Stocks.Views
+namespace NepseClient.Modules.Commons.Views
 {
     /// <summary>
     /// Interaction logic for PaginationNavigationUC.xaml

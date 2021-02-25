@@ -6,4 +6,5 @@
     <converters:DailyGainConverter x:Key="DailyGainConverter" />
     <converters:TotalGainConverter x:Key="TotalGainConverter" />
     <converters:PolarBrushConverter x:Key="PolarBrushConverter" />
+    <converters:PolarPackIconKindConverter x:Key="PolarPackIconKindConverter" />
 </ResourceDictionary>

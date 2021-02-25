@@ -13,11 +13,13 @@ namespace NepseClient.Libraries.MeroShare.Models.Responses
         public string ValueAsOfPreviousClosingPrice { get; set; }
         public double ValueOfLastTransPrice { get; set; }
         public double ValueOfPrevClosingPrice { get; set; }
+        public double Change => LastTransactionPrice - PreviousClosingPrice;
+        public double TotalChange => ValueOfLastTransPrice - ValueOfPrevClosingPrice;
     }
 
     public class MerosharePortfolioResponse
     {
-        public List<MeroShareMyPortfolio> MeroShareMyPortfolio { get; set; }
+        public MeroShareMyPortfolio[] MeroShareMyPortfolio { get; set; }
         public int TotalItems { get; set; }
         public string TotalValueAsOfLastTransactionPrice { get; set; }
         public string TotalValueAsOfPreviousClosingPrice { get; set; }
