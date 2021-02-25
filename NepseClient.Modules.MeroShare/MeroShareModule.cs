@@ -31,6 +31,10 @@ namespace NepseClient.Modules.MeroShare
             containerRegistry.RegisterForNavigation<LoginPage, LoginPageViewModel>();
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>("MeroSharePortfolioPage");
             containerRegistry.RegisterForNavigation<AsbaPage, AsbaPageViewModel>();
+
+            containerRegistry.RegisterForNavigation<MyAsbaApplicationReportPage, MyAsbaApplicationReportPageViewModel>();
+            containerRegistry.RegisterForNavigation<MyAsbaApplyForIssuePage, MyAsbaApplyForIssuePageViewModel>();
+            containerRegistry.RegisterForNavigation<MyAsbaOldApplicationReportPage, MyAsbaOldApplicationReportPageViewModel>();
         }
     }
 }

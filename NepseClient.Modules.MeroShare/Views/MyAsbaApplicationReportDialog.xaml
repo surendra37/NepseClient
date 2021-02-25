@@ -7,25 +7,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              mc:Ignorable="av"            
              prism:ViewModelLocator.AutoWireViewModel="True"
-             av:DesignWidth="816" av:DesignHeight="512"
+             av:DesignWidth="816.001" av:DesignHeight="512"
              FontSize="20">
     <StackPanel Margin="16" MinWidth="800" MinHeight="500">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Share.CompanyName}" av:Text="Nepal Infrastructure Bank Ltd"/>
-            <TextBlock Text="-" Margin="4 0"/>
-            <TextBlock Text="{Binding Share.SubGroup}" av:Text="General Public" />
-            <TextBlock Text="{Binding Share.Scrip, StringFormat='({0})'}" Margin="4 0" av:Text="(NIFRA)" />
-            <TextBlock Text="{Binding Share.ShareTypeName}" Background="AliceBlue" av:Text="IPO" />
-            <TextBlock Text="=>" />
-            <TextBlock Text="{Binding Share.ShareGroupName}" av:Text="Ordinary Shares"/>
-        </StackPanel>
+        <TextBlock TextTrimming="CharacterEllipsis">
+            <Run Text="{Binding Share.CompanyName}" av:Text="Nepal Infrastructure Bank Ltd"/>
+            -
+            <Run Text="{Binding Share.SubGroup}" av:Text="General Public" />
+            (
+            <Run Text="{Binding Share.Scrip}" av:Text="NIFRA" />
+            )
+            <Run Text="{Binding Share.ShareTypeName}" Background="AliceBlue" av:Text="IPO" />
+            =>
+            <Run Text="{Binding Share.ShareGroupName}" av:Text="Ordinary Shares"/>
+        </TextBlock>
         <Separator />
         <UniformGrid Columns="3">
             <TextBlock Text="Issue Manager" FontWeight="Bold" />
             <TextBlock Text="Issue Open Date" FontWeight="Bold" />
             <TextBlock Text="Issue Close Date" FontWeight="Bold" />
 
-            <TextBlock Text="{Binding Share.ClientName}" av:Text="NIBL ACE CAPITAL LTD - 1"/>
+            <TextBlock Text="{Binding Share.ClientName}" av:Text="NIBL ACE CAPITAL LTD - 1" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding Share.MinIssueOpenDate}" av:Text="2021-01-15 10:00:00 AM"/>
             <TextBlock Text="{Binding Share.MaxIssueCloseDate}" av:Text="2021-01-19 05:00:00 PM"/>
 

@@ -21,6 +21,7 @@ namespace NepseClient.Modules.TradeManagementSystem.ViewModels
             : base(appCommand)
         {
             _client = client;
+            RefreshCommand.Execute();
         }
 
         public override async void ExecuteRefreshCommand()

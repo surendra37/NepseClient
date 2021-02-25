@@ -36,6 +36,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         {
             _client = client;
             _dialog = dialog;
+            RefreshCommand.Execute();
         }
 
         public override async void ExecuteRefreshCommand()
@@ -44,12 +45,8 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             {
                 IsBusy = true;
                 AppCommand.ShowMessage("Getting application report");
-                Items = await Task.Run(() => _client.GetApplicationReport().Object);
-                if (Items is null)
-                {
-                    _client.IsAuthenticated = false;
-                    Items = await Task.Run(() => _client.GetApplicationReport().Object);
-                }
+                var items = await _client.GetApplicationReportAsync();
+                Items = items.Object;
                 IsBusy = false;
             }
             catch (Exception ex)
@@ -65,19 +62,16 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         public DelegateCommand<ApplicationReportItem> ViewReportCommand =>
             _viewReportCommand ?? (_viewReportCommand = new DelegateCommand<ApplicationReportItem>(ExecuteViewReportCommand));
 
-        async void ExecuteViewReportCommand(ApplicationReportItem report)
+        void ExecuteViewReportCommand(ApplicationReportItem report)
         {
             try
             {
                 AppCommand.ShowMessage("Getting application report");
-                var companyDetails = await Task.Run(() =>_client.GetAsbaCompanyDetails(report));
-                var applicantFormDetails = await Task.Run(() =>_client.GetApplicantFormReportDetail(report));
 
                 var dialogParams = new DialogParameters()
-                    .AddShareReport(companyDetails)
-                    .AddApplicantFormDetail(applicantFormDetails);
+                    .AddReport(report, false);
 
-                _dialog.ShowDialog(nameof(MyAsbaApplicationReportPage), dialogParams, result =>
+                _dialog.ShowDialog(nameof(MyAsbaApplicationReportDialog), dialogParams, result =>
                 {
 
                 });

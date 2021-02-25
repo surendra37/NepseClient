@@ -85,6 +85,11 @@ namespace NepseClient.Commons.Extensions
             }
 
             var response = await service.Client.ExecuteAsync<T>(request, method, ct);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // Try one more time
+                response = await service.Client.ExecuteAsync<T>(request, method, ct);
+            }
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 service.IsAuthenticated = false;

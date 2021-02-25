@@ -9,11 +9,6 @@
               behaviors:DataGridBehavior.DisplayRowNumber="True" 
               HeadersVisibility="All">
         <DataGrid.Columns>
-            <DataGridTextColumn Header="Scrip" Binding="{Binding Scrip}" />
-            <DataGridTextColumn Header="Company" Binding="{Binding CompanyName}" />
-            <DataGridTextColumn Header="Type" Binding="{Binding ShareTypeName}" />
-            <DataGridTextColumn Header="Group" Binding="{Binding ShareGroupName}" />
-            <DataGridTextColumn Header="Sub Group" Binding="{Binding SubGroup}" />
             <DataGridTemplateColumn Header="Actions">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -27,6 +22,11 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
+            <DataGridTextColumn Header="Scrip" Binding="{Binding Scrip}" />
+            <DataGridTextColumn Header="Company" Binding="{Binding CompanyName}"/>
+            <DataGridTextColumn Header="Type" Binding="{Binding ShareTypeName}" />
+            <DataGridTextColumn Header="Group" Binding="{Binding ShareGroupName}" />
+            <DataGridTextColumn Header="Sub Group" Binding="{Binding SubGroup}" />
         </DataGrid.Columns>
     </DataGrid>
 </UserControl>

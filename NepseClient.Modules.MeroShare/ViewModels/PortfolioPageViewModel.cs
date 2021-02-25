@@ -31,6 +31,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             base(applicationCommand)
         {
             _client = client;
+            RefreshCommand.Execute();
         }
 
         protected override async void Navigate(int page)

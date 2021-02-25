@@ -70,5 +70,20 @@ namespace NepseClient.Modules.MeroShare.Extensions
         {
             return value.GetValue<ApplicantFormReportDetail>("FormDetail");
         }
+
+        public static IDialogParameters AddReport(this IDialogParameters value, ApplicationReportItem report, bool isOldReport)
+        {
+            value.Add("OldReportType", isOldReport);
+            value.Add("Report", report);
+            return value;
+        }
+        public static bool GetReportType(this IDialogParameters value)
+        {
+            return value.GetValue<bool>("OldReportType");
+        }
+        public static ApplicationReportItem GetReport(this IDialogParameters value)
+        {
+            return value.GetValue<ApplicationReportItem>("Report");
+        }
     }
 }

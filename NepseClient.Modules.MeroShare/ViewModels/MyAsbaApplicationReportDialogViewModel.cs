@@ -1,15 +1,19 @@
 ﻿using System;
 
+using NepseClient.Libraries.MeroShare;
 using NepseClient.Libraries.MeroShare.Models.Responses;
 using NepseClient.Modules.MeroShare.Extensions;
 
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 
+using Serilog;
+
 namespace NepseClient.Modules.MeroShare.ViewModels
 {
     public class MyAsbaApplicationReportDialogViewModel : BindableBase, IDialogAware
     {
+        private readonly MeroshareClient _client;
         public string Title { get; set; }
 
         public event Action<IDialogResult> RequestClose;
@@ -22,6 +26,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         }
 
         private ApplicantFormReportDetail _form;
+
         public ApplicantFormReportDetail Form
         {
             get { return _form; }
@@ -32,11 +37,34 @@ namespace NepseClient.Modules.MeroShare.ViewModels
 
         public void OnDialogClosed() { }
 
-        public void OnDialogOpened(IDialogParameters parameters)
+        public async void OnDialogOpened(IDialogParameters parameters)
         {
-            Share = parameters.GetShareReport();
-            Form = parameters.GetFormDetail();
-            Title = $"Application Report of {Share.CompanyName}";
+            try
+            {
+                var report = parameters.GetReport();
+                var isOldReport = parameters.GetReportType();
+                
+                Title = $"Application Report of {report.CompanyName}";
+
+                Share = await _client.GetAsbaCompanyDetailsAsync(report);
+                if (isOldReport)
+                {
+                    Form = await _client.GetOldApplicationReportDetailsAsync(report);
+                }
+                else
+                {
+                    Form = await _client.GetApplicantFormReportDetailAsync(report);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to get report");
+            }
+        }
+
+        public MyAsbaApplicationReportDialogViewModel(MeroshareClient client)
+        {
+            _client = client;
         }
     }
 }

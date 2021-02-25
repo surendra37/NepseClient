@@ -27,6 +27,9 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 {
                     //new SubheaderNavigationItem() { Subheader = "Documents" },
                     new PrismSideNavItem("My Portfolio", PackIconKind.ClipboardPerson, "MeroSharePortfolioPage", true),
+                    new SubheaderNavigationItem(){ Subheader = "My ASBA" },
+                    new PrismSideNavItem("Application Report", PackIconKind.Web, nameof(MyAsbaApplicationReportPage)),
+                    new PrismSideNavItem("Old Application Report", PackIconKind.Web, nameof(MyAsbaOldApplicationReportPage)),
                 };
             }
         }

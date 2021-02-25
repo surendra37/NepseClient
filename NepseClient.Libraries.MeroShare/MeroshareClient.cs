@@ -175,46 +175,41 @@ namespace NepseClient.Libraries.MeroShare
         }
 
         #region ASBA
-        public ApplicationReportResponse GetOldApplicationReport()
+        public Task<ApplicationReportResponse> GetOldApplicationReportAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/api/meroShare/migrated/applicantForm/search");
             var body = new GetApplicationReport("VIEW");
             request.AddJsonBody(body);
 
-            var response = this.AuthorizedPost<ApplicationReportResponse>(request);
-            return response.Data;
+            return this.AuthorizePostAsync<ApplicationReportResponse>(request, ct);
         }
-        public ApplicationReportResponse GetApplicationReport()
+        public Task<ApplicationReportResponse> GetApplicationReportAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/api/meroShare/applicantForm/active/search/");
             var body = new GetApplicationReport("VIEW_APPLICANT_FORM_COMPLETE");
             request.AddJsonBody(body);
 
-            var response = this.AuthorizedPost<ApplicationReportResponse>(request);
-            return response.Data;
+            return this.AuthorizePostAsync<ApplicationReportResponse>(request, ct);
         }
 
-        public ApplicantFormReportDetail GetApplicantFormReportDetail(ApplicationReportItem report)
+        public Task<ApplicantFormReportDetail> GetApplicantFormReportDetailAsync(ApplicationReportItem report, CancellationToken ct = default)
         {
+            // For alloted information
             var request = new RestRequest($"/api/meroShare/applicantForm/report/detail/{report.ApplicantFormId}"); // 8094132 applicant form id
-            var response = this.AuthorizedGet<ApplicantFormReportDetail>(request);
-            return response.Data;
+            return this.AuthorizeGetAsync<ApplicantFormReportDetail>(request, ct);
         }
-
-        public AsbaShareReportDetailResponse GetAsbaCompanyDetails(ApplicationReportItem report)
+        public Task<AsbaShareReportDetailResponse> GetAsbaCompanyDetailsAsync(ApplicationReportItem report, CancellationToken ct = default)
         {
             // For share information
             var request = new RestRequest($"/api/meroShare/active/{report.CompanyShareId}"); //288  // CompanyShareId
-            var response = this.AuthorizedGet<AsbaShareReportDetailResponse>(request);
-            return response.Data;
+            return this.AuthorizeGetAsync<AsbaShareReportDetailResponse>(request, ct);
 
         }
-        public ApplicantFormReportDetail GetOldApplicationReportDetails(ApplicationReportItem report)
+        public Task<ApplicantFormReportDetail> GetOldApplicationReportDetailsAsync(ApplicationReportItem report, CancellationToken ct = default)
         {
             // For alloted information
             var request = new RestRequest($"/api/meroShare/migrated/applicantForm/report/{report.ApplicantFormId}"); //8549728 // ApplicantFormId
-            var response = this.AuthorizedGet<ApplicantFormReportDetail>(request);
-            return response.Data;
+            return this.AuthorizeGetAsync<ApplicantFormReportDetail>(request, ct);
         }
 
         public ApplicationReportResponse GetApplicableIssues()

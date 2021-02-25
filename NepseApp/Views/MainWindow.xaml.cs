@@ -1,5 +1,7 @@
 ﻿using MaterialDesignExtensions.Controls;
 
+using System.Windows.Controls;
+
 namespace NepseApp.Views
 {
     /// <summary>
@@ -21,23 +23,13 @@ namespace NepseApp.Views
 
         private void MenuItem_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (sender == StockMenu)
+            var menus = new MenuItem[] { TmsMenu, MeroShareMenu, StockMenu };
+            foreach (var menu in menus)
             {
-                //StockMenu.IsChecked = false;
-                TmsMenu.IsChecked = false;
-                MeroShareMenu.IsChecked = false;
-            }
-            else if (sender == TmsMenu)
-            {
-                StockMenu.IsChecked = false;
-                //TmsMenu.IsChecked = false;
-                MeroShareMenu.IsChecked = false;
-            }
-            else if (sender == MeroShareMenu)
-            {
-                StockMenu.IsChecked = false;
-                TmsMenu.IsChecked = false;
-                //MeroShareMenu.IsChecked = false;
+                if (menu is not null && sender is not null)
+                {
+                    menu.IsChecked = menu == sender;
+                }
             }
         }
     }

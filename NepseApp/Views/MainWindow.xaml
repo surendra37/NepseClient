@@ -60,7 +60,7 @@
                 <MenuItem Header="Show Notices" IsCheckable="True" IsChecked="{Binding ShowNotices}"/>
                 <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>
                 <Separator/>
-                <MenuItem x:Name="StockMenu" Header="Stocks" IsCheckable="True" Checked="MenuItem_Checked" 
+                <MenuItem x:Name="StockMenu" Header="Stocks" IsCheckable="True" IsChecked="True" Checked="MenuItem_Checked" 
                           Command="{Binding UpdateSideNavViewCommand}" 
                           CommandParameter="StocksNavPage"/>
                 <MenuItem x:Name="TmsMenu" Header="TMS" IsCheckable="True" Checked="MenuItem_Checked" 
