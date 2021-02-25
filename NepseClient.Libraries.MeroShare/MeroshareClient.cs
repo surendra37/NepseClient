@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 
-using NepseClient.Commons.Constants;
+using Microsoft.Extensions.Caching.Memory;
+
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
 using NepseClient.Commons.Utils;
+using NepseClient.Libraries.MeroShare.Constants;
 using NepseClient.Libraries.MeroShare.Models.Requests;
 using NepseClient.Libraries.MeroShare.Models.Responses;
-
-using Newtonsoft.Json;
 
 using Ookii.Dialogs.Wpf;
 
@@ -22,48 +21,20 @@ using Serilog;
 
 namespace NepseClient.Libraries.MeroShare
 {
-    public class MeroshareClient : IAuthorizable, IDisposable
+    public class MeroshareClient : IAuthorizable, IRestAuthorizableAsync
     {
         private readonly IMeroShareConfiguration _configuration;
-
-        private readonly object _meLock = new object();
-        private MeroshareOwnDetailResponse _me;
-        public MeroshareOwnDetailResponse Me
-        {
-            get
-            {
-                lock (_meLock)
-                {
-                    if (_me is null)
-                        _me = GetOwnDetails();
-                }
-                return _me;
-            }
-        }
-
-        private readonly object _bankLock = new object();
-        private MeroshareCapitalResponse[] _banks;
-        public MeroshareCapitalResponse[] Banks
-        {
-            get
-            {
-                lock (_bankLock)
-                {
-                    if (_banks is null)
-                        _banks = GetMyBanks();
-                }
-                return _banks;
-            }
-        }
-
         public bool IsAuthenticated { get; set; }
 
         public IRestClient Client { get; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
-        public MeroshareClient(IConfiguration configuration)
+        public IMemoryCache Cache { get; }
+
+        public MeroshareClient(IConfiguration configuration, IMemoryCache cache)
         {
             _configuration = configuration.Meroshare;
             Client = RestClientUtils.CreateNewClient("https://backend.cdsc.com.np");
+            Cache = cache;
         }
 
         #region Authentication
@@ -71,10 +42,9 @@ namespace NepseClient.Libraries.MeroShare
         {
             SignInAsync().GetAwaiter().GetResult();
         }
-
-        public async Task SignInAsync()
+        public async Task SignInAsync(CancellationToken ct = default)
         {
-            SignOut();
+            await SignOutAsync(ct);
 
             var clientId = _configuration.ClientId;
             var dialog = new CredentialDialog
@@ -92,14 +62,13 @@ namespace NepseClient.Libraries.MeroShare
                 {
                     var username = dialog.UserName;
                     var password = dialog.Password;
-                    await SignInAsync(clientId, username, password); //176//150394//vVy.$3pz7wx#y9S
+                    await SignInAsync(clientId, username, password, ct); //176//150394//vVy.$3pz7wx#y9S
                     dialog.ConfirmCredentials(true);
                     IsAuthenticated = true;
                 }
             }
         }
-
-        private async Task SignInAsync(string clientId, string username, string password)
+        private async Task SignInAsync(string clientId, string username, string password, CancellationToken ct)
         {
             Log.Debug("Signing in...");
 
@@ -107,7 +76,7 @@ namespace NepseClient.Libraries.MeroShare
             var json = new MeroshareAuthRequest(clientId, username, password);
             request.AddJsonBody(json);
 
-            var response = await Client.ExecutePostAsync(request);
+            var response = await Client.ExecutePostAsync(request, ct);
             if (!response.IsSuccessful)
             {
                 Log.Warning(response.Content);
@@ -121,13 +90,24 @@ namespace NepseClient.Libraries.MeroShare
             Client.Authenticator = new MeroshareAuthenticator(authHeader);
             Log.Debug("Signed In");
         }
-        public void SignOut()
+        public async Task SignOutAsync(CancellationToken ct = default)
         {
             Log.Debug("Signing out from MeroShare");
-            var request = new RestRequest("/api/meroShare/auth/logout/");
-            var response = Client.Get(request);
-            Log.Debug(response.Content);
-
+            if (IsAuthenticated)
+            {
+                var request = new RestRequest("/api/meroShare/auth/logout/");
+                request.AddOrUpdateParameter("Accept", "application/json, text/plain, */*", ParameterType.HttpHeader);
+                var response = await Client.ExecuteGetAsync(request, ct);
+                Log.Debug(response.Content);
+                if (response.IsSuccessful)
+                {
+                    IsAuthenticated = false;
+                }
+            }
+            foreach (var key in CacheKeys.All)
+            {
+                Cache.Remove(key);
+            }
             // Remove all stored values
             Log.Debug("Signed out from MeroShare");
         }
@@ -136,27 +116,26 @@ namespace NepseClient.Libraries.MeroShare
         /// <summary>
         /// Get Depository Participants (Capitals)
         /// </summary>
-        public MeroshareCapitalResponse[] GetCapitals()
+        public async Task<MeroshareCapitalResponse[]> GetCapitalsAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting capitals");
             var request = new RestRequest("/api/meroShare/capital");
-            var response = Client.Get<MeroshareCapitalResponse[]>(request);
+            var response = await Client.ExecuteGetAsync<MeroshareCapitalResponse[]>(request, ct);
             return response.Data;
         }
-
-        private MeroshareOwnDetailResponse GetOwnDetails()
+        public async Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting own details");
             var request = new RestRequest("/api/meroShare/ownDetail/");
-            var response = this.AuthorizedGet<MeroshareOwnDetailResponse>(request);
+            var response = await Client.ExecuteGetAsync<MeroshareOwnDetailResponse>(request, ct);
             return response.Data;
         }
 
-        public Task<string[]> GetMySharesAsync()
+        public Task<string[]> GetMySharesAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting my shares");
             var request = new RestRequest("/api/myPurchase/myShare/");
-            return Client.GetAsync<string[]>(request);
+            return this.AuthorizeGetAsync<string[]>(request, ct);
         }
 
         public MeroshareViewMyPurchaseResponse ViewMyPurchase(MeroshareViewMyPurchaseRequest body)
@@ -175,50 +154,16 @@ namespace NepseClient.Libraries.MeroShare
             var response = this.AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
             return response.Data;
         }
-
-        public IEnumerable<MeroshareViewMyPurchaseResponse> GetWaccs(IEnumerable<string> scrips)
+        public async Task<MerosharePortfolioResponse> GetMyPortfoliosAsync(int page = 1, CancellationToken ct = default)
         {
-            Log.Debug("Getting waccs");
-            var me = GetOwnDetails();
-            var request = new MeroshareViewMyPurchaseRequest
+            var me = await Cache.GetOrCreateAsync(CacheKeys.OwnDetail, entry =>
             {
-                Demat = me.Demat,
-            };
-            foreach (var scrip in scrips)
-            {
-                request.Scrip = scrip;
-                var view = ViewMyPurchase(request);
-                var searches = SearchMyPurchase(request);
-                if (searches is null || searches.Length == 0)
-                {
-                    yield return view;
-                }
-                else
-                {
-                    var first = searches.First();
-                    var myView = new MeroshareViewMyPurchaseResponse
-                    {
-                        Isin = first.Isin,
-                        ScripName = first.Scrip,
-                        TotalCost = searches.Sum(x => x.UserPrice * x.TransactionQuantity),
-                        TotalQuantity = searches.Sum(x => x.TransactionQuantity),
-                        //AverageBuyRate
-                    };
-                    myView.TotalCost += view.TotalCost;
-                    myView.TotalQuantity += view.TotalQuantity;
-                    myView.AverageBuyRate = myView.TotalCost / myView.TotalQuantity;
-
-                    yield return myView;
-                }
-
-            }
-        }
-        public MerosharePortfolioResponse GetMyPortfolios(int page = 1)
-        {
+                return GetOwnDetailsAsync(ct);
+            });
             var body = new GetMyPortfolioRequest
             {
-                ClientCode = Me.ClientCode,
-                Demat = new string[] { Me.Demat },
+                ClientCode = me.ClientCode,
+                Demat = new string[] { me.Demat },
                 Page = page,
                 Size = 200,
                 SortAsc = true,
@@ -227,33 +172,7 @@ namespace NepseClient.Libraries.MeroShare
             var request = new RestRequest("/api/meroShareView/myPortfolio");
             request.AddJsonBody(body);
 
-            var response = this.AuthorizedPost<MerosharePortfolioResponse>(request);
-            return response.Data;
-        }
-
-        public MeroshareViewMyPurchaseResponse[] ReadWaccFromFile()
-        {
-            var path = Path.Combine(PathConstants.AppDataPath.Value, "wacc.json");
-            if (!File.Exists(path))
-            {
-                var output = GetWaccs(GetMySharesAsync().GetAwaiter().GetResult()).ToArray();
-                File.WriteAllText(path, JsonConvert.SerializeObject(output));
-                return output;
-            }
-            else
-            {
-                var json = File.ReadAllText(path);
-                return JsonConvert.DeserializeObject<MeroshareViewMyPurchaseResponse[]>(json);
-            }
-        }
-
-        public void Dispose()
-        {
-#if DEBUG
-            //SignOut();
-#else
-            SignOut();
-#endif
+            return await this.AuthorizeGetAsync<MerosharePortfolioResponse>(request, ct);
         }
 
         #region ASBA

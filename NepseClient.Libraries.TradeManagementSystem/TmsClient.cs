@@ -10,7 +10,9 @@ using RestSharp.Authenticators;
 using Serilog;
 
 using System;
+using System.Linq;
 using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NepseClient.Libraries.TradeManagementSystem
@@ -36,9 +38,18 @@ namespace NepseClient.Libraries.TradeManagementSystem
 
         private IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
         {
-            if (authData is null || authData.IsCookieEnabled) return new TmsAuthenticator(Client);
+            if (authData is null || authData.IsCookieEnabled) 
+                return new XsrfTokenAuthenticator(GetXsrfToken(Client));
 
-            return new BearerAuthenticator(authData.JsonWebToken);
+            return new JwtAuthenticator(authData.JsonWebToken);
+        }
+
+        private static string GetXsrfToken(IRestClient client)
+        {
+            // TODO: manage cookies
+            var collection = client.CookieContainer.GetCookies(client.BaseUrl);
+            var cookies = collection.FirstOrDefault(x => x.Name.Equals("XSRF-TOKEN"));
+            return cookies?.Value;
         }
 
         public void UpdateBaseUrl()
@@ -66,7 +77,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
 
         #region Authentication
 
-        public async Task SignInAsync()
+        public async Task SignInAsync(CancellationToken ct = default)
         {
             var url = _configuration.BaseUrl;
             var dialog = new Ookii.Dialogs.Wpf.CredentialDialog
@@ -85,14 +96,14 @@ namespace NepseClient.Libraries.TradeManagementSystem
                 {
                     var username = dialog.UserName;
                     var password = dialog.Password;
-                    await SignInAsync(url, username, password);
+                    await SignInAsync(url, username, password, ct);
                     dialog.ConfirmCredentials(true);
                 }
             }
         }
-        private async Task SignInAsync(string url, string username, string password)
+        private async Task SignInAsync(string url, string username, string password, CancellationToken ct)
         {
-            SignOut();
+            await SignOutAsync(ct);
             Log.Debug("Signing in");
 
             var request = new RestRequest("/tmsapi/authenticate");
@@ -100,7 +111,7 @@ namespace NepseClient.Libraries.TradeManagementSystem
             request.AddJsonBody(json);
 
             Client = RestClientUtils.CreateNewClient(url);
-            var response = await Client.ExecutePostAsync<ResponseBase<AuthenticationDataResponse>>(request);
+            var response = await Client.ExecutePostAsync<ResponseBase<AuthenticationDataResponse>>(request, ct);
             if (!response.IsSuccessful)
             {
                 Log.Warning(response.Content);
@@ -112,16 +123,17 @@ namespace NepseClient.Libraries.TradeManagementSystem
             Log.Debug("Signed In");
         }
 
-        public void SignOut()
+        public async Task SignOutAsync(CancellationToken ct = default)
         {
             Log.Debug("Signing out from Tms");
-            if (IsAuthenticated)
+            if (IsAuthenticated && AuthData.IsCookieEnabled)
             {
                 Log.Debug("Signing out");
                 var request = new RestRequest("/tmsapi/authenticate/logout");
-                var response = Client.Post<ResponseBase>(request);
+                var response = await Client.ExecutePostAsync<ResponseBase>(request, ct);
                 Log.Information(response.Data.Message);
             }
+            IsAuthenticated = false;
             Log.Debug("Signed out from Tms");
         }
         #endregion

@@ -89,7 +89,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         {
             try
             {
-                Items = await System.Threading.Tasks.Task.Run(() => _client.GetCapitals());
+                Items = await _client.GetCapitalsAsync();
                 var id = _config.Meroshare.ClientId;
                 SelectedItem = Items?.FirstOrDefault(x => x.Id.Equals(id) || string.IsNullOrEmpty(id));
             }

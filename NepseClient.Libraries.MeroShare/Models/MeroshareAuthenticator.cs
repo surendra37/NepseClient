@@ -14,7 +14,7 @@ namespace NepseClient.Libraries.MeroShare
 
         public void Authenticate(IRestClient client, IRestRequest request)
         {
-            request.AddHeader("Authorization", _authorization);
+            request.AddOrUpdateParameter("Authorization", _authorization, ParameterType.HttpHeader);
         }
     }
 }

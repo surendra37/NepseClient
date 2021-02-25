@@ -14,8 +14,6 @@ using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.MeroShare.Extensions;
 
-using Ookii.Dialogs.Wpf;
-
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -225,13 +223,12 @@ namespace NepseApp.ViewModels
         public DelegateCommand TmsLogOutCommand =>
             _tmsLogoutCommand ?? (_tmsLogoutCommand = new DelegateCommand(ExecuteTmsLogOutCommand));
 
-        void ExecuteTmsLogOutCommand()
+        async void ExecuteTmsLogOutCommand()
         {
             try
             {
-                _client.SignOut();
+                await _client.SignOutAsync();
                 var url = _config.Tms.BaseUrl;
-                //CredentialDialog.DeleteCredential(url);
                 IsTmsLoggedIn = false;
 
             }
@@ -284,14 +281,13 @@ namespace NepseApp.ViewModels
         public DelegateCommand MeroShareLogOutCommand =>
             _meroShareLogoutCommand ?? (_meroShareLogoutCommand = new DelegateCommand(ExecuteMeroShareLogOutCommand));
 
-        void ExecuteMeroShareLogOutCommand()
+        async void ExecuteMeroShareLogOutCommand()
         {
             try
             {
-                _meroshareClient.SignOut();
+                await _meroshareClient.SignOutAsync();
                 var url = _config.Meroshare.BaseUrl;
-                CredentialDialog.DeleteCredential(url);
-                IsMeroShareLoggedIn = false;
+                IsMeroShareLoggedIn = _meroshareClient.IsAuthenticated;
             }
             catch (Exception ex)
             {

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using NepseClient.Commons.Contracts;
 
@@ -34,7 +36,7 @@ namespace NepseClient.Commons.Extensions
             {
                 ClearAuthHeader(request);
                 authorizable.IsAuthenticated = false;
-                authorizable.Authorize();                
+                authorizable.Authorize();
                 response = GetResponse<T>(authorizable.Client, request, method);
             }
 
@@ -44,7 +46,7 @@ namespace NepseClient.Commons.Extensions
         private static void ClearAuthHeader(IRestRequest request)
         {
             var authHeader = request.Parameters.FirstOrDefault(x => x.Name.Equals("Authorization"));
-            if(authHeader is null) return;
+            if (authHeader is null) return;
 
             request.Parameters.Remove(authHeader);
         }
@@ -64,6 +66,32 @@ namespace NepseClient.Commons.Extensions
                 Method.COPY => throw new Exception("Copy Not supported"),
                 _ => client.Get<T>(request),
             };
+        }
+
+
+        public static Task<T> AuthorizeGetAsync<T>(this IRestAuthorizableAsync service, IRestRequest request, CancellationToken ct)
+        {
+            return AuthorizeAsync<T>(service, request, Method.GET, ct);
+        }
+        public static Task<T> AuthorizePostAsync<T>(this IRestAuthorizableAsync service, IRestRequest request, CancellationToken ct)
+        {
+            return AuthorizeAsync<T>(service, request, Method.POST, ct);
+        }
+        public static async Task<T> AuthorizeAsync<T>(this IRestAuthorizableAsync service, IRestRequest request, Method method, CancellationToken ct)
+        {
+            if (!service.IsAuthenticated)
+            {
+                await service.SignInAsync(ct);
+            }
+
+            var response = await service.Client.ExecuteAsync<T>(request, method, ct);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                service.IsAuthenticated = false;
+                await service.SignInAsync(ct);
+                response = await service.Client.ExecuteAsync<T>(request, method, ct);
+            }
+            return response.Data;
         }
     }
 }

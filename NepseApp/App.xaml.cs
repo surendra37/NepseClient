@@ -1,4 +1,6 @@
-﻿using NepseApp.Models;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+using NepseApp.Models;
 using NepseApp.ViewModels;
 using NepseApp.Views;
 
@@ -84,6 +86,12 @@ namespace NepseApp
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            var cache = new MemoryCache(new MemoryCacheOptions
+            {
+                SizeLimit = 1024
+            });
+            containerRegistry.RegisterInstance<IMemoryCache>(cache);
+
             containerRegistry.RegisterDialogWindow<CustomDialogWindow>();
 
             containerRegistry.RegisterSingleton<IApplicationCommand, ApplicationCommand>();
@@ -106,8 +114,7 @@ namespace NepseApp
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Container.Resolve<NepseClient.Libraries.TradeManagementSystem.TmsClient>().SignOut();
-            Container.Resolve<NepseClient.Libraries.MeroShare.MeroshareClient>().SignOut();
+            Container.Resolve<IMemoryCache>().Dispose();
             Log.CloseAndFlush();
             base.OnExit(e);
         }

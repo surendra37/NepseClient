@@ -58,11 +58,11 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         public DelegateCommand RefreshCommand =>
             _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand));
 
-        void ExecuteRefreshCommand()
+        async void ExecuteRefreshCommand()
         {
             try
             {
-                Items = _client.GetCapitals();
+                Items = await _client.GetCapitalsAsync();
             }
             catch (System.Exception ex)
             {
