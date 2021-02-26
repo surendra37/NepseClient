@@ -12,12 +12,11 @@ namespace NepseClient.Modules.MeroShare
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var regionManager = containerProvider.Resolve<IRegionManager>();
-            regionManager.RegisterViewWithRegion(RegionNames.ContentRegion, typeof(LoginPage));
+            //var regionManager = containerProvider.Resolve<IRegionManager>();
 
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaApplyForIssuePage));
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaApplicationReportPage));
-            regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaOldApplicationReportPage));
+            //regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaApplyForIssuePage));
+            //regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaApplicationReportPage));
+            //regionManager.RegisterViewWithRegion(RegionNames.MyAsbaTabRegion, typeof(MyAsbaOldApplicationReportPage));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

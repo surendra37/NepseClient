@@ -88,11 +88,12 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 if (Items is null) return;
 
                 AppCommand.ShowMessage("Loading wacc...");
+                var me = await _client.GetOwnDetailsAsync(true);
                 foreach (var item in Items)
                 {
                     var request = new MeroshareViewMyPurchaseRequest
                     {
-                        Demat = _client.Me.Demat,
+                        Demat = me.Demat,
                         Scrip = item.Script,
                     };
                     var purchase = await _client.ViewMyPurchaseAsync(request);

@@ -26,6 +26,7 @@ namespace NepseClient.Modules.TradeManagementSystem.ViewModels
                 return new List<INavigationItem>
                 {
                     //new SubheaderNavigationItem() { Subheader = "Documents" },
+                    new PrismSideNavItem("My Information", PackIconKind.Marketplace, nameof(TmsMyInformationPage), true),
                     new PrismSideNavItem("My Portfolio", PackIconKind.Marketplace, nameof(PortfolioPage), true),
                     new SubheaderNavigationItem { Subheader = "Market Data" },
                     new PrismSideNavItem("Live Market", PackIconKind.XboxLive, nameof(LiveMarketPage)),

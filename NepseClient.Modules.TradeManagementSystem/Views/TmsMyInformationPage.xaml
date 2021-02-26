@@ -1,0 +1,54 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.TradeManagementSystem.Views.TmsMyInformationPage"             
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             av:DesignWidth="629.05" av:DesignHeight="184.96">
+    <TabControl>
+        <TabItem Header="General">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Surendra Shrestha" VerticalAlignment="Center" FontWeight="Bold"/>
+                    <md:Chip Margin="2 0" Content="Kathmandu" />
+                    <md:Chip Margin="2 0" Content="Individual" />
+                    <md:Chip Margin="2 0" Content="Online" />
+                    <md:Chip Margin="2 0" Content="Activated" />
+                </StackPanel>
+                <Separator Margin="4"/>
+                <UniformGrid>
+                    <UniformGrid.Resources>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignCaptionTextBlock}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                            <Setter Property="Margin" Value="4 0" />
+                        </Style>
+                    </UniformGrid.Resources>
+                    <TextBlock>
+                        <Run Text="Address:" FontWeight="Bold"/>
+                        <Run Text="Gunsan-9, Manthali-9"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Code:" FontWeight="Bold"/>
+                        <Run Text="SS482167" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Client Group:" FontWeight="Bold"/>
+                        <Run Text="SS482167" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="" FontWeight="Bold"/>
+                        <Run Text="SS482167" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Code:" FontWeight="Bold"/>
+                        <Run Text="SS482167" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Code:" FontWeight="Bold"/>
+                        <Run Text="SS482167" />
+                    </TextBlock>
+                </UniformGrid>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</UserControl>

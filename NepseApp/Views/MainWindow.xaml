@@ -52,7 +52,28 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Grid.ColumnSpan="3" IsMainMenu="True">
-            <MenuItem Header="File" />
+            <MenuItem Header="File" >
+                <MenuItem Header="TMS">
+                    <MenuItem Header="Update Base URL" Command="{Binding UpdateTmsBaseUrl}" Icon="{md:PackIcon Kind=Web}" />
+                    <Separator />
+                    <MenuItem Header="Log In" Command="{Binding TmsLogInCommand}" 
+                          Icon="{md:PackIcon Kind=Login}" 
+                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
+                    <MenuItem Header="Log Out" Command="{Binding TmsLogOutCommand}" 
+                          Icon="{md:PackIcon Kind=Logout}"
+                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </MenuItem>
+                <MenuItem Header="MeroShare">
+                    <MenuItem Header="Update Client Id" Command="{Binding UpdateMeroShareClientId}" Icon="{md:PackIcon Kind=Person}" />
+                    <Separator />
+                    <MenuItem Header="Log In" Command="{Binding MeroShareLogInCommand}" 
+                          Icon="{md:PackIcon Kind=Login}" 
+                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
+                    <MenuItem Header="Log Out" Command="{Binding MeroShareLogOutCommand}" 
+                          Icon="{md:PackIcon Kind=Logout}"
+                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </MenuItem>
+            </MenuItem>
             <MenuItem Header="Edit" />
             <MenuItem Header="View" >
                 <MenuItem Header="Refresh" Icon="{md:PackIcon Kind=Refresh}" Command="{Binding ApplicationCommand.RefreshCommand}" InputGestureText="F5"/>
@@ -70,29 +91,6 @@
                           Command="{Binding UpdateSideNavViewCommand}" 
                           CommandParameter="MeroShareNavPage"/>
 
-            </MenuItem>
-            <MenuItem Header="TMS">
-                <MenuItem Header="Update Base URL" Command="{Binding UpdateTmsBaseUrl}" Icon="{md:PackIcon Kind=Web}" />
-                <MenuItem Header="Log In" Command="{Binding TmsLogInCommand}" 
-                          Icon="{md:PackIcon Kind=Login}" 
-                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
-                <MenuItem Header="Log Out" Command="{Binding TmsLogOutCommand}" 
-                          Icon="{md:PackIcon Kind=Logout}"
-                          Visibility="{Binding IsTmsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            </MenuItem>
-            <MenuItem Header="MeroShare">
-                <MenuItem Header="Update Client Id" Command="{Binding UpdateMeroShareClientId}" Icon="{md:PackIcon Kind=Person}" />
-                <MenuItem Header="Log In" Command="{Binding MeroShareLogInCommand}" 
-                          Icon="{md:PackIcon Kind=Login}" 
-                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource InvertBooleanToVisibilityConverter}}"/>
-                <MenuItem Header="Log Out" Command="{Binding MeroShareLogOutCommand}" 
-                          Icon="{md:PackIcon Kind=Logout}"
-                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <MenuItem Header="Import my portfolio as watchlist" 
-                          Icon="{md:PackIcon Kind=Import}"
-                          Command="{Binding ImportPortfolioCommand}"
-                          Visibility="{Binding IsMeroShareLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                <Separator />
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About" />

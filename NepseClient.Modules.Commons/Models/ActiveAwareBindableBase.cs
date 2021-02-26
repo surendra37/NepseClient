@@ -39,7 +39,7 @@ namespace NepseClient.Modules.Commons.Models
 
         private DelegateCommand _refreshCommand;
         public DelegateCommand RefreshCommand =>
-            _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand));
+            _refreshCommand ?? (_refreshCommand = new DelegateCommand(ExecuteRefreshCommand, () => !IsBusy));
 
         public virtual void ExecuteRefreshCommand() { }
 

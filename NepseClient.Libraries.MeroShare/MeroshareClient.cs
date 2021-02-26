@@ -29,17 +29,6 @@ namespace NepseClient.Libraries.MeroShare
         public IRestClient Client { get; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
         public IMemoryCache Cache { get; }
-        public MeroshareOwnDetailResponse Me
-        {
-            get
-            {
-                return Cache.GetOrCreate(CacheKeys.OwnDetail, entry =>
-                {
-                    entry.Size = 1;
-                    return GetOwnDetailsAsync().GetAwaiter().GetResult();
-                });
-            }
-        }
 
         public MeroshareClient(IConfiguration configuration, IMemoryCache cache)
         {
@@ -133,7 +122,17 @@ namespace NepseClient.Libraries.MeroShare
             var request = new RestRequest("/api/meroShare/capital");
             return this.AuthorizeGetAsync<MeroshareCapitalResponse[]>(request, ct);
         }
-        public Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(CancellationToken ct = default)
+        public Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(bool useCache = true, CancellationToken ct = default)
+        {
+            if (!useCache) return GetOwnDetailsAsync(ct);
+
+            return Cache.GetOrCreateAsync(CacheKeys.OwnDetail, entry =>
+            {
+                entry.Size = 1;
+                return GetOwnDetailsAsync(ct);
+            });
+        }
+        private Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(CancellationToken ct = default)
         {
             Log.Debug("Getting own details");
             var request = new RestRequest("/api/meroShare/ownDetail/");
@@ -162,11 +161,7 @@ namespace NepseClient.Libraries.MeroShare
         }
         public async Task<MerosharePortfolioResponse> GetMyPortfoliosAsync(int page = 1, int size = 200, CancellationToken ct = default)
         {
-            var me = await Cache.GetOrCreateAsync(CacheKeys.OwnDetail, entry =>
-            {
-                entry.Size = 1;
-                return GetOwnDetailsAsync(ct);
-            });
+            var me = await GetOwnDetailsAsync(true, ct);
             var body = new GetMyPortfolioRequest
             {
                 ClientCode = me.ClientCode,

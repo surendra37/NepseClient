@@ -19,6 +19,8 @@ namespace NepseClient.Modules.TradeManagementSystem
 
             containerRegistry.RegisterForNavigation<PortfolioPage, PortfolioPageViewModel>();
             containerRegistry.RegisterForNavigation<LiveMarketPage, LiveMarketPageViewModel>();
+
+            containerRegistry.RegisterForNavigation<TmsMyInformationPage, TmsMyInformationPageViewModel>();
         }
     }
 }

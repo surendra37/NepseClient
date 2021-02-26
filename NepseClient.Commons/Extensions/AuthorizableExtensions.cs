@@ -96,6 +96,11 @@ namespace NepseClient.Commons.Extensions
                 await service.SignInAsync(ct);
                 response = await service.Client.ExecuteAsync<T>(request, method, ct);
             }
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.Content, response.ErrorException);
+            }
+
             return response.Data;
         }
     }

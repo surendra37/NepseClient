@@ -46,7 +46,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 IsBusy = true;
                 AppCommand.ShowMessage("Getting old application report");
                 var items = await _client.GetOldApplicationReportAsync();
-                Items = items.Object;
+                Items = items?.Object;
                 IsBusy = false;
             }
             catch (Exception ex)

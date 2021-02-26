@@ -46,7 +46,6 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 
                 Title = $"Application Report of {report.CompanyName}";
 
-                Share = await _client.GetAsbaCompanyDetailsAsync(report);
                 if (isOldReport)
                 {
                     Form = await _client.GetOldApplicationReportDetailsAsync(report);
@@ -55,6 +54,8 @@ namespace NepseClient.Modules.MeroShare.ViewModels
                 {
                     Form = await _client.GetApplicantFormReportDetailAsync(report);
                 }
+                
+                Share = await _client.GetAsbaCompanyDetailsAsync(report);
             }
             catch (Exception ex)
             {
