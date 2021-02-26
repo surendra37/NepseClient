@@ -29,6 +29,17 @@ namespace NepseClient.Libraries.MeroShare
         public IRestClient Client { get; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
         public IMemoryCache Cache { get; }
+        public MeroshareOwnDetailResponse Me
+        {
+            get
+            {
+                return Cache.GetOrCreate(CacheKeys.OwnDetail, entry =>
+                {
+                    entry.Size = 1;
+                    return GetOwnDetailsAsync().GetAwaiter().GetResult();
+                });
+            }
+        }
 
         public MeroshareClient(IConfiguration configuration, IMemoryCache cache)
         {
@@ -136,21 +147,18 @@ namespace NepseClient.Libraries.MeroShare
             return this.AuthorizeGetAsync<string[]>(request, ct);
         }
 
-        public MeroshareViewMyPurchaseResponse ViewMyPurchase(MeroshareViewMyPurchaseRequest body)
+        public Task<MeroshareViewMyPurchaseResponse> ViewMyPurchaseAsync(MeroshareViewMyPurchaseRequest body, CancellationToken ct = default)
         {
             Log.Debug("View my purchase");
             var request = new RestRequest("/api/myPurchase/view/");
             request.AddJsonBody(body);
-            var response = this.AuthorizedPost<MeroshareViewMyPurchaseResponse>(request);
-            return response.Data;
+            return this.AuthorizePostAsync<MeroshareViewMyPurchaseResponse>(request, ct);
         }
-
-        public MeroshareSearchMyPurchaseRespose[] SearchMyPurchase(MeroshareViewMyPurchaseRequest body)
+        public Task<MeroshareSearchMyPurchaseRespose[]> SearchMyPurchase(MeroshareViewMyPurchaseRequest body, CancellationToken ct = default)
         {
             var request = new RestRequest("/api/myPurchase/search/");
             request.AddJsonBody(body);
-            var response = this.AuthorizedPost<MeroshareSearchMyPurchaseRespose[]>(request);
-            return response.Data;
+            return this.AuthorizePostAsync<MeroshareSearchMyPurchaseRespose[]>(request, ct);
         }
         public async Task<MerosharePortfolioResponse> GetMyPortfoliosAsync(int page = 1, int size = 200, CancellationToken ct = default)
         {

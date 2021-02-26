@@ -13,11 +13,13 @@ namespace NepseClient.Libraries.NepalStockExchange.Contexts
             LastUpdated = new LastUpdatedContext(this);
             TodayPrice = new TodayPriceContext(this, LastUpdated);
             Watchlist = new WatchlistContext(this);
+            Wacc = new WaccContext(this);
         }
 
         public TodayPriceContext TodayPrice { get; set; }
         public WatchlistContext Watchlist { get; set; }
         public LastUpdatedContext LastUpdated { get; set; }
+        public WaccContext Wacc { get; set; }
         public abstract IDbConnection GetConnection();
         public abstract IDbConnection GetConnectionReadOnly();
     }

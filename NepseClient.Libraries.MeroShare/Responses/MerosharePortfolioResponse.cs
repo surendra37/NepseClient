@@ -13,8 +13,11 @@ namespace NepseClient.Libraries.MeroShare.Models.Responses
         public string ValueAsOfPreviousClosingPrice { get; set; }
         public double ValueOfLastTransPrice { get; set; }
         public double ValueOfPrevClosingPrice { get; set; }
+        public double AverageBuyRate { get; set; }
         public double Change => LastTransactionPrice - PreviousClosingPrice;
         public double TotalChange => ValueOfLastTransPrice - ValueOfPrevClosingPrice;
+        public double Profit => LastTransactionPrice - AverageBuyRate;
+        public double TotalProfit => Profit * CurrentBalance;
     }
 
     public class MerosharePortfolioResponse

@@ -1,6 +1,8 @@
-﻿namespace NepseClient.Libraries.MeroShare.Models.Responses
+﻿using NepseClient.Commons.Interfaces;
+
+namespace NepseClient.Libraries.MeroShare.Models.Responses
 {
-    public class MeroshareViewMyPurchaseResponse
+    public class MeroshareViewMyPurchaseResponse : IWaccItem
     {
         public double AverageBuyRate { get; set; }
         public string Isin { get; set; }

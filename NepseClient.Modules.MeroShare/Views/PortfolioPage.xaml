@@ -9,11 +9,15 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" av:DesignWidth="506.937">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True"
+        <ToolBar HorizontalContentAlignment="Right">
+            <Button Content="{md:PackIcon Kind=Import}" ToolTip="Import Wacc" Command="{Binding LoadWaccCommand}"/>
+        </ToolBar>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="True"
                   behaviors:DataGridBehavior.DisplayRowNumber="True"
                   HeadersVisibility="All">
             <DataGrid.Columns>
@@ -25,6 +29,18 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Quantity" Binding="{Binding CurrentBalance, StringFormat=N0}" CellStyle="{StaticResource RightCellStyle}" />
+                <DataGridTemplateColumn Header="Buy Rate" CellStyle="{StaticResource RightCellStyle}"
+                                        CanUserSort="True" SortMemberPath="LastTransactionPrice">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock ToolTip="{Binding Profit, StringFormat=N2, Mode=OneWay}" 
+                                       Foreground="{Binding Profit, Converter={StaticResource PolarBrushConverter}}">
+                                    <Run Text="{Binding AverageBuyRate, StringFormat=N0, Mode=OneWay}" />
+                                   <md:PackIcon Kind="{Binding Profit, Converter={StaticResource PolarPackIconKindConverter}}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="LTP" CellStyle="{StaticResource RightCellStyle}"
                                         CanUserSort="True" SortMemberPath="LastTransactionPrice">
                     <DataGridTemplateColumn.CellTemplate>
@@ -37,21 +53,19 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Total" CellStyle="{StaticResource RightCellStyle}"
-                                        CanUserSort="True" SortMemberPath="ValueOfLastTransPrice">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding ValueOfLastTransPrice, StringFormat=N0}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Total" CellStyle="{StaticResource RightCellStyle}"
+                                        CanUserSort="True" SortMemberPath="ValueOfLastTransPrice"
+                                        Binding="{Binding ValueOfLastTransPrice, StringFormat=N0}" />
                 <DataGridTextColumn Header="Daily Gain" 
                                     Binding="{Binding TotalChange, StringFormat=N0}" 
+                                    CellStyle="{StaticResource RightCellStyle}" />
+                <DataGridTextColumn Header="Total Gain" 
+                                    Binding="{Binding TotalProfit, StringFormat=N0}" 
                                     CellStyle="{StaticResource RightCellStyle}" />
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock FontSize="18">
                 <Run Text="Total #:" FontWeight="Bold"/>
                 <Run Text="{Binding TotalItems, StringFormat=N0, Mode=OneWay}" av:Text="99"/>
@@ -71,8 +85,17 @@
                 <md:PackIcon 
                     Kind="{Binding DailyProfit, Converter={StaticResource PolarPackIconKindConverter}, Mode=OneWay}"/>
             </TextBlock>
+            <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+            <TextBlock FontSize="18" 
+                       Foreground="{Binding TotalProfit, Converter={StaticResource PolarBrushConverter}}">
+                <Run Text="Total Gain:"  FontWeight="Bold"/>
+                <Run Text="{Binding TotalProfit, StringFormat=N0, Mode=OneWay}" 
+                     av:Text="990"/>
+                <md:PackIcon 
+                    Kind="{Binding TotalProfit, Converter={StaticResource PolarPackIconKindConverter}, Mode=OneWay}"/>
+            </TextBlock>
         </StackPanel>
-        <views:PaginationNavigationUC Grid.Row="2" />
+        <views:PaginationNavigationUC Grid.Row="3" />
     </Grid>
 
 </UserControl>
