@@ -26,7 +26,6 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         }
 
         private ApplicantFormReportDetail _form;
-
         public ApplicantFormReportDetail Form
         {
             get { return _form; }
@@ -37,25 +36,14 @@ namespace NepseClient.Modules.MeroShare.ViewModels
 
         public void OnDialogClosed() { }
 
-        public async void OnDialogOpened(IDialogParameters parameters)
+        public void OnDialogOpened(IDialogParameters parameters)
         {
             try
             {
                 var report = parameters.GetReport();
-                var isOldReport = parameters.GetReportType();
-                
                 Title = $"Application Report of {report.CompanyName}";
-
-                if (isOldReport)
-                {
-                    Form = await _client.GetOldApplicationReportDetailsAsync(report);
-                }
-                else
-                {
-                    Form = await _client.GetApplicantFormReportDetailAsync(report);
-                }
-                
-                Share = await _client.GetAsbaCompanyDetailsAsync(report);
+                Form = parameters.GetFormDetail();
+                Share = parameters.GetShareReport();
             }
             catch (Exception ex)
             {

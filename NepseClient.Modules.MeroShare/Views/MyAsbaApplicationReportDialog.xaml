@@ -7,70 +7,80 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              mc:Ignorable="av"            
              prism:ViewModelLocator.AutoWireViewModel="True"
-             av:DesignWidth="816.001" av:DesignHeight="512"
-             FontSize="20">
-    <StackPanel Margin="16" MinWidth="800" MinHeight="500">
-        <TextBlock TextTrimming="CharacterEllipsis">
-            <Run Text="{Binding Share.CompanyName}" av:Text="Nepal Infrastructure Bank Ltd"/>
-            -
-            <Run Text="{Binding Share.SubGroup}" av:Text="General Public" />
-            (
-            <Run Text="{Binding Share.Scrip}" av:Text="NIFRA" />
-            )
-            <Run Text="{Binding Share.ShareTypeName}" Background="AliceBlue" av:Text="IPO" />
-            =>
-            <Run Text="{Binding Share.ShareGroupName}" av:Text="Ordinary Shares"/>
-        </TextBlock>
-        <Separator />
-        <UniformGrid Columns="3">
-            <TextBlock Text="Issue Manager" FontWeight="Bold" />
-            <TextBlock Text="Issue Open Date" FontWeight="Bold" />
-            <TextBlock Text="Issue Close Date" FontWeight="Bold" />
-
-            <TextBlock Text="{Binding Share.ClientName}" av:Text="NIBL ACE CAPITAL LTD - 1" TextTrimming="CharacterEllipsis"/>
-            <TextBlock Text="{Binding Share.MinIssueOpenDate}" av:Text="2021-01-15 10:00:00 AM"/>
-            <TextBlock Text="{Binding Share.MaxIssueCloseDate}" av:Text="2021-01-19 05:00:00 PM"/>
-
-            <TextBlock Text="No. of Share Issued" FontWeight="Bold" />
-            <TextBlock Text="Price Per Share" FontWeight="Bold" />
-            <TextBlock Text="Minimum Quantity" FontWeight="Bold" />
-
-            <TextBlock Text="{Binding Share.MaxUnit}" av:Text="8000000" />
-            <TextBlock Text="{Binding Share.SharePerUnit}" av:Text="100" />
-            <TextBlock Text="{Binding Share.MinUnit}" av:Text="10" />
-
-
-            <TextBlock Text="Maximum Quantity" FontWeight="Bold" />
-            <TextBlock Text="" />
-            <TextBlock Text="" />
-
-            <TextBlock Text="{Binding Share.MaxUnit}" av:Text="2000000" />
-        </UniformGrid>
-        <Separator />
-        <UniformGrid Columns="2">
-            <TextBlock Text="Applied Quantity" FontWeight="Bold"/>
-            <TextBlock Text="{Binding Form.AppliedKitta}" av:Text="100" />
-
-            <TextBlock Text="Amount" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.Amount}" av:Text="10000" />
-
-            <TextBlock Text="Bank" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.ClientName}" av:Text="NICA BANK LTD" />
-
-            <TextBlock Text="Branch" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.RegisteredBranchName}" av:Text="Nica bank ltd-Pulchowk branch" />
-
-            <TextBlock Text="Account Number" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.AccountNumber}" av:Text="4712242342343" />
-
-            <TextBlock Text="Application Submitted Date" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.AppliedDate}" av:Text="Jan 16, 2021" />
-
-            <TextBlock Text="Status" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.StatusName}" av:Text="Verified" />
-
-            <TextBlock Text="Remarks" FontWeight="Bold" />
-            <TextBlock Text="{Binding Form.ReasonOrRemark}" av:Text="Block Amount Status-Amount Blocked" />
-        </UniformGrid>
-    </StackPanel>
+             av:DesignWidth="816.001" av:DesignHeight="1136"
+             FontSize="18">
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="SizeToContent" Value="Manual" />
+            <Setter Property="Width" Value="512" />
+            <Setter Property="Width" Value="600" />
+        </Style>
+    </prism:Dialog.WindowStyle>
+    <UserControl.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <Setter Property="IsReadOnly" Value="True" />
+        </Style>
+        <Style TargetType="md:Card">
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Margin" Value="0 0 0 8" />
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <md:Card>
+                <WrapPanel>
+                    <TextBox Text="{Binding Share.CompanyName}" av:Text="Nepal Infrastructure Bank Ltd"
+                 md:HintAssist.Hint="Company"/>
+                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <TextBox Text="{Binding Share.SubGroup}" av:Text="General Public"
+                 md:HintAssist.Hint="Sub Group"/>
+                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <TextBox Text="{Binding Share.Scrip}" av:Text="NIFRA"
+                 md:HintAssist.Hint="Scrip"/>
+                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <TextBox Text="{Binding Share.ShareTypeName}" av:Text="IPO"
+                 md:HintAssist.Hint="Type"/>
+                    <Separator Style="{StaticResource VerticalSeparatorStyle}"/>
+                    <TextBox Text="{Binding Share.ShareGroupName}" av:Text="Ordinary Shares"
+                 md:HintAssist.Hint="Group"/>
+                </WrapPanel>
+            </md:Card>
+            <md:Card>
+                <StackPanel>
+                    <TextBox Text="{Binding Form.AppliedKitta}" av:Text="10" 
+                 md:HintAssist.Hint="Applied Quantity"/>
+                    <TextBox Text="{Binding Form.Amount}" av:Text="10000" 
+                     md:HintAssist.Hint="Amount"/>
+                    <TextBox Text="{Binding Form.ClientName}" av:Text="NICA BANK LTD" 
+                 md:HintAssist.Hint="Bank"/>
+                    <TextBox Text="{Binding Form.RegisteredBranchName}" av:Text="Nica bank ltd-Pulchowk branch" 
+                 md:HintAssist.Hint="Branch"/>
+                    <TextBox Text="{Binding Form.AccountNumber}" av:Text="4712242342343" 
+                 md:HintAssist.Hint="Account Number"/>
+                    <TextBox Text="{Binding Form.AppliedDate}" av:Text="Jan 16, 2021" 
+                 md:HintAssist.Hint="Application Submitted Date"/>
+                    <TextBox Text="{Binding Form.StatusName}" av:Text="Verified" 
+                 md:HintAssist.Hint="Status"/>
+                    <TextBox Text="{Binding Form.ReasonOrRemark}" av:Text="Block Amount Status-Amount Blocked" 
+                 md:HintAssist.Hint="Remarks"/>
+                </StackPanel>
+            </md:Card>
+            <md:Card>
+                <StackPanel>
+                    <TextBox Text="{Binding Share.ClientName}" av:Text="NIBL ACE CAPITAL LTD - 1" 
+                   md:HintAssist.Hint="Issue Manager"/>
+                    <TextBox Text="{Binding Share.MinIssueOpenDate}" av:Text="2021-01-15 10:00:00 AM"
+                   md:HintAssist.Hint="Issue Open Date"/>
+                    <TextBox Text="{Binding Share.MaxIssueCloseDate}" av:Text="2021-01-19 05:00:00 PM"
+                   md:HintAssist.Hint="Issue Close Date"/>
+                    <TextBox Text="{Binding Share.MaxUnit}" av:Text="8000000" 
+                 md:HintAssist.Hint="No. of Share Issued"/>
+                    <TextBox Text="{Binding Share.SharePerUnit}" av:Text="100" 
+                 md:HintAssist.Hint="Price Per Share"/>
+                    <TextBox Text="{Binding Share.MinUnit}" av:Text="10" 
+                 md:HintAssist.Hint="Minimum Quantity"/>
+                </StackPanel>
+            </md:Card>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

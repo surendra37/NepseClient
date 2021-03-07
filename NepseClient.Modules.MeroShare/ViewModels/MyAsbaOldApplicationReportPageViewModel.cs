@@ -62,25 +62,28 @@ namespace NepseClient.Modules.MeroShare.ViewModels
         public DelegateCommand<ApplicationReportItem> ViewReportCommand =>
             _viewReportCommand ?? (_viewReportCommand = new DelegateCommand<ApplicationReportItem>(ExecuteViewReportCommand));
 
-        void ExecuteViewReportCommand(ApplicationReportItem report)
+        async void ExecuteViewReportCommand(ApplicationReportItem report)
         {
             try
             {
-                AppCommand.ShowMessage("Getting application report");                
+                AppCommand.ShowMessage("Getting application report");
+
+                var form = await _client.GetOldApplicationReportDetailsAsync(report);
+                var share = await _client.GetAsbaCompanyDetailsAsync(report);
 
                 var dialogParams = new DialogParameters()
+                    .AddShareReport(share)
+                    .AddApplicantFormDetail(form)
                     .AddReport(report, true);
+                AppCommand.HideMessage();
 
-                _dialog.ShowDialog(nameof(MyAsbaApplicationReportDialog), dialogParams, result =>
-                {
-
-                });
+                _dialog.ShowDialog(nameof(MyAsbaApplicationReportDialog), dialogParams, null);
             }
             catch (Exception ex)
             {
+                AppCommand.HideMessage();
                 LogErrorAndEnqueMessage(ex, "Failed to view report");
             }
-            AppCommand.HideMessage();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MaterialDesignThemes.Wpf;
 
+using NepseApp.Models;
 using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
@@ -73,6 +74,74 @@ namespace NepseApp.ViewModels
                 _updateUIEvent.Publish(nameof(RegionNames.SideNavRegion));
             }
         }
+
+        public bool IsLoggedIn
+        {
+            get
+            {
+                return ViewType switch
+                {
+                    ViewType.MeroShare => _meroshareClient.IsAuthenticated,
+                    ViewType.Tms => _client.IsAuthenticated,
+                    ViewType.Stocks => true,
+                    _ => false,
+                };
+            }
+        }
+
+        #region Views
+        private ViewType _viewType = ViewType.MeroShare;
+        public ViewType ViewType
+        {
+            get { return _viewType; }
+            set
+            {
+                if (SetProperty(ref _viewType, value))
+                {
+                    UpdateRegions(ViewType);
+                    RaisePropertyChanged(nameof(IsTmsViewSelected));
+                    RaisePropertyChanged(nameof(IsMeroShareViewSelected));
+                    RaisePropertyChanged(nameof(IsStockViewSelected));
+                }
+            }
+        }
+
+        public bool IsMeroShareViewSelected
+        {
+            get => ViewType == ViewType.MeroShare;
+            set => ViewType = ViewType.MeroShare;
+        }
+
+        public bool IsTmsViewSelected
+        {
+            get => ViewType == ViewType.Tms;
+            set => ViewType = ViewType.Tms;
+        }
+
+        public bool IsStockViewSelected
+        {
+            get => ViewType == ViewType.Stocks;
+            set => ViewType = ViewType.Stocks;
+        }
+
+        private void UpdateRegions(ViewType type)
+        {
+            switch (type)
+            {
+                case ViewType.MeroShare:
+                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "MeroShareNavPage");
+                    break;
+                case ViewType.Tms:
+                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "StocksNavPage");
+                    break;
+                case ViewType.Stocks:
+                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "TmsNavPage");
+                    break;
+                default:
+                    break;
+            }
+        }
+        #endregion
 
         public MainWindowViewModel(IRegionManager regionManager, IApplicationCommand applicationCommand,
             TmsClient nepse, IDialogService dialog, IEventAggregator events, DatabaseContext database,
