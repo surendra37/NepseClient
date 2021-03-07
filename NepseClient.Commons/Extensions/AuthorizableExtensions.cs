@@ -83,7 +83,6 @@ namespace NepseClient.Commons.Extensions
             {
                 await service.SignInAsync(ct);
             }
-
             var response = await service.Client.ExecuteAsync<T>(request, method, ct);
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {

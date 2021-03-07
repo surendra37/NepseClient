@@ -6,6 +6,7 @@ using NepseApp.Views;
 
 using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
+using NepseClient.Commons.Interfaces;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Views;
 
@@ -86,6 +87,7 @@ namespace NepseApp
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IStorage, Storage>();
             var cache = new MemoryCache(new MemoryCacheOptions
             {
                 SizeLimit = 1024

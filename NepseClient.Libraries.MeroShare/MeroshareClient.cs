@@ -8,6 +8,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Extensions;
+using NepseClient.Commons.Interfaces;
 using NepseClient.Commons.Utils;
 using NepseClient.Libraries.MeroShare.Constants;
 using NepseClient.Libraries.MeroShare.Models.Requests;
@@ -23,18 +24,29 @@ namespace NepseClient.Libraries.MeroShare
 {
     public class MeroshareClient : IAuthorizable, IRestAuthorizableAsync
     {
+        private const string _authKey = "meroshare_key";
         private readonly IMeroShareConfiguration _configuration;
+        private readonly IStorage _storage;
+
         public bool IsAuthenticated { get; set; }
 
         public IRestClient Client { get; }
         public Func<MeroshareAuthRequest> PromptCredential { get; set; }
         public IMemoryCache Cache { get; }
 
-        public MeroshareClient(IConfiguration configuration, IMemoryCache cache)
+        public MeroshareClient(IConfiguration configuration, IMemoryCache cache, IStorage storage)
         {
             _configuration = configuration.Meroshare;
+            _storage = storage;
             Client = RestClientUtils.CreateNewClient("https://backend.cdsc.com.np");
             Cache = cache;
+
+            if (_storage.LocalStorage.TryGetValue(_authKey, out var value))
+            {
+                IsAuthenticated = true;
+                Client.Authenticator = new MeroshareAuthenticator(value);
+                Client.CookieContainer = _storage.Container;
+            }
         }
 
         #region Authentication
@@ -88,6 +100,8 @@ namespace NepseClient.Libraries.MeroShare
             if (string.IsNullOrEmpty(authHeader))
                 throw new AuthenticationException("Authorization header not found");
             Client.Authenticator = new MeroshareAuthenticator(authHeader);
+            _storage.LocalStorage[_authKey] = authHeader;
+            _storage.Save();
             Log.Debug("Signed In");
         }
         public async Task SignOutAsync(CancellationToken ct = default)
@@ -120,7 +134,7 @@ namespace NepseClient.Libraries.MeroShare
         {
             Log.Debug("Getting capitals");
             var request = new RestRequest("/api/meroShare/capital");
-            return this.AuthorizeGetAsync<MeroshareCapitalResponse[]>(request, ct);
+            return Client.GetAsync<MeroshareCapitalResponse[]>(request, ct);
         }
         public Task<MeroshareOwnDetailResponse> GetOwnDetailsAsync(bool useCache = true, CancellationToken ct = default)
         {

@@ -26,6 +26,13 @@ namespace NepseClient.Libraries.NepalStockExchange.Contexts
             _context = context;
         }
 
+        public async Task<int> Clear()
+        {
+            using var connection = GetConnection();
+            var deleted = await connection.ExecuteAsync(DeleteQuery);
+            return deleted;
+        }
+
         public async Task<bool> Insert(IWaccItem item)
         {
             using var connection = GetConnection();

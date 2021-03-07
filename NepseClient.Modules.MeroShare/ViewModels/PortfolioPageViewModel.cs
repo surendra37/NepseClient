@@ -89,6 +89,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
 
                 AppCommand.ShowMessage("Loading wacc...");
                 var me = await _client.GetOwnDetailsAsync(true);
+                await _database.Clear();
                 foreach (var item in Items)
                 {
                     var request = new MeroshareViewMyPurchaseRequest

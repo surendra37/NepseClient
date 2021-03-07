@@ -1,8 +1,12 @@
 ﻿using NepseClient.Commons.Contracts;
+using NepseClient.Commons.Extensions;
+using NepseClient.Commons.Interfaces;
 using NepseClient.Commons.Utils;
 using NepseClient.Libraries.TradeManagementSystem.Models;
 using NepseClient.Libraries.TradeManagementSystem.Requests;
 using NepseClient.Libraries.TradeManagementSystem.Responses;
+
+using Newtonsoft.Json;
 
 using RestSharp;
 using RestSharp.Authenticators;
@@ -10,6 +14,7 @@ using RestSharp.Authenticators;
 using Serilog;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
@@ -17,28 +22,40 @@ using System.Threading.Tasks;
 
 namespace NepseClient.Libraries.TradeManagementSystem
 {
-    public class TmsClient
+    public class TmsClient : IRestAuthorizableAsync
     {
         private readonly ITmsConfiguration _configuration;
-        public AuthenticationDataResponse AuthData { get; private set; }
+        private readonly IStorage _storage;
+        private readonly string _sessionKey = "__usrsession__";
+
+        public AuthenticationDataResponse AuthData
+        {
+            get
+            {
+                var success = _storage.LocalStorage.TryGetValue(_sessionKey, out var value);
+                if (success) return JsonConvert.DeserializeObject<AuthenticationDataResponse>(value);
+
+                IsAuthenticated = false;
+                return null;
+            }
+        }
         public bool IsAuthenticated { get; set; }
         public IRestClient Client { get; private set; }
 
-        public TmsClient(IConfiguration config)
+        public TmsClient(IConfiguration config, IStorage storage)
         {
             _configuration = config.Tms;
+            _storage = storage;
             Client = RestClientUtils.CreateNewClient(config.Tms.BaseUrl);
-        }
-
-        private void Authorize()
-        {
-            IsAuthenticated = false;
-
+            Client.CookieContainer = _storage.Container;
+            IsAuthenticated = AuthData is not null;
+            if(IsAuthenticated)
+                Client.Authenticator = GetAuthenticator(AuthData);
         }
 
         private IAuthenticator GetAuthenticator(AuthenticationDataResponse authData)
         {
-            if (authData is null || authData.IsCookieEnabled) 
+            if (authData is null || authData.IsCookieEnabled)
                 return new XsrfTokenAuthenticator(GetXsrfToken(Client));
 
             return new JwtAuthenticator(authData.JsonWebToken);
@@ -117,8 +134,15 @@ namespace NepseClient.Libraries.TradeManagementSystem
                 Log.Warning(response.Content);
                 throw new AuthenticationException(response.Data.Message);
             }
-            AuthData = response.Data.Data;
+            _storage.LocalStorage[_sessionKey] = JsonConvert.SerializeObject(response.Data.Data);
+            foreach (var cookie in response.Cookies)
+            {
+                _storage.Container.Add(Client.BaseUrl, new System.Net.Cookie(cookie.Name, cookie.Value));
+            }
+            Client.CookieContainer = _storage.Container;
             IsAuthenticated = true;
+            _storage.Save();
+
             Client.Authenticator = GetAuthenticator(AuthData);
             Log.Debug("Signed In");
         }
@@ -157,26 +181,10 @@ namespace NepseClient.Libraries.TradeManagementSystem
         #endregion
 
         #region Market
-        public Task<WebSocketResponse<WsSecurityResponse>> GetLiveMarketAsync()
+        public Task<WebSocketResponse<WsSecurityResponse>> GetLiveMarketAsync(CancellationToken ct = default)
         {
             var request = new RestRequest("/tmsapi/rtApi/ws/top25securities");
-            return AuthorizeGet<WebSocketResponse<WsSecurityResponse>>(request);
-        }
-
-        private async Task<T> AuthorizeGet<T>(IRestRequest request)
-        {
-            var response = await Client.ExecuteGetAsync<T>(request);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                Authorize();
-                response = await Client.ExecuteGetAsync<T>(request);
-            }
-            if (!response.IsSuccessful)
-            {
-                throw new Exception(response.Content, response.ErrorException);
-            }
-
-            return response.Data;
+            return this.AuthorizeGetAsync<WebSocketResponse<WsSecurityResponse>>(request, ct);
         }
         #endregion
     }
