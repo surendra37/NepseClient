@@ -5,6 +5,7 @@ using NepseClient.Libraries.NepalStockExchange;
 using NepseClient.Libraries.NepalStockExchange.Responses;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
+using NepseClient.Modules.Stocks.Models;
 
 using Prism.Commands;
 using Prism.Regions;
@@ -14,13 +15,35 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
-    public class StockContentPageViewModel : ActiveAwareBindableBase, INavigationAware
+    public class StockContentPageViewModel : ActiveAwareBindableBase
     {
         private readonly ServiceClient _client;
-        private int _id;
+
+        private IEnumerable<SecurityResponse> _securities;
+        public IEnumerable<SecurityResponse> Securities
+        {
+            get { return _securities; }
+            set { SetProperty(ref _securities, value); }
+        }
+
+        private SecurityResponse _selectedSecurity;
+        public SecurityResponse SelectedSecurity
+        {
+            get { return _selectedSecurity; }
+            set
+            {
+                if (SetProperty(ref _selectedSecurity, value))
+                {
+                    RefreshCommand.Execute();
+                }
+            }
+        }
+
+        public SecuritiesSearchSuggestionsSource SearchSuggestionsSource { get; } = new SecuritiesSearchSuggestionsSource();
 
         #region Details
         private CorporteActionResponse[] _corporteActions;
@@ -37,6 +60,7 @@ namespace NepseClient.Modules.Stocks.ViewModels
             set { SetProperty(ref _security, value); }
         }
         #endregion
+
         public Func<double, string> Formatter { get; }
         public CartesianMapper<GraphResponse> ClosePriceConfiguration { get; }
         public FinancialMapper<GraphResponse> OhlcConfiguration { get; }
@@ -92,20 +116,8 @@ namespace NepseClient.Modules.Stocks.ViewModels
             ClosePriceValues = new ChartValues<GraphResponse>();
 
             Formatter = value => new DateTime((long)(value * TimeSpan.FromDays(1).Ticks)).ToString("d");
-        }
 
-        public bool IsNavigationTarget(NavigationContext navigationContext) => true;
-
-        public void OnNavigatedFrom(NavigationContext navigationContext)
-        {
-
-        }
-
-        public void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            var success = navigationContext.Parameters.TryGetValue("Id", out _id);
-            if (!success) return;
-            RefreshCommand.Execute();
+            RefreshSecuritiesCommand.Execute();
         }
 
         public override void ExecuteRefreshCommand()
@@ -158,10 +170,30 @@ namespace NepseClient.Modules.Stocks.ViewModels
 
         private void UpdateData()
         {
-            Security = _client.GetSecurityDetail(_id);
-            Items = _client.GetGraphData(_id);
-            CorporteActions = _client.GetCorporateActions(_id);
+            if (SelectedSecurity is null) return;
+
+            var id = SelectedSecurity.Id;
+            Security = _client.GetSecurityDetail(id);
+            Items = _client.GetGraphData(id);
+            CorporteActions = _client.GetCorporateActions(id);
             LastPrice = Items.LastOrDefault()?.ClosePrice ?? 0;
+        }
+
+        private DelegateCommand _refreshSecuritiesCommand;
+        public DelegateCommand RefreshSecuritiesCommand =>
+            _refreshSecuritiesCommand ?? (_refreshSecuritiesCommand = new DelegateCommand(ExecuteRefreshSecuritiesCommand));
+
+        async void ExecuteRefreshSecuritiesCommand()
+        {
+            try
+            {
+                Securities = await Task.Run(() => _client.GetSecurities());
+                SearchSuggestionsSource.UpdateSecurities(Securities);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load securities");
+            }
         }
     }
 }

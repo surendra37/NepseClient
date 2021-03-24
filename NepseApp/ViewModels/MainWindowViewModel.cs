@@ -132,10 +132,10 @@ namespace NepseApp.ViewModels
                     _regionManager.RequestNavigate(RegionNames.SideNavRegion, "MeroShareNavPage");
                     break;
                 case ViewType.Tms:
-                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "StocksNavPage");
+                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "TmsNavPage");
                     break;
                 case ViewType.Stocks:
-                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "TmsNavPage");
+                    _regionManager.RequestNavigate(RegionNames.SideNavRegion, "StocksNavPage");
                     break;
                 default:
                     break;

@@ -3,13 +3,29 @@
              xmlns:prism="http://prismlibrary.com/"             
              xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="NepseClient.Modules.Stocks.Views.StockContentPage"             
              prism:ViewModelLocator.AutoWireViewModel="True" av:DesignWidth="828.4" av:DesignHeight="660.663"
-             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="8">
+                <TextBlock Text="Stock Symbol => " VerticalAlignment="Center" FontWeight="Bold" Margin="8 0"/>
+                <ComboBox ItemsSource="{Binding Securities}" 
+                          SelectedItem="{Binding SelectedSecurity}" 
+                          md:HintAssist.Hint="Select Security"
+                          DisplayMemberPath="Symbol"
+                          Width="196"/>
+
+                <Button Grid.Column="1" Content="{md:PackIcon Kind=Refresh}" 
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        Command="{Binding RefreshSecuritiesCommand}"
+                        VerticalAlignment="Center"/>
+            </StackPanel>
+
             <Grid Margin="8 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

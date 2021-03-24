@@ -7,10 +7,11 @@
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>../assets/nepse_tms.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>app.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.0.7</AssemblyVersion>
-    <FileVersion>1.0.0.6</FileVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>default</LangVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>

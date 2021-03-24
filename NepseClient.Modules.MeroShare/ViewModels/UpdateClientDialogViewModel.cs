@@ -61,6 +61,7 @@ namespace NepseClient.Modules.MeroShare.ViewModels
             {
                 var id = SelectedItem?.Id;
                 _config.Meroshare.ClientId = id;
+                _config.Meroshare.Save();
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
             }
             catch (Exception ex)

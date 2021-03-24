@@ -7,6 +7,7 @@ using Prism.Commands;
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace NepseClient.Modules.Stocks.ViewModels
 {
@@ -28,14 +29,14 @@ namespace NepseClient.Modules.Stocks.ViewModels
             RefreshCommand.Execute();
         }
 
-        protected override void Navigate(int page)
+        protected override async void Navigate(int page)
         {
 
             try
             {
-                var live = _service.GetLiveMarket();
+                //    var live = _service.GetLiveMarket();
                 IsBusy = true;
-                var notices = _service.GetNotices(page - 1);
+                var notices = await Task.Run(() => _service.GetNotices(page - 1));
                 foreach (var item in notices.Content)
                 {
                     item.OpenAttachmentCommand = OpenAttachmentCommand;

@@ -51,7 +51,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Menu Grid.Row="0" Grid.ColumnSpan="3" IsMainMenu="True">
+        <Menu Grid.Row="0" Grid.ColumnSpan="3" IsMainMenu="True" Visibility="Collapsed">
             <MenuItem Header="File" >
                 <MenuItem Header="TMS">
                     <MenuItem Header="Update Base URL" Command="{Binding UpdateTmsBaseUrl}" Icon="{md:PackIcon Kind=Web}" />
@@ -77,16 +77,6 @@
             <MenuItem Header="Edit" />
             <MenuItem Header="View" >
                 <MenuItem Header="Refresh" Icon="{md:PackIcon Kind=Refresh}" Command="{Binding ApplicationCommand.RefreshCommand}" InputGestureText="F5"/>
-                <Separator />
-                <MenuItem Header="Show Notices" IsCheckable="True" IsChecked="{Binding ShowNotices}"/>
-                <MenuItem Header="Show Floorsheets" IsCheckable="True" IsChecked="{Binding ShowFloorsheets}"/>
-                <Separator/>
-                <MenuItem x:Name="StockMenu" Header="Stocks" IsCheckable="True" 
-                          IsChecked="{Binding IsStockViewSelected}"/>
-                <MenuItem x:Name="TmsMenu" Header="TMS" IsCheckable="True" 
-                          IsChecked="{Binding IsTmsViewSelected}"/>
-                <MenuItem x:Name="MeroShareMenu" Header="MeroShare" IsCheckable="True" 
-                          IsChecked="{Binding IsMeroShareViewSelected}"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem Header="About" />

@@ -1,4 +1,6 @@
-﻿using NepseClient.Commons.Constants;
+﻿using MaterialDesignExtensions.Model;
+
+using NepseClient.Commons.Constants;
 using NepseClient.Commons.Contracts;
 using NepseClient.Commons.Interfaces;
 using NepseClient.Libraries.NepalStockExchange;
@@ -8,6 +10,7 @@ using NepseClient.Modules.Commons.Events;
 using NepseClient.Modules.Commons.Interfaces;
 using NepseClient.Modules.Commons.Models;
 using NepseClient.Modules.Stocks.Adapters;
+using NepseClient.Modules.Stocks.Models;
 using NepseClient.Modules.Stocks.Views;
 
 using Prism.Commands;
@@ -37,6 +40,8 @@ namespace NepseClient.Modules.Stocks.ViewModels
             get { return _marketStatusText; }
             set { SetProperty(ref _marketStatusText, value); }
         }
+
+        
 
         #region Side Nav
         private string _searchText;

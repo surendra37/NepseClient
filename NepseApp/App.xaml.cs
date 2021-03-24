@@ -48,9 +48,9 @@ namespace NepseApp
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             base.OnStartup(e);
 
-            //var regionManager = Container.Resolve<IRegionManager>();
-            ////regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(NepseClient.Modules.Stocks.Views.SideNavPage));
-            //regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(NepseClient.Modules.MeroShare.Views.SideNavPage));
+            var regionManager = Container.Resolve<IRegionManager>();
+            //regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(NepseClient.Modules.Stocks.Views.SideNavPage));
+            regionManager.RegisterViewWithRegion(RegionNames.SideNavRegion, typeof(SideNavPage));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
